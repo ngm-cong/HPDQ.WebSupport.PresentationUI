@@ -1,0 +1,158 @@
+﻿@using System.Security.Claims
+@{
+    ViewData["Title"] = "Danh sách yêu cầu";
+    var email = User.FindFirst(ClaimTypes.Email)?.Value
+        ?? User.FindFirst("preferred_username")?.Value
+        ?? User.FindFirst("upn")?.Value;
+}
+@model IEnumerable<HPDQ.WebSupport.DataEntitites.Ticket>
+<link rel="stylesheet" href="~/css/contentlist.css" />
+<h3>DANH SÁCH YÊU CẦU</h3>
+<div class="contentlist" id="contentlist">
+    @foreach (var model in (Model ?? new List<HPDQ.WebSupport.DataEntitites.Ticket>()))
+    {
+        <div class="item" tag="@(model.Id)">
+            <div class="card-title">[@(model.CreatedOn.ToString("HH:mm dd/MM/yyyy"))] @(model.Description.Substring(0, Math.Min(model.Description.Length, 100)))</div>
+            <div class="text-container">@(model.Description)<div class="corner-label">@(model.Status)</div></div>
+        </div>
+    }
+    @* <div class="item">
+        <div class="card-title">Tiêu đề</div>
+        <div class="text-container">Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123<div class="corner-label">Mới tạo</div></div>
+    </div>
+    <div class="item">
+        <div class="card-title">Tiêu đề</div>
+        <div class="text-container">Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123<div class="corner-label">Chờ xử lý</div></div>
+    </div>
+    <div class="item">
+        <div class="card-title">Tiêu đề</div>
+        <div class="text-container">Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123<div class="corner-label">Đã trả lời</div></div>
+    </div>
+    <div class="item">
+        <div class="card-title">Tiêu đề</div>
+        <div class="text-container">Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123<div class="corner-label">Mới tạo</div></div>
+    </div>
+    <div class="item">
+        <div class="card-title">Tiêu đề</div>
+        <div class="text-container">Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123<div class="corner-label">Mới tạo</div></div>
+    </div> *@
+</div>
+<!-- Modal -->
+<div class="modal fade" id="dialogModal" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="myModalLabel">YÊU CẦU</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input id="modelTag" type="hidden" />
+                <partial name="_NewTicket" />
+            </div>
+            @* <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save changes</button>
+            </div> *@
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script src="~/js/fileinput.js"></script>
+    <script src="~/js/ajaxutil.js"></script>
+    <script type="text/javascript">
+        function formatDateTime(input) {
+            // Normalize to 3-digit milliseconds if needed
+            const fixedInput = input.replace(/(\.\d{1,2})(?!\d)/, (match) => {
+                return match.padEnd(4, '0'); // e.g., ".17" → ".170"
+            });
+
+            const date = new Date(fixedInput);
+
+            if (isNaN(date)) return "Invalid date";
+
+            const pad = n => n.toString().padStart(2, '0');
+
+            const hours = pad(date.getHours());
+            const minutes = pad(date.getMinutes());
+            const day = pad(date.getDate());
+            const month = pad(date.getMonth() + 1); // months are 0-based
+            const year = date.getFullYear();
+
+            return `${hours}:${minutes} ${day}/${month}/${year}`;
+        }
+        $(function () {
+            $('#contentlist .item').click(function () {
+                function loadComments(bodydata) {
+                    postData('@WebSupport.Utilities.Globals.APIUrl/Comments/Load', '@WebSupport.Utilities.Globals.APIKey', bodydata, function(response) {
+                        if (response.errorCode != 0)
+                        {
+                            window.location.href = '/Home/Index';
+                            return;
+                        }
+                        $.each(response.data, function(index, value) {
+                            var className = 'item';
+                            if (value.email != '@email') {
+                                className = 'item reply';
+                            }
+                            $('.content.contentlist').append(`<div class="${className}">
+                                <div class="card-title">[${formatDateTime(value.createdOn)}] ${value.email}</div>
+                                <div class="text-container">${value.commentDesc}<div class="corner-label">Đính kèm</div></div>
+                            </div>`);
+                        });
+                        var dialogModal = new bootstrap.Modal(document.getElementById('dialogModal'));
+                        dialogModal.show();
+                    });
+                }
+                var bodydata = {
+                    id: $(this).attr('tag')
+                };
+                postData('@WebSupport.Utilities.Globals.APIUrl/Tickets/Load', '@WebSupport.Utilities.Globals.APIKey', bodydata, function(response) {
+                    if (response.errorCode != 0)
+                    {
+                        window.location.href = '/Home/Index';
+                        return;
+                    }
+                    $('.content.contentlist').html('');
+                    var className = 'item';
+                    if (response.data[0].email != '@email') {
+                        className = 'item reply';
+                    }
+                    $('.content.contentlist').append(`<div class="${className}">
+                        <div class="card-title">[${formatDateTime(response.data[0].createdOn)}] ${response.data[0].email}</div>
+                        <div class="text-container">${response.data[0].description}<div class="corner-label">Đính kèm</div></div>
+                    </div>`);
+                    $('#modelTag').val(bodydata.id);
+
+                    bodydata = {
+                        ticketId: $('#modelTag').val()
+                    };
+                    loadComments(bodydata);
+                });
+            });
+            $('#btnconfirm').click(function () {
+                var bodydata = {
+                    email: '@email',
+                    commentDesc: $('#txtdescription').val(),
+                    ticketId: $('#modelTag').val()
+                };
+                postData('@WebSupport.Utilities.Globals.APIUrl/Comments/Create', '@WebSupport.Utilities.Globals.APIKey', bodydata, function(response) {
+                    if (response.errorCode != 0)
+                    {
+                        alert(response.message);
+                        return;
+                    }
+                    var className = 'item';
+                    if (response.data.email != '@email') {
+                        className = 'item reply';
+                    }
+                    $('.content.contentlist').append(`<div class="${className}">
+                        <div class="card-title">[@DateTime.Now.ToString("HH:mm dd/MM/yyyy")] ${response.data.email}</div>
+                        <div class="text-container">${response.data.commentDesc}<div class="corner-label">Đính kèm</div></div>
+                    </div>`);
+                });
+            });
+            var formData = new FormData();
+            initFileInput();
+        });
+    </script>
+}
