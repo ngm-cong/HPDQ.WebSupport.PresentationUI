@@ -24,7 +24,6 @@
                 var uploadVal = uploadFileInputs('@WebSupport.Utilities.Globals.APIUrl/Upload/Upload', '@WebSupport.Utilities.Globals.APIKey', uploadCompleted, files);
                 uploadCompleted = uploadVal.uploadCompleted;
                 files = uploadVal.files;
-                console.log(files);
 
                 if (uploadCompleted == false) return;
 

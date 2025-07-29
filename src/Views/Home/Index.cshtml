@@ -82,46 +82,43 @@
         }
         $(function () {
             $('#contentlist .item').click(function () {
-                // function loadImages() {
-                //     $('.content.contentlist div.item').each(function(index, element) {
-                //         console.log('Item ' + index + ':', $(this).attr('tagId'));
-                //         var className = $(`.content.contentlist div.item:eq(${index}) div.corner-label`).attr('class');
-                //         console.log(className);
-                //         var bodydata;
-                //         if (index == 0) {
-                //             bodydata = {
-                //                 ticketId: $(this).attr('tagId')
-                //             };
-                //         } else {
-                //             bodydata = {
-                //                 commentId: $(this).attr('tagId')
-                //             };
-                //         }
-                //         console.log(bodydata);
-                //         postData('@WebSupport.Utilities.Globals.APIUrl/Attachments/Load', '@WebSupport.Utilities.Globals.APIKey', bodydata, function(response) {
-                //             if (response.data.length > 0) {
-                //                 $(`.content.contentlist div.item:eq(${index}) div.corner-label`).attr('class', className.replace(' disabled', ''));
-                //                 $.each(response.data, function(index, value) {
-                //                     $.ajax({
-                //                         url: `@WebSupport.Utilities.Globals.APIUrl/Upload/Get/${value.fileName}`,
-                //                         method: 'GET',
-                //                         headers: {
-                //                             'X-API-KEY': '@WebSupport.Utilities.Globals.APIKey'
-                //                         },
-                //                         dataType: 'json',
-                //                         success: function(response) {
-                //                             console.log('Kết quả:', response);
-                //                             $(`.content.contentlist div.item:eq(${index})`).after('<div><img src="" /></div>');
-                //                         },
-                //                         error: function(xhr, status, error) {
-                //                             console.error('Lỗi:', error);
-                //                         }
-                //                     });
-                //                 });
-                //             }
-                //         });
-                //     });
-                // }
+                function loadImages() {
+                    $('.content.contentlist div.item').each(function(index, element) {
+                        var className = $(`.content.contentlist div.item:eq(${index}) div.corner-label`).attr('class');
+                        var bodydata;
+                        if (index == 0) {
+                            bodydata = {
+                                ticketId: $(this).attr('tagId')
+                            };
+                        } else {
+                            bodydata = {
+                                commentId: $(this).attr('tagId')
+                            };
+                        }
+                        postData('@WebSupport.Utilities.Globals.APIUrl/Attachments/Count', '@WebSupport.Utilities.Globals.APIKey', bodydata, function(response) {
+                            if (response.data > 0) {
+                                $(`.content.contentlist div.item:eq(${index}) div.corner-label`).attr('class', className.replace(' disabled', ''));
+                                // $.each(response.data, function(index, value) {
+                                //     $.ajax({
+                                //         url: `@WebSupport.Utilities.Globals.APIUrl/Upload/Get/${value.fileName}`,
+                                //         method: 'GET',
+                                //         headers: {
+                                //             'X-API-KEY': '@WebSupport.Utilities.Globals.APIKey'
+                                //         },
+                                //         dataType: 'json',
+                                //         success: function(response) {
+                                //             console.log('Kết quả:', response);
+                                //             $(`.content.contentlist div.item:eq(${index})`).after('<div><img src="" /></div>');
+                                //         },
+                                //         error: function(xhr, status, error) {
+                                //             console.error('Lỗi:', error);
+                                //         }
+                                //     });
+                                // });
+                            }
+                        });
+                    });
+                }
                 function loadComments(bodydata) {
                     postData('@WebSupport.Utilities.Globals.APIUrl/Comments/Load', '@WebSupport.Utilities.Globals.APIKey', bodydata, function(response) {
                         if (response.errorCode != 0)
@@ -139,7 +136,7 @@
                                 <div class="text-container">${value.commentDesc}<div class="corner-label disabled">Đính kèm</div></div>
                             </div>`);
                         });
-                        // loadImages();
+                        loadImages();
                         var dialogModal = new bootstrap.Modal(document.getElementById('dialogModal'));
                         dialogModal.show();
                     });
@@ -177,7 +174,6 @@
                 var uploadVal = uploadFileInputs('@WebSupport.Utilities.Globals.APIUrl/Upload/Upload', '@WebSupport.Utilities.Globals.APIKey', uploadCompleted, files);
                 uploadCompleted = uploadVal.uploadCompleted;
                 files = uploadVal.files;
-                console.log(files);
 
                 if (uploadCompleted == false) return;
 
