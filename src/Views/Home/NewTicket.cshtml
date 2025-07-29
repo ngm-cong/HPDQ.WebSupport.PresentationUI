@@ -20,28 +20,11 @@
 
                 var uploadCompleted = false;
                 var files;
-                if (formDataFileLength() > 0) {
-                    $.ajax({
-                        url: '@WebSupport.Utilities.Globals.APIUrl/Upload/Upload', // replace with your actual API endpoint
-                        type: 'POST',
-                        headers: {
-                            'X-API-KEY': '@WebSupport.Utilities.Globals.APIKey'
-                        },
-                        data: formData,
-                        contentType: false,
-                        processData: false,
-                        async: false,
-                        success: function (res) {
-                            uploadCompleted = true;
-                            files = res.data;
-                        },
-                        error: function (err) {
-                            console.error("Upload failed", err);
-                        }
-                    });
-                } else {
-                    uploadCompleted = true;
-                }
+
+                var uploadVal = uploadFileInputs('@WebSupport.Utilities.Globals.APIUrl/Upload/Upload', '@WebSupport.Utilities.Globals.APIKey', uploadCompleted, files);
+                uploadCompleted = uploadVal.uploadCompleted;
+                files = uploadVal.files;
+                console.log(files);
 
                 if (uploadCompleted == false) return;
 
@@ -64,7 +47,6 @@
                             alert(response.message);
                             return;
                         }
-                        debugger;
                         window.location.href = '/Home/Index';
                     },
                     error: function(xhr, status, error) {

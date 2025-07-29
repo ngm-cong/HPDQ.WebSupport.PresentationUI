@@ -82,6 +82,46 @@
         }
         $(function () {
             $('#contentlist .item').click(function () {
+                // function loadImages() {
+                //     $('.content.contentlist div.item').each(function(index, element) {
+                //         console.log('Item ' + index + ':', $(this).attr('tagId'));
+                //         var className = $(`.content.contentlist div.item:eq(${index}) div.corner-label`).attr('class');
+                //         console.log(className);
+                //         var bodydata;
+                //         if (index == 0) {
+                //             bodydata = {
+                //                 ticketId: $(this).attr('tagId')
+                //             };
+                //         } else {
+                //             bodydata = {
+                //                 commentId: $(this).attr('tagId')
+                //             };
+                //         }
+                //         console.log(bodydata);
+                //         postData('@WebSupport.Utilities.Globals.APIUrl/Attachments/Load', '@WebSupport.Utilities.Globals.APIKey', bodydata, function(response) {
+                //             if (response.data.length > 0) {
+                //                 $(`.content.contentlist div.item:eq(${index}) div.corner-label`).attr('class', className.replace(' disabled', ''));
+                //                 $.each(response.data, function(index, value) {
+                //                     $.ajax({
+                //                         url: `@WebSupport.Utilities.Globals.APIUrl/Upload/Get/${value.fileName}`,
+                //                         method: 'GET',
+                //                         headers: {
+                //                             'X-API-KEY': '@WebSupport.Utilities.Globals.APIKey'
+                //                         },
+                //                         dataType: 'json',
+                //                         success: function(response) {
+                //                             console.log('Kết quả:', response);
+                //                             $(`.content.contentlist div.item:eq(${index})`).after('<div><img src="" /></div>');
+                //                         },
+                //                         error: function(xhr, status, error) {
+                //                             console.error('Lỗi:', error);
+                //                         }
+                //                     });
+                //                 });
+                //             }
+                //         });
+                //     });
+                // }
                 function loadComments(bodydata) {
                     postData('@WebSupport.Utilities.Globals.APIUrl/Comments/Load', '@WebSupport.Utilities.Globals.APIKey', bodydata, function(response) {
                         if (response.errorCode != 0)
@@ -94,11 +134,12 @@
                             if (value.email != '@email') {
                                 className = 'item reply';
                             }
-                            $('.content.contentlist').append(`<div class="${className}">
+                            $('.content.contentlist').append(`<div class="${className}" tagId="${value.id}">
                                 <div class="card-title">[${formatDateTime(value.createdOn)}] ${value.email}</div>
-                                <div class="text-container">${value.commentDesc}<div class="corner-label">Đính kèm</div></div>
+                                <div class="text-container">${value.commentDesc}<div class="corner-label disabled">Đính kèm</div></div>
                             </div>`);
                         });
+                        // loadImages();
                         var dialogModal = new bootstrap.Modal(document.getElementById('dialogModal'));
                         dialogModal.show();
                     });
@@ -117,9 +158,9 @@
                     if (response.data[0].email != '@email') {
                         className = 'item reply';
                     }
-                    $('.content.contentlist').append(`<div class="${className}">
+                    $('.content.contentlist').append(`<div class="${className}" tagId="${response.data[0].id}">
                         <div class="card-title">[${formatDateTime(response.data[0].createdOn)}] ${response.data[0].email}</div>
-                        <div class="text-container">${response.data[0].description}<div class="corner-label">Đính kèm</div></div>
+                        <div class="text-container">${response.data[0].description}<div class="corner-label disabled">Đính kèm</div></div>
                     </div>`);
                     $('#modelTag').val(bodydata.id);
 
@@ -130,10 +171,21 @@
                 });
             });
             $('#btnconfirm').click(function () {
+                var uploadCompleted = false;
+                var files;
+
+                var uploadVal = uploadFileInputs('@WebSupport.Utilities.Globals.APIUrl/Upload/Upload', '@WebSupport.Utilities.Globals.APIKey', uploadCompleted, files);
+                uploadCompleted = uploadVal.uploadCompleted;
+                files = uploadVal.files;
+                console.log(files);
+
+                if (uploadCompleted == false) return;
+
                 var bodydata = {
                     email: '@email',
                     commentDesc: $('#txtdescription').val(),
-                    ticketId: $('#modelTag').val()
+                    ticketId: $('#modelTag').val(),
+                    files: files
                 };
                 postData('@WebSupport.Utilities.Globals.APIUrl/Comments/Create', '@WebSupport.Utilities.Globals.APIKey', bodydata, function(response) {
                     if (response.errorCode != 0)
@@ -149,9 +201,11 @@
                         <div class="card-title">[@DateTime.Now.ToString("HH:mm dd/MM/yyyy")] ${response.data.email}</div>
                         <div class="text-container">${response.data.commentDesc}<div class="corner-label">Đính kèm</div></div>
                     </div>`);
+
+                    formData = new FormData();
+                    $('#divattachment').html(formDataFileLength());
                 });
             });
-            var formData = new FormData();
             initFileInput();
         });
     </script>

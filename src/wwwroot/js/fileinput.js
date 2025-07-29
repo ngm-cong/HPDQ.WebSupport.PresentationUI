@@ -24,3 +24,36 @@ function initFileInput() {
         $('#imgattachment').show();
     });
 }
+
+function uploadFileInputs(url, apikey) {
+    var uploadCompleted = false;
+    var files;
+
+    if (formDataFileLength() > 0) {
+        $.ajax({
+            url: url, // replace with your actual API endpoint
+            type: 'POST',
+            headers: {
+                'X-API-KEY': apikey
+            },
+            data: formData,
+            contentType: false,
+            processData: false,
+            async: false,
+            success: function (res) {
+                uploadCompleted = true;
+                files = res.data;
+            },
+            error: function (err) {
+                console.error("Upload failed", err);
+            }
+        });
+    } else {
+        uploadCompleted = true;
+    }
+
+    return {
+        uploadCompleted: uploadCompleted,
+        files: files
+    };
+}

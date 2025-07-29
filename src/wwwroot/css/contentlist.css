@@ -33,3 +33,6 @@ div.contentlist .item:not(:last-child) {
     border-radius: 4px;
     /*margin-left: 5px;*/
 }
+.corner-label.disabled {
+    background: #E8E8E8;
+}
