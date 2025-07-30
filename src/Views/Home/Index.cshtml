@@ -56,6 +56,23 @@
         </div>
     </div>
 </div>
+<!-- Modal -->
+<div class="modal fade" id="dialogModalImage" tabindex="-1" aria-labelledby="myModalLabelImage" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 1000px; height: 400px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="myModalLabelImage">HÌNH ẢNH ĐÍNH KÈM</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+            </div>
+            @* <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save changes</button>
+            </div> *@
+        </div>
+    </div>
+</div>
 @section Scripts {
     <script src="~/js/fileinput.js"></script>
     <script src="~/js/ajaxutil.js"></script>
@@ -133,7 +150,7 @@
                             }
                             $('.content.contentlist').append(`<div class="${className}" tagId="${value.id}">
                                 <div class="card-title">[${formatDateTime(value.createdOn)}] ${value.email}</div>
-                                <div class="text-container">${value.commentDesc}<div class="corner-label disabled">Đính kèm</div></div>
+                                <div class="text-container">${value.commentDesc}<div class="corner-label disabled" onclick="showImagePopup(this, false)">Đính kèm</div></div>
                             </div>`);
                         });
                         loadImages();
@@ -157,7 +174,7 @@
                     }
                     $('.content.contentlist').append(`<div class="${className}" tagId="${response.data[0].id}">
                         <div class="card-title">[${formatDateTime(response.data[0].createdOn)}] ${response.data[0].email}</div>
-                        <div class="text-container">${response.data[0].description}<div class="corner-label disabled">Đính kèm</div></div>
+                        <div class="text-container">${response.data[0].description}<div class="corner-label disabled" onclick="showImagePopup(this, true)">Đính kèm</div></div>
                     </div>`);
                     $('#modelTag').val(bodydata.id);
 
@@ -204,5 +221,44 @@
             });
             initFileInput();
         });
+        function showImagePopup(element, isTicket) {
+            var elclass = $(element).attr('class');
+            if (elclass.includes('disabled')) return;
+            $('#dialogModalImage div.modal-body').html('');
+            var bodydata;
+            if (isTicket) {
+                bodydata = {
+                    ticketId: $(this).attr('tagId')
+                };
+            } else {
+                bodydata = {
+                    commentId: $(this).attr('tagId')
+                };
+            }
+            postData('@WebSupport.Utilities.Globals.APIUrl/Attachments/Load', '@WebSupport.Utilities.Globals.APIKey', bodydata, function(response) {
+                console.log(response);
+                if (response.data.length > 0) {
+                    $.each(response.data, function(index, value) {
+                        $.ajax({
+                            url: `@WebSupport.Utilities.Globals.APIUrl/Upload/Get/${value.fileName}`,
+                            method: 'GET',
+                            headers: {
+                                'X-API-KEY': '@WebSupport.Utilities.Globals.APIKey'
+                            },
+                            dataType: 'json',
+                            success: function(response) {
+                                // console.log('Kết quả:', response.data);
+                                $('#dialogModalImage div.modal-body').append(`<div><img src="data:image/png;base64,${response.data}" /></div>`);
+                            },
+                            error: function(xhr, status, error) {
+                                console.error('Lỗi:', error);
+                            }
+                        });
+                    });
+                }
+            });
+            var dialogModal = new bootstrap.Modal(document.getElementById('dialogModalImage'));
+            dialogModal.show();
+        }
     </script>
 }
