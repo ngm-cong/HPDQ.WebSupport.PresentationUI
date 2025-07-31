@@ -250,6 +250,9 @@
                     location.reload();
                 });
             });
+            document.getElementById('dialogModalImage').addEventListener('shown.bs.modal', function () {
+                this.focus();
+            });
         });
         function showImagePopup(element, isTicket) {
             var elclass = $(element).attr('class');
@@ -279,6 +282,7 @@
                             success: function(response) {
                                 // console.log('Kết quả:', response.data);
                                 $('#dialogModalImage div.modal-body').append(`<div><img src="data:image/png;base64,${response.data}" /></div>`);
+                                $('#dialogModalImage').focus();
                             },
                             error: function(xhr, status, error) {
                                 console.error('Lỗi:', error);
@@ -287,7 +291,7 @@
                     });
                 }
             });
-            var dialogModal = new bootstrap.Modal(document.getElementById('dialogModalImage'));
+            var dialogModal = new bootstrap.Modal(document.getElementById('dialogModalImage'), { backdrop: true, keyboard: true });
             dialogModal.show();
         }
     </script>
