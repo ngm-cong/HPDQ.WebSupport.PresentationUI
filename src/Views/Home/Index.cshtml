@@ -11,31 +11,11 @@
 <div class="contentlist" id="contentlist">
     @foreach (var model in (Model ?? new List<HPDQ.WebSupport.DataEntitites.Ticket>()))
     {
-        <div class="item" tag="@(model.Id)">
+        <div class="item" tag="@(model.Id)" tagEmail="@(model.Email)" tagStatus="@((byte)model.Status)">
             <div class="card-title">[@(model.CreatedOn.ToString("HH:mm dd/MM/yyyy"))] @(model.Description.Substring(0, Math.Min(model.Description.Length, 100)))</div>
             <div class="text-container">@(model.Description)<div class="corner-label">@(model.Status)</div></div>
         </div>
     }
-    @* <div class="item">
-        <div class="card-title">Tiêu đề</div>
-        <div class="text-container">Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123<div class="corner-label">Mới tạo</div></div>
-    </div>
-    <div class="item">
-        <div class="card-title">Tiêu đề</div>
-        <div class="text-container">Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123<div class="corner-label">Chờ xử lý</div></div>
-    </div>
-    <div class="item">
-        <div class="card-title">Tiêu đề</div>
-        <div class="text-container">Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123<div class="corner-label">Đã trả lời</div></div>
-    </div>
-    <div class="item">
-        <div class="card-title">Tiêu đề</div>
-        <div class="text-container">Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123<div class="corner-label">Mới tạo</div></div>
-    </div>
-    <div class="item">
-        <div class="card-title">Tiêu đề</div>
-        <div class="text-container">Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123 Nội dung 213123123<div class="corner-label">Mới tạo</div></div>
-    </div> *@
 </div>
 <!-- Modal -->
 <div class="modal fade" id="dialogModal" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true">
@@ -99,6 +79,10 @@
         }
         $(function () {
             $('#contentlist .item').click(function () {
+                if ($(this).attr('tagEmail') != '@email' && $(this).attr('tagStatus') == '1') $('#lblcomplete').show();
+                else $('#lblcomplete').hide();
+                if ($(this).attr('tagEmail') == '@email' && $(this).attr('tagStatus') == '2') $('#lblclose').show();
+                else $('#lblclose').hide();
                 function loadImages() {
                     $('.content.contentlist div.item').each(function(index, element) {
                         var className = $(`.content.contentlist div.item:eq(${index}) div.corner-label`).attr('class');
@@ -220,6 +204,52 @@
                 });
             });
             initFileInput();
+            if ('@ViewBag.Type' == '1') {
+                $('#lblaccept').on('click', function () {
+                    var bodydata = {
+                        id: $('#modelTag').val(),
+                        status: 1,
+                        progressByEmail: '@email',
+                    };
+                    postData('@WebSupport.Utilities.Globals.APIUrl/Tickets/Update', '@WebSupport.Utilities.Globals.APIKey', bodydata, function(response) {
+                        if (response.errorCode != 0)
+                        {
+                            alert(response.message);
+                            return;
+                        }
+                        location.reload();
+                    });
+                });
+                $('#lblaccept').show();
+            }
+            $('#lblcomplete').on('click', function () {
+                var bodydata = {
+                    id: $('#modelTag').val(),
+                    status: 2,
+                };
+                postData('@WebSupport.Utilities.Globals.APIUrl/Tickets/Update', '@WebSupport.Utilities.Globals.APIKey', bodydata, function(response) {
+                    if (response.errorCode != 0)
+                    {
+                        alert(response.message);
+                        return;
+                    }
+                    location.reload();
+                });
+            });
+            $('#lblclose').on('click', function () {
+                var bodydata = {
+                    id: $('#modelTag').val(),
+                    status: 3,
+                };
+                postData('@WebSupport.Utilities.Globals.APIUrl/Tickets/Update', '@WebSupport.Utilities.Globals.APIKey', bodydata, function(response) {
+                    if (response.errorCode != 0)
+                    {
+                        alert(response.message);
+                        return;
+                    }
+                    location.reload();
+                });
+            });
         });
         function showImagePopup(element, isTicket) {
             var elclass = $(element).attr('class');

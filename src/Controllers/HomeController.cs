@@ -26,7 +26,13 @@ namespace WebSupport.Controllers
         public async Task<IActionResult> Index()
         {
             var email = _userEmail();
-            var tickets = await WebSupport.Utilities.API.Instance.Ticket.Load(new HPDQ.WebSupport.Criteria.TicketCriteria { Email = email! });
+            var criteria = new HPDQ.WebSupport.Criteria.TicketCriteria
+            {
+                Email = email!,
+                ProgressByEmail = email!,
+                SearchOption = HPDQ.WebSupport.Criteria.SearchOption.OR,
+            };
+            var tickets = await WebSupport.Utilities.API.Instance.Ticket.Load(criteria);
             return View(tickets);
         }
 
@@ -51,7 +57,13 @@ namespace WebSupport.Controllers
         public async Task<IActionResult> List()
         {
             var email = _userEmail();
-            var tickets = await WebSupport.Utilities.API.Instance.Ticket.Load(new HPDQ.WebSupport.Criteria.TicketCriteria { ProgressByEmail = email! });
+            var criteria = new HPDQ.WebSupport.Criteria.TicketCriteria
+            {
+                ProgressByEmail = null,
+                SearchOption = HPDQ.WebSupport.Criteria.SearchOption.ISNULL,
+            };
+            var tickets = await WebSupport.Utilities.API.Instance.Ticket.Load(criteria);
+            ViewBag.Type = 1;
             return View("Index", tickets);
         }
     }
