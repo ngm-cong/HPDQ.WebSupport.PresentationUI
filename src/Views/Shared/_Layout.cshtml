@@ -13,6 +13,25 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/WebSupport.styles.css" asp-append-version="true" />
+    <style type="text/css">
+        #busyindicator {
+            position: absolute;
+            top: 0;
+            left: 0;
+            /* transform: translate(-50%, -50%); */
+            width: 100vw;
+            height: 100vh;
+            opacity: 0.5;
+            z-index: 9999;
+            padding-left: calc(50% - 250px);
+            padding-top: 250px;
+            background: white;
+            user-select: none; /* Ngăn chọn văn bản */
+            -webkit-user-select: none; /* Safari/Chrome */
+            -moz-user-select: none; /* Firefox */
+            -ms-user-select: none; /* IE/Edge */
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -56,7 +75,9 @@
             @RenderBody()
         </main>
     </div>
-
+    <div id="busyindicator" style="display: none;">
+        <img src="~/img/busy.gif" />
+    </div>
     @* <footer class="border-top footer text-muted">
         <div class="container">
             &copy; 2025 - WebSupport - <a asp-area="" asp-controller="Home" asp-action="NewTicket">NewTicket</a>

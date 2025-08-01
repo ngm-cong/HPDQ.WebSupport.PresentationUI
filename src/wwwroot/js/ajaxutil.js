@@ -7,11 +7,17 @@
         },
         contentType: 'application/json',
         data: JSON.stringify(bodydata),
+        beforeSend: function () {
+            $('#busyindicator').show();
+        },
         success: function (response) {
             success(response);
         },
         error: function (xhr, status, error) {
             console.error("Error:", error);
+        },
+        complete: function () {
+            $('#busyindicator').hide();
         }
     });
 }

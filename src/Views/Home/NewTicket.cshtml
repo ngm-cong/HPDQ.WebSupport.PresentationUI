@@ -9,6 +9,7 @@
 <h3>YÊU CẦU</h3>
 <partial name="_NewTicket" />
 @section Scripts {
+    <script src="~/js/ajaxutil.js"></script>
     <script src="~/js/fileinput.js"></script>
     <script type="text/javascript">
         $(function () {
@@ -32,25 +33,13 @@
                     description: $('#txtdescription').val(),
                     files: files
                 };
-                $.ajax({
-                    url: '@WebSupport.Utilities.Globals.APIUrl/Tickets/Create',
-                    type: 'POST',
-                    headers: {
-                        'X-API-KEY': '@WebSupport.Utilities.Globals.APIKey'
-                    },
-                    contentType: 'application/json',
-                    data: JSON.stringify(bodydata),
-                    success: function(response) {
-                        if (response.errorCode != 0)
-                        {
-                            alert(response.message);
-                            return;
-                        }
-                        window.location.href = '/Home/Index';
-                    },
-                    error: function(xhr, status, error) {
-                        console.error("Error:", error);
+                postData('@WebSupport.Utilities.Globals.APIUrl/Tickets/Create', '@WebSupport.Utilities.Globals.APIKey', bodydata, function(response) {
+                    if (response.errorCode != 0)
+                    {
+                        alert(response.message);
+                        return;
                     }
+                    window.location.href = '/Home/Index';
                 });
             });
             initFileInput();
