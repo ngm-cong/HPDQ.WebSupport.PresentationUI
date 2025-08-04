@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/WebSupport.styles.css" asp-append-version="true" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
     @await RenderSectionAsync("Styles", required: false)
     <style type="text/css">
         #busyindicator {
@@ -36,15 +37,23 @@
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index"><img src="~/img/logo.svg" style="width: 184px; height: 32px;" /></a>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3" style="background-color: #339AF0 !important; padding-top: 0; padding-bottom: 0; height: 50px; padding-left: 0; box-shadow: none; padding-bottom: 0; margin-bottom: 0 !important;">
+            <div class="container-fluid" style="margin-left: 0 !important; padding-left: 0 !important; border-bottom: 1px solid #ccc; text-align: left;">
+                <div style="display: flex; align-items: center; height: 50px;">
+                    <div style="background-color: #fff; display: inline-block; height: 100%; width: 220px; border-right: 1px solid #ccc; float: left;">
+                        <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index"><img src="~/img/logo.svg" style="width: 184px; height: 32px; height: 50px; margin-left: 0;" /></a>
+                    </div>
+                    <span id="menuicon" style="padding-left: 20px; cursor: pointer;"><i class="fa-solid fa-bars"></i></span>
+                </div>
+                <span style="padding-left: 1cm; font-weight: bold; text-transform: uppercase;">
+                    @ViewData["Title"]
+                </span>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <input type="hidden" value='@ViewContext.RouteData.Values["controller"]' />
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                @* <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "Home" && ViewContext.RouteData.Values["action"]?.ToString() == "Index" ? "active" : "")">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index"><span>Theo dõi</span></a>
@@ -67,22 +76,46 @@
                     {
                         <a asp-controller="Account" asp-action="SignIn">Login with Microsoft</a>
                     }
-                </div>
+                </div> *@
             </div>
         </nav>
     </header>
-    @* <nav class="sidebar">
-        <h4 class="text-white text-center">Menu</h4>
-        <a href="#dashboard">Dashboard</a>
-        <a href="#issues">Yêu cầu lỗi</a>
-        <a href="#users">Quản lý người dùng</a>
-        <a href="#reports">Báo cáo</a>
-        <a href="#settings">Cài đặt</a>
-    </nav> *@
-    <div class="container conent">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
+    <!-- MAIN BODY WITH SIDEBAR AND CONTENT -->
+    <div class="d-flex">
+        <!-- đẩy nội dung xuống dưới header -->
+        <!-- SIDEBAR -->
+        <aside id="sidebar" style="width: 220px; min-height: calc(100vh - 50px); border: 1px solid #ccc; border-top: 0; border-bottom: 0;">
+            <ul class="nav flex-column">
+                @* <li><a href="#" class="nav-link">Dashboard</a></li> *@
+                <li><a class="nav-link" asp-controller="Home" asp-action="Index">Danh sách yêu cầu</a></li>
+                <li><a class="nav-link" asp-controller="Home" asp-action="NewTicket">Tạo mới yêu cầu</a></li>
+                <li><a class="nav-link" asp-controller="Home" asp-action="List">Theo dõi yêu cầu</a></li>
+                <li><a class="nav-link" asp-controller="Home" asp-action="List">Lịch sử yêu cầu</a></li>
+            </ul>
+        </aside>
+        <!-- MAIN + BOTTOM PANEL -->
+        <div class="d-flex flex-column flex-grow-1">
+            <!-- MAIN CONTENT -->
+            <main class="flex-grow-1" style="background-color: #F5F6FA; padding: 4px;">
+                @RenderBody()
+            </main>
+            <!-- BOTTOM PANEL -->
+            <div style="height: 50px; background-color: #0B5ED7; color: white; text-align: center; line-height: 50px; text-align: right; padding-right: 10px;">
+                <span style="padding-right: 30px; cursor: pointer;">
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        <a asp-controller="Account" asp-action="SignOut" style="color: white; text-decoration: none;">
+                            <i class="fa fa-sign-out" aria-hidden="true"></i>
+                        </a>
+                    }
+                    else
+                    {
+                        <a asp-controller="Account" asp-action="SignIn">Login with Microsoft</a>
+                    }
+                </span>
+                @Html.Raw(email)
+            </div>
+        </div>
     </div>
     <div id="busyindicator" style="display: none;">
         <img src="~/img/busy.gif" />
@@ -96,5 +129,17 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
+    <script type="text/javascript">
+        $(function () {
+            $('#menuicon').on('click', function () {
+                if ($('#sidebar').is(':visible')) {
+                    $('#sidebar').hide();
+                }
+                else {
+                    $('#sidebar').show();
+                }
+            });
+        });
+    </script>
 </body>
 </html>
