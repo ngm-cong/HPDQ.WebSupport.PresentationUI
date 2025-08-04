@@ -40,7 +40,7 @@
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3" style="background-color: #339AF0 !important; padding-top: 0; padding-bottom: 0; height: 50px; padding-left: 0; box-shadow: none; padding-bottom: 0; margin-bottom: 0 !important;">
             <div class="container-fluid" style="margin-left: 0 !important; padding-left: 0 !important; border-bottom: 1px solid #ccc; text-align: left;">
                 <div style="display: flex; align-items: center; height: 50px;">
-                    <div style="background-color: #fff; display: inline-block; height: 100%; width: 220px; border-right: 1px solid #ccc; float: left;">
+                    <div style="background-color: #fff; display: inline-block; height: 100%; width: 222px; border-right: 1px solid #ccc; float: left;">
                         <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index"><img src="~/img/logo.svg" style="width: 184px; height: 32px; height: 50px; margin-left: 0;" /></a>
                     </div>
                     <span id="menuicon" style="padding-left: 20px; cursor: pointer;"><i class="fa-solid fa-bars"></i></span>
@@ -83,8 +83,9 @@
     <!-- MAIN BODY WITH SIDEBAR AND CONTENT -->
     <div class="d-flex">
         <!-- đẩy nội dung xuống dưới header -->
+        <div style="width: 1px; min-height: calc(100vh - 50px); border: 1px solid #ccc; border-top: 0; border-bottom: 0;"></div>
         <!-- SIDEBAR -->
-        <aside id="sidebar" style="width: 220px; min-height: calc(100vh - 50px); border: 1px solid #ccc; border-top: 0; border-bottom: 0;">
+        <aside id="sidebar" style="width: 220px; min-height: calc(100vh - 50px); border: 1px solid #ccc; border-top: 0; border-bottom: 0; border-left: 0;">
             <ul class="nav flex-column">
                 @* <li><a href="#" class="nav-link">Dashboard</a></li> *@
                 <li><a class="nav-link" asp-controller="Home" asp-action="Index">Danh sách yêu cầu</a></li>
