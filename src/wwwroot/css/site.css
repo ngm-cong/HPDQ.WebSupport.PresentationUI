@@ -25,6 +25,7 @@ body {
     padding: 0;
     margin: 0;
     position: relative;
+    background: #F5F6FA;
 }
 
 .nav-item {
@@ -40,4 +41,26 @@ body {
 .nav-item.active span {
     background: #06428B;
     color: #fff;
+}
+
+.sidebar {
+    width: 250px;
+    background-color: white;
+    padding: 1rem 0;
+}
+
+.sidebar a {
+    color: #fff;
+    text-decoration: none;
+    padding: 0.75rem 1.25rem;
+    display: block;
+}
+
+.sidebar a:hover {
+    background-color: #495057;
+}
+
+.container.content {
+    flex-grow: 1;
+    padding: 1.5rem;
 }
