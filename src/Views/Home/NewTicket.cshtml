@@ -1,13 +1,46 @@
 ﻿@using System.Security.Claims
 @{
-    ViewData["Title"] = "Chi tiết yêu cầu";
+    ViewData["Title"] = "Tạo mới yêu cầu";
     var email = User.FindFirst(ClaimTypes.Email)?.Value
         ?? User.FindFirst("preferred_username")?.Value
         ?? User.FindFirst("upn")?.Value;
 }
-@* @Html.Partial("_NewTicket") *@
-<h3>YÊU CẦU</h3>
-<partial name="_NewTicket" />
+@model NewTicketViewModel
+<style type="text/css">
+    input[type=button] {
+        width: 80px;
+        height: 80px;
+    }
+</style>
+@* <h3>YÊU CẦU</h3> *@
+<div>
+    <table style="margin-bottom: 10px;">
+        <tr>
+            <td>Phân loại:</td>
+            <td>
+                <select id="cbotype" class="form-select" style="max-width: 200px;">
+                    @foreach (var item in (Model.TicketTypes ?? new List<HPDQ.WebSupport.DataEntitites.CodeDetail>()))
+                    {
+                        <option value="@item.Code">@item.Description</option>
+                    }
+                </select>
+            </td>
+        </tr>
+    </table>
+    <span style="width: 100%; font-weight: bold; text-decoration: underline;">NỘI DUNG YÊU CẦU</span><br />
+    <textarea id="txtdescription" type="text" style="width: 100%; min-height: 300px; margin-top: 10px; margin-bottom: 10px;"></textarea>
+    <table>
+        <tr>
+            <td style="width: 100%; text-decoration: underline; color: #06428B; cursor: pointer; text-align: left;">
+                <span id="lblattach">Đính kèm</span>
+                <input id="fileinput" type="file" multiple style="display: none;" />
+            </td>
+            <td style="white-space: nowrap;"><div id="divattachment" style="display: inline-block; color: red; font-weight: bold; vertical-align: top;"></div><img id="imgattachment" style="display: none; margin-right: 10px;" src="/img/attachment.png" /></td>
+            <td style="white-space: nowrap;"><input id="btnconfirm" type="button" value="Gửi" style="background: #2980b9; color: #fff; border: 1px solid #ccc;" /></td>
+        </tr>
+    </table>
+</div>
+@* <partial name="_NewTicket" /> *@
 @section Scripts {
     <script src="~/js/ajaxutil.js"></script>
     <script src="~/js/fileinput.js"></script>
@@ -22,17 +55,24 @@
                 var uploadCompleted = false;
                 var files;
 
-                var uploadVal = uploadFileInputs('@WebSupport.Utilities.Globals.APIUrl/Upload/Upload', '@WebSupport.Utilities.Globals.APIKey', uploadCompleted, files);
-                uploadCompleted = uploadVal.uploadCompleted;
-                files = uploadVal.files;
-
-                if (uploadCompleted == false) return;
+                var uploadVal;
+                if (formDataFileLength() > 0) {
+                    uploadVal = uploadFileInputs('@WebSupport.Utilities.Globals.APIUrl/Upload/Upload', '@WebSupport.Utilities.Globals.APIKey', uploadCompleted, files);
+                    uploadCompleted = uploadVal.uploadCompleted;
+                    files = uploadVal.files;
+                }
+                if (uploadCompleted == false) {
+                    alert(uploadVal.message);
+                    return;
+                }
 
                 var bodydata = {
                     email: '@email',
                     description: $('#txtdescription').val(),
-                    files: files
+                    files: files,
+                    type: $('#cbotype').val()
                 };
+                console.log('Tickets/Create', bodydata);
                 postData('@WebSupport.Utilities.Globals.APIUrl/Tickets/Create', '@WebSupport.Utilities.Globals.APIKey', bodydata, function(response) {
                     if (response.errorCode != 0)
                     {

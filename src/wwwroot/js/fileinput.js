@@ -28,6 +28,7 @@ function initFileInput() {
 function uploadFileInputs(url, apikey) {
     var uploadCompleted = false;
     var files;
+    var message
 
     if (formDataFileLength() > 0) {
         $.ajax({
@@ -40,12 +41,24 @@ function uploadFileInputs(url, apikey) {
             contentType: false,
             processData: false,
             async: false,
-            success: function (res) {
-                uploadCompleted = true;
-                files = res.data;
+            beforeSend: function () {
+                $('#busyindicator').show();
+            },
+            success: function (response) {
+                if (response.errorCode != 0) {
+                    uploadCompleted = false;
+                    message = response.message;
+                }
+                else {
+                    uploadCompleted = true;
+                    files = response.data;
+                }
             },
             error: function (err) {
                 console.error("Upload failed", err);
+            },
+            complete: function () {
+                $('#busyindicator').hide();
             }
         });
     } else {
@@ -54,6 +67,7 @@ function uploadFileInputs(url, apikey) {
 
     return {
         uploadCompleted: uploadCompleted,
-        files: files
+        files: files,
+        message: message
     };
 }

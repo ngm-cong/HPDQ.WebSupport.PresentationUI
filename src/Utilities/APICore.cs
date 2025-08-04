@@ -1,14 +1,14 @@
 ﻿namespace WebSupport.Utilities
 {
-    public class APICore
+    public class APIRoute
     {
-        internal RouteAPI routeAPI = new RouteAPI();
+        internal APICore routeAPI = new APICore();
         public void Configs(Core.RESTful.RESTfulUtilities restfulCore, string routeUrl)
         {
             routeAPI.Configs(restfulCore, routeUrl);
         }
     }
-    public class RouteAPI
+    public class APICore
     {
         private Core.RESTful.RESTfulUtilities? _restfulCore;
         private string? _routeUrl;

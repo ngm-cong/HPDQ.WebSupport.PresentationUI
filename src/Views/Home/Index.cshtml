@@ -12,7 +12,7 @@
     {
         <div class="item" tag="@(model.Id)" tagEmail="@(model.Email)" tagStatus="@((byte)model.Status)">
             <div class="card-title">[@(model.CreatedOn.ToString("HH:mm dd/MM/yyyy"))] @(model.Description.Substring(0, Math.Min(model.Description.Length, 100)))</div>
-            <div class="text-container">@(model.Description)<div class="corner-label">@(model.Status)</div></div>
+            <div class="text-container">@(model.Description)<div class="corner-label @(model.Status == HPDQ.WebSupport.DataEntitites.TicketStatus.Done ? "done" : "") @(model.Status == HPDQ.WebSupport.DataEntitites.TicketStatus.Closed ? "closed" : "")">@(model.Status.GetDescription())</div></div>
         </div>
     }
 </div>
@@ -104,6 +104,10 @@
                                 var itemcontainer = $('<div class="itemcontainer"></div>');
                                 $(`.content.contentlist div.item:eq(${index})`).append(itemcontainer);
                                 $.each(response.data, function(index, value) {
+                                    if (!/\.jpe?g$|\.png$/i.test(value.fileName)) {
+                                        console.log('value.fileName: ', value.fileName);
+                                        return true;
+                                    }
                                     $.ajax({
                                         url: `@WebSupport.Utilities.Globals.APIUrl/Upload/Get/${value.fileName}`,
                                         method: 'GET',
@@ -276,6 +280,10 @@
                 console.log(response);
                 if (response.data.length > 0) {
                     $.each(response.data, function(index, value) {
+                        if (!/\.jpe?g$|\.png$/i.test(value.fileName)) {
+                            console.log('value.fileName: ', value.fileName);
+                            return true;
+                        }
                         $.ajax({
                             url: `@WebSupport.Utilities.Globals.APIUrl/Upload/Get/${value.fileName}`,
                             method: 'GET',

@@ -1,7 +1,9 @@
+using HPDQ.WebSupport.DataEntitites;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using System.Security.Claims;
+using System.Threading.Tasks;
 using WebSupport.Models;
 
 namespace WebSupport.Controllers
@@ -37,9 +39,13 @@ namespace WebSupport.Controllers
         }
 
         [Authorize]
-        public IActionResult NewTicket()
+        public async Task<IActionResult> NewTicket()
         {
-            return View();
+            var ticketTypes = await WebSupport.Utilities.API.Instance.CodeDetail.Load(new HPDQ.WebSupport.Criteria.CodeDetailCriteria
+            {
+                Master = CodeDetailMaster.TicketType,
+            });
+            return View(new NewTicketViewModel { TicketTypes = ticketTypes });
         }
 
         public IActionResult Login()
@@ -61,6 +67,21 @@ namespace WebSupport.Controllers
             {
                 ProgressByEmail = null,
                 SearchOption = HPDQ.WebSupport.Criteria.SearchOption.ISNULL,
+            };
+            var tickets = await WebSupport.Utilities.API.Instance.Ticket.Load(criteria);
+            ViewBag.Type = 1;
+            return View("Index", tickets);
+        }
+
+        [Authorize]
+        public async Task<IActionResult> History()
+        {
+            var email = _userEmail();
+            var criteria = new HPDQ.WebSupport.Criteria.TicketCriteria
+            {
+                ProgressByEmail = null,
+                SearchOption = HPDQ.WebSupport.Criteria.SearchOption.ISNULL,
+                ExcludeStatus = null,
             };
             var tickets = await WebSupport.Utilities.API.Instance.Ticket.Load(criteria);
             ViewBag.Type = 1;
