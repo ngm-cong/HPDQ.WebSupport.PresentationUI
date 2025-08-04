@@ -36,3 +36,12 @@ div.contentlist .item:not(:last-child) {
 .corner-label.disabled {
     background: #E8E8E8;
 }
+div.contentlist .itemcontainer {
+    height: 100px;
+    display: inline-block;
+}
+div.contentlist .itemcontainer img {
+    height: 100px;
+    float: left;
+    cursor: pointer;
+}
