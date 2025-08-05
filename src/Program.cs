@@ -1,16 +1,19 @@
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Microsoft.Identity.Web;
-
 var builder = WebApplication.CreateBuilder(args);
-
-builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
-    .AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAd"));
 
 WebSupport.Utilities.Globals.APIKey = builder.Configuration[$"APISettings:APIKey"];
 WebSupport.Utilities.Globals.APIUrl = builder.Configuration[$"APISettings:APIUrl"];
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+// Cookie-based Authentication
+builder.Services.AddAuthentication("MyCookieAuth")
+    .AddCookie("MyCookieAuth", options =>
+    {
+        options.LoginPath = "/Account/Login";
+        options.AccessDeniedPath = "/Account/AccessDenied";
+        options.Cookie.Name = "MyAuthCookie";
+        options.ExpireTimeSpan = TimeSpan.FromHours(1);
+    });
 
 var app = builder.Build();
 

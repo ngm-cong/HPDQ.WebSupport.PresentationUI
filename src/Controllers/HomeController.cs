@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using WebSupport.Models;
 
 namespace WebSupport.Controllers
@@ -17,9 +16,9 @@ namespace WebSupport.Controllers
             _logger = logger;
         }
 
-        private string? _userEmail()
+        private string? _userEMP_ID()
         {
-            return User.FindFirst(ClaimTypes.Email)?.Value
+            return User.FindFirst(ClaimTypes.NameIdentifier)?.Value
                 ?? User.FindFirst("preferred_username")?.Value
                 ?? User.FindFirst("upn")?.Value;
         }
@@ -27,11 +26,11 @@ namespace WebSupport.Controllers
         [Authorize]
         public async Task<IActionResult> Index()
         {
-            var email = _userEmail();
+            var emp_id = _userEMP_ID();
             var criteria = new HPDQ.WebSupport.Criteria.TicketCriteria
             {
-                Email = email!,
-                ProgressByEmail = email!,
+                EMP_ID = emp_id!,
+                ProgressBy_EMP_ID = emp_id!,
                 SearchOption = HPDQ.WebSupport.Criteria.SearchOption.OR,
             };
             var tickets = await WebSupport.Utilities.API.Instance.Ticket.Load(criteria);
@@ -59,13 +58,13 @@ namespace WebSupport.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> List()
         {
-            var email = _userEmail();
+            var emp_id = _userEMP_ID();
             var criteria = new HPDQ.WebSupport.Criteria.TicketCriteria
             {
-                ProgressByEmail = null,
+                ProgressBy_EMP_ID = null,
                 SearchOption = HPDQ.WebSupport.Criteria.SearchOption.ISNULL,
             };
             var tickets = await WebSupport.Utilities.API.Instance.Ticket.Load(criteria);
@@ -76,10 +75,10 @@ namespace WebSupport.Controllers
         [Authorize]
         public async Task<IActionResult> History()
         {
-            var email = _userEmail();
+            var emp_id = _userEMP_ID();
             var criteria = new HPDQ.WebSupport.Criteria.TicketCriteria
             {
-                ProgressByEmail = null,
+                ProgressBy_EMP_ID = null,
                 SearchOption = HPDQ.WebSupport.Criteria.SearchOption.ISNULL,
                 ExcludeStatus = null,
             };

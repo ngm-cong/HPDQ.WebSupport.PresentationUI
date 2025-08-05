@@ -1,8 +1,8 @@
 ﻿@using System.Security.Claims
 @{
-    var email = User.FindFirst(ClaimTypes.Email)?.Value
-                     ?? User.FindFirst("preferred_username")?.Value
-                     ?? User.FindFirst("upn")?.Value;
+    var emp_id = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+        ?? User.FindFirst("preferred_username")?.Value
+        ?? User.FindFirst("upn")?.Value;
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -53,30 +53,6 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <input type="hidden" value='@ViewContext.RouteData.Values["controller"]' />
-                @* <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "Home" && ViewContext.RouteData.Values["action"]?.ToString() == "Index" ? "active" : "")">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index"><span>Theo dõi</span></a>
-                        </li>
-                        <li class="nav-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "Home" && ViewContext.RouteData.Values["action"]?.ToString() == "NewTicket" ? "active" : "")">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="NewTicket"><span>Đề nghị</span></a>
-                        </li>
-                        <li class="nav-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "Home" && ViewContext.RouteData.Values["action"]?.ToString() == "List" ? "active" : "")">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="List"><span>Danh sách</span></a>
-                        </li>
-                    </ul>
-                </div>
-                <div>
-                    @Html.Raw(email)
-                    @if (User.Identity?.IsAuthenticated == true)
-                    {
-                        <a asp-controller="Account" asp-action="SignOut">Logout</a>
-                    }
-                    else
-                    {
-                        <a asp-controller="Account" asp-action="SignIn">Login with Microsoft</a>
-                    }
-                </div> *@
             </div>
         </nav>
     </header>
@@ -90,7 +66,10 @@
                 @* <li><a href="#" class="nav-link">Dashboard</a></li> *@
                 <li><a class="nav-link" asp-controller="Home" asp-action="Index">Danh sách yêu cầu</a></li>
                 <li><a class="nav-link" asp-controller="Home" asp-action="NewTicket">Tạo mới yêu cầu</a></li>
-                <li><a class="nav-link" asp-controller="Home" asp-action="List">Theo dõi yêu cầu</a></li>
+                @if (User.IsInRole("Admin"))
+                {
+                    <li><a class="nav-link" asp-controller="Home" asp-action="List">Theo dõi yêu cầu</a></li>
+                }
                 <li><a class="nav-link" asp-controller="Home" asp-action="History">Lịch sử yêu cầu</a></li>
             </ul>
         </aside>
@@ -105,7 +84,7 @@
                 <span style="padding-right: 30px; cursor: pointer;">
                     @if (User.Identity?.IsAuthenticated == true)
                     {
-                        <a asp-controller="Account" asp-action="SignOut" style="color: white; text-decoration: none;">
+                        <a asp-controller="Account" asp-action="Logout" style="color: white; text-decoration: none;">
                             <i class="fa fa-sign-out" aria-hidden="true"></i>
                         </a>
                     }
@@ -114,7 +93,7 @@
                         <a asp-controller="Account" asp-action="SignIn">Login with Microsoft</a>
                     }
                 </span>
-                @Html.Raw(email)
+                @Html.Raw(emp_id)
             </div>
         </div>
     </div>

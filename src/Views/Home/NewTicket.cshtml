@@ -1,7 +1,7 @@
 ﻿@using System.Security.Claims
 @{
     ViewData["Title"] = "Tạo mới yêu cầu";
-    var email = User.FindFirst(ClaimTypes.Email)?.Value
+    var emp_id = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
         ?? User.FindFirst("preferred_username")?.Value
         ?? User.FindFirst("upn")?.Value;
 }
@@ -56,18 +56,16 @@
                 var files;
 
                 var uploadVal;
-                if (formDataFileLength() > 0) {
-                    uploadVal = uploadFileInputs('@WebSupport.Utilities.Globals.APIUrl/Upload/Upload', '@WebSupport.Utilities.Globals.APIKey', uploadCompleted, files);
-                    uploadCompleted = uploadVal.uploadCompleted;
-                    files = uploadVal.files;
-                }
+                uploadVal = uploadFileInputs('@WebSupport.Utilities.Globals.APIUrl/Upload/Upload', '@WebSupport.Utilities.Globals.APIKey', uploadCompleted, files);
+                uploadCompleted = uploadVal.uploadCompleted;
+                files = uploadVal.files;
                 if (uploadCompleted == false) {
                     alert(uploadVal.message);
                     return;
                 }
 
                 var bodydata = {
-                    email: '@email',
+                    emp_id: '@emp_id',
                     description: $('#txtdescription').val(),
                     files: files,
                     type: $('#cbotype').val()
