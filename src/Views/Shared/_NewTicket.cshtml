@@ -1,20 +1,20 @@
 ﻿<link rel="stylesheet" href="~/css/contentlist.css" />
 <style type="text/css">
-    .wrapper {
+    /* .wrapper {
         display: flex;
         flex-direction: column;
-        height: calc(100vh - 140px); /* Full screen height */
+        height: calc(100vh - 140px);
         margin: 0;
     }
 
     .content {
-        flex: 1; /* Fills all remaining space */
-        overflow: auto; /* Optional: scroll if content is large */
+        flex: 1;
+        overflow: auto;
         border: 1px solid #ccc;
         margin-bottom: 10px;
-    }
+    } */
 
-    .footer {
+    /* .footer {
         padding: 0;
         text-align: center;
         border: 1px solid #ccc;
@@ -35,24 +35,48 @@
             border: none;
             outline-color: #a9cce3;
             outline-width: 1px;
-        }
+        } */
 
-    div.contentlist .item {
+    /* div.contentlist .item {
         margin: 5px;
-    }
+    } */
 
+    #chatbox .item:not(.reply) {
+        margin-right: 100px;
+    }
         div.contentlist .item.reply {
             margin-left: 100px;
         }
 
-            div.contentlist .item.reply .card-title {
-                background: #82e0aa;
-            }
+    .wrapperfooter input[type=text] {
+        width: 100%;
+        height: 80px;
+        margin: 0;
+    }
+
+    .wrapperfooter input[type=button] {
+        width: 80px;
+        height: 80px;
+    }
+
+    .wrapperfooter input[type=text]:focus {
+        border: none;
+        outline-color: #a9cce3;
+        outline-width: 1px;
+    }
+
+    #chatbox .item:not(:first-child) {
+        margin-top: 10px;
+    }
+
+    #chatbox .item:not(:last-child) {
+        border-bottom: 1px solid #ccc;
+    }
 </style>
-<div class="wrapper">
-    <div class="content contentlist">
+<div class="wrapper" style="min-height: calc(100vh - 100px); display: flex; flex-direction: column;">
+    <div id="chatbox" class="content contentlist card" style="flex: 1; overflow: auto; padding: 10px;">
     </div>
-    <div class="footer">
+    <div class="card wrapperfooter" style="height: 130px; margin-top: 10px; padding: 10px;">
         <div style="text-align: left;">
             <table>
                 <tr>

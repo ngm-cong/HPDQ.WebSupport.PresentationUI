@@ -1,16 +1,18 @@
 ﻿div.contentlist .item {
     border: 1px solid #ccc;
-    border-radius: 5px;
+    /*border-radius: 5px;*/
     cursor: pointer;
+    margin: 0;
+    padding: 10px;
 }
 
 div.contentlist .item:not(:last-child) {
-    margin-bottom: 20px;
+    border-bottom: 0;
 }
 
 .card-title {
-    background: #7fb3d5;
-    /* color: #fff; */
+    /*background: #7fb3d5;*/
+    color: #6c757d !important;
 }
 
 .text-container {
@@ -32,15 +34,20 @@ div.contentlist .item:not(:last-child) {
     padding: 2px 6px;
     border-radius: 4px;
     /*margin-left: 5px;*/
+    width: 74px;
+    height: 20px;
 }
 .corner-label.disabled {
     background: #E8E8E8;
 }
 .corner-label.done {
-    background: #008000;
+    background: #ff8c00;
 }
 .corner-label.closed {
-    background: #ff8c00;
+    background: #ef8282;
+}
+.corner-label.progress {
+    background: #198754;
 }
 div.contentlist .itemcontainer {
     height: 100px;

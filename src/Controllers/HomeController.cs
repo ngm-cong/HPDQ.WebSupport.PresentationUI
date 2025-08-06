@@ -78,9 +78,10 @@ namespace WebSupport.Controllers
             var emp_id = _userEMP_ID();
             var criteria = new HPDQ.WebSupport.Criteria.TicketCriteria
             {
-                ProgressBy_EMP_ID = null,
-                SearchOption = HPDQ.WebSupport.Criteria.SearchOption.ISNULL,
                 ExcludeStatus = null,
+                EMP_ID = emp_id,
+                ProgressBy_EMP_ID = emp_id,
+                SearchOption = HPDQ.WebSupport.Criteria.SearchOption.OR,
             };
             var tickets = await WebSupport.Utilities.API.Instance.Ticket.Load(criteria);
             ViewBag.Type = 1;

@@ -6,13 +6,12 @@
         ?? User.FindFirst("upn")?.Value;
 }
 @model IEnumerable<HPDQ.WebSupport.DataEntitites.Ticket>
-<h3>DANH SÁCH YÊU CẦU</h3>
 <div class="contentlist" id="contentlist">
     @foreach (var model in (Model ?? new List<HPDQ.WebSupport.DataEntitites.Ticket>()))
     {
         <div class="item" tag="@(model.Id)" tagEMP_ID="@(model.EMP_ID)" tagStatus="@((byte)model.Status)">
-            <div class="card-title">[@(model.CreatedOn.ToString("HH:mm dd/MM/yyyy"))] @(model.Description.Substring(0, Math.Min(model.Description.Length, 100)))</div>
-            <div class="text-container">@(model.Description)<div class="corner-label @(model.Status == HPDQ.WebSupport.DataEntitites.TicketStatus.Done ? "done" : "") @(model.Status == HPDQ.WebSupport.DataEntitites.TicketStatus.Closed ? "closed" : "")">@(model.Status.GetDescription())</div></div>
+            <div class="card-title text-muted small">[@(model.CreatedOn.ToString("HH:mm dd/MM/yyyy"))] @(model.EMP_ID)</div>
+            <div class="text-container">@(model.Description)<div class="corner-label @(model.Status == HPDQ.WebSupport.DataEntitites.TicketStatus.Done ? "done" : "") @(model.Status == HPDQ.WebSupport.DataEntitites.TicketStatus.Closed ? "closed" : "") @(model.Status == HPDQ.WebSupport.DataEntitites.TicketStatus.InProgress ? "progress" : "")">@(model.Status.GetDescription())</div></div>
         </div>
     }
 </div>
@@ -141,7 +140,7 @@
                                 className = 'item reply';
                             }
                             $('.content.contentlist').append(`<div class="${className}" tagId="${value.id}">
-                                <div class="card-title">[${formatDateTime(value.createdOn)}] ${value.emp_id}</div>
+                                <div class="card-title text-muted small">[${formatDateTime(value.createdOn)}] ${value.emp_id}</div>
                                 <div class="text-container">${value.commentDesc}<div class="corner-label disabled" onclick="showImagePopup(this, false)">Đính kèm</div></div>
                             </div>`);
                         });
@@ -160,12 +159,13 @@
                         return;
                     }
                     $('.content.contentlist').html('');
+                    console.log('response.data[0].emp_id: ', response.data[0]);
                     var className = 'item';
                     if (response.data[0].emp_id != '@emp_id') {
                         className = 'item reply';
                     }
                     $('.content.contentlist').append(`<div class="${className}" tagId="${response.data[0].id}">
-                        <div class="card-title">[${formatDateTime(response.data[0].createdOn)}] ${response.data[0].emp_id}</div>
+                        <div class="card-title text-muted small">[${formatDateTime(response.data[0].createdOn)}] ${response.data[0].emp_id}</div>
                         <div class="text-container">${response.data[0].description}<div class="corner-label disabled" onclick="showImagePopup(this, true)">Đính kèm</div></div>
                     </div>`);
                     $('#modelTag').val(bodydata.id);
@@ -207,7 +207,7 @@
                         className = 'item reply';
                     }
                     $('.content.contentlist').append(`<div class="${className}">
-                        <div class="card-title">[@DateTime.Now.ToString("HH:mm dd/MM/yyyy")] ${response.data.emp_id}</div>
+                        <div class="card-title text-muted small">[@DateTime.Now.ToString("HH:mm dd/MM/yyyy")] ${response.data.emp_id}</div>
                         <div class="text-container">${response.data.commentDesc}<div class="corner-label">Đính kèm</div></div>
                     </div>`);
 

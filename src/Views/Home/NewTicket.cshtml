@@ -9,36 +9,59 @@
 <style type="text/css">
     input[type=button] {
         width: 80px;
-        height: 80px;
+        height: 40px;
+    }
+    .card {
+        border-radius: 0.5rem;
+        box-shadow: 0 0 8px rgba(0,0,0,0.05);
+        border: 1px solid #06428B;
+    }
+    #requestType {
+        width: 25%;
+        margin-left: 20px;
+    }
+    #desc_label {
+        top: -12px;
+        left: 12px;
+        color: #3b3c36;
     }
 </style>
-@* <h3>YÊU CẦU</h3> *@
-<div>
-    <table style="margin-bottom: 10px;">
-        <tr>
-            <td>Phân loại:</td>
-            <td>
-                <select id="cbotype" class="form-select" style="max-width: 200px;">
-                    @foreach (var item in (Model.TicketTypes ?? new List<HPDQ.WebSupport.DataEntitites.CodeDetail>()))
-                    {
-                        <option value="@item.Code">@item.Description</option>
-                    }
-                </select>
-            </td>
-        </tr>
-    </table>
-    <span style="width: 100%; font-weight: bold; text-decoration: underline;">NỘI DUNG YÊU CẦU</span><br />
-    <textarea id="txtdescription" type="text" style="width: 100%; min-height: 300px; margin-top: 10px; margin-bottom: 10px;"></textarea>
-    <table>
-        <tr>
-            <td style="width: 100%; text-decoration: underline; color: #06428B; cursor: pointer; text-align: left;">
-                <span id="lblattach">Đính kèm</span>
-                <input id="fileinput" type="file" multiple style="display: none;" />
-            </td>
-            <td style="white-space: nowrap;"><div id="divattachment" style="display: inline-block; color: red; font-weight: bold; vertical-align: top;"></div><img id="imgattachment" style="display: none; margin-right: 10px;" src="/img/attachment.png" /></td>
-            <td style="white-space: nowrap;"><input id="btnconfirm" type="button" value="Gửi" style="background: #2980b9; color: #fff; border: 1px solid #ccc;" /></td>
-        </tr>
-    </table>
+<div class="container-fluid p-3">
+    <div class="card">
+        <div class="card-body">
+            <table style="margin-bottom: 10px;">
+                <tr>
+                    <td style="color: #3b3c36;"><b>Phân loại yêu cầu: </b></td>
+                    <td>
+                        <select id="cbotype" class="form-select" style="max-width: 200px;">
+                            @foreach (var item in (Model.TicketTypes ?? new List<HPDQ.WebSupport.DataEntitites.CodeDetail>()))
+                            {
+                                <option value="@item.Code">@item.Description</option>
+                            }
+                        </select>
+                    </td>
+                </tr>
+            </table>
+            <div class="mb-3 border rounded p-3 position-relative">
+                <label for="description" id="desc_label" class="form-label fw-bold position-absolute bg-white px-2">Mô tả yêu cầu</label>
+                <textarea class="form-control border-primary-subtle" rows="12" id="txtdescription" type="text" style="width: 100%; min-height: 300px; margin-top: 10px; margin-bottom: 10px;"></textarea>
+            </div>
+            <table>
+                <tr>
+                    <td style="width: 100%; color: #06428B; cursor: pointer; text-align: left;">
+                        <div style="width: 120px;">
+                            <label id="lblattach" class="btn btn-outline-secondary d-flex align-items-center text-decoration-none">
+                                <i class="bi bi-plus-lg me-2"></i> Đính kèm
+                            </label>
+                            <input id="fileinput" type="file" multiple style="display: none;" />
+                        </div>
+                    </td>
+                    <td style="white-space: nowrap;"><div id="divattachment" style="display: inline-block; color: red; font-weight: bold; vertical-align: top;"></div><img id="imgattachment" style="display: none; margin-right: 10px;" src="/img/attachment.png" /></td>
+                    <td style="white-space: nowrap;"><input id="btnconfirm" type="button" value="Gửi" style="background: #2980b9; color: #fff; border: 1px solid #ccc;" /></td>
+                </tr>
+            </table>
+        </div>
+    </div>
 </div>
 @* <partial name="_NewTicket" /> *@
 @section Scripts {

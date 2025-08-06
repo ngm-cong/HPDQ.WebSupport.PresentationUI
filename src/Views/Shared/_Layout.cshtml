@@ -3,6 +3,7 @@
     var emp_id = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
         ?? User.FindFirst("preferred_username")?.Value
         ?? User.FindFirst("upn")?.Value;
+    var currentPath = ViewContext.RouteData.Values["action"]?.ToString()?.ToLower();
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -11,9 +12,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - WebSupport</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <!-- Bootstrap Icons -->
+    <link href="~/css-bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/WebSupport.styles.css" asp-append-version="true" />
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <link href="~/css/font-awesome-all.min.css" rel="stylesheet" />
     @await RenderSectionAsync("Styles", required: false)
     <style type="text/css">
         #busyindicator {
@@ -36,70 +39,104 @@
     </style>
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3" style="background-color: #339AF0 !important; padding-top: 0; padding-bottom: 0; height: 50px; padding-left: 0; box-shadow: none; padding-bottom: 0; margin-bottom: 0 !important;">
-            <div class="container-fluid" style="margin-left: 0 !important; padding-left: 0 !important; border-bottom: 1px solid #ccc; text-align: left;">
-                <div style="display: flex; align-items: center; height: 50px;">
-                    <div style="background-color: #fff; display: inline-block; height: 100%; width: 222px; border-right: 1px solid #ccc; float: left;">
-                        <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index"><img src="~/img/logo.svg" style="width: 184px; height: 32px; height: 50px; margin-left: 0;" /></a>
-                    </div>
-                    <span id="menuicon" style="padding-left: 20px; cursor: pointer;"><i class="fa-solid fa-bars"></i></span>
-                </div>
-                <span style="padding-left: 1cm; font-weight: bold; text-transform: uppercase;">
-                    @ViewData["Title"]
-                </span>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <input type="hidden" value='@ViewContext.RouteData.Values["controller"]' />
-            </div>
-        </nav>
-    </header>
-    <!-- MAIN BODY WITH SIDEBAR AND CONTENT -->
-    <div class="d-flex">
-        <!-- đẩy nội dung xuống dưới header -->
-        <div style="width: 1px; min-height: calc(100vh - 50px); border: 1px solid #ccc; border-top: 0; border-bottom: 0;"></div>
-        <!-- SIDEBAR -->
-        <aside id="sidebar" style="width: 220px; min-height: calc(100vh - 50px); border: 1px solid #ccc; border-top: 0; border-bottom: 0; border-left: 0;">
-            <ul class="nav flex-column">
-                @* <li><a href="#" class="nav-link">Dashboard</a></li> *@
-                <li><a class="nav-link" asp-controller="Home" asp-action="Index">Danh sách yêu cầu</a></li>
-                <li><a class="nav-link" asp-controller="Home" asp-action="NewTicket">Tạo mới yêu cầu</a></li>
+    <!-- Content -->
+    <div class="wrapper d-flex">
+        <!-- Sidebar -->
+        <div id="sidebar" class="d-flex flex-column flex-shrink-0 p-3 sidebar-visible">
+            <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-dark text-decoration-none">
+                <img src="~/img/logo.svg" width="200" height="35" />
+            </a>
+            <hr />
+            <ul class="nav nav-pills flex-column mb-auto">
+                <li>
+                    <a asp-controller="Home" asp-action="Index" class="nav-link @(currentPath == "" ? "active" : "link-dark")">
+                        <i class="bi bi-bar-chart-line-fill"></i>
+                        Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a asp-controller="Home" asp-action="Index" class="nav-link @(currentPath == "index" ? "active" : "link-dark")">
+                        <i class="bi bi-card-list"></i>
+                        Danh sách yêu cầu
+                    </a>
+                </li>
+                @if (User.IsInRole("Admin") == false)
+                {
+                    <li>
+                        <a asp-controller="Home" asp-action="NewTicket" class="nav-link @(currentPath == "newticket" ? "active" : "link-dark")">
+                            <i class="bi bi-file-earmark-plus"></i>
+                            Tạo yêu cầu mới
+                        </a>
+                    </li>
+                }
                 @if (User.IsInRole("Admin"))
                 {
-                    <li><a class="nav-link" asp-controller="Home" asp-action="List">Theo dõi yêu cầu</a></li>
-                }
-                <li><a class="nav-link" asp-controller="Home" asp-action="History">Lịch sử yêu cầu</a></li>
-            </ul>
-        </aside>
-        <!-- MAIN + BOTTOM PANEL -->
-        <div class="d-flex flex-column flex-grow-1">
-            <!-- MAIN CONTENT -->
-            <main class="flex-grow-1" style="background-color: #F5F6FA; padding: 4px;">
-                @RenderBody()
-            </main>
-            <!-- BOTTOM PANEL -->
-            <div style="height: 50px; background-color: #0B5ED7; color: white; text-align: center; line-height: 50px; text-align: right; padding-right: 10px;">
-                <span style="padding-right: 30px; cursor: pointer;">
-                    @if (User.Identity?.IsAuthenticated == true)
-                    {
-                        <a asp-controller="Account" asp-action="Logout" style="color: white; text-decoration: none;">
-                            <i class="fa fa-sign-out" aria-hidden="true"></i>
+                    <li>
+                        <a asp-controller="Home" asp-action="List" class="nav-link @(currentPath == "list" ? "active" : "link-dark")">
+                            <i class="bi bi-eye-fill"></i>
+                            Theo dõi yêu cầu
                         </a>
-                    }
-                    else
-                    {
-                        <a asp-controller="Account" asp-action="SignIn">Login with Microsoft</a>
-                    }
-                </span>
-                @Html.Raw(emp_id)
+                    </li>
+                }
+                <li>
+                    <a asp-controller="Home" asp-action="History" class="nav-link @(currentPath == "history" ? "active" : "link-dark")">
+                        <i class="bi bi-clock-history"></i>
+                        Lịch sử yêu cầu
+                    </a>
+                </li>
+            </ul>
+            <hr />
+        </div>
+
+        <div class="main flex-grow-1 d-flex flex-column">
+            <!-- Header -->
+            <div class="header d-flex align-items-center justify-content-between">
+                <button id="toggleSidebar" class="btn btn-light me-3">
+                    <i class="bi bi-list"></i>
+                </button>
+                <h2 class="m-0">@ViewData["Title"]?.ToString()?.ToUpper()</h2>
             </div>
+
+            <!-- Content -->
+            <div class="content flex-grow-1">
+                @RenderBody()
+            </div>
+
+            <!-- Footer -->
+            <div class="footer d-flex justify-content-end align-items-center">
+                <div id="username">@Html.Raw(emp_id)</div>
+                <div id="logout_btn" class="ms-3 fw-bold" data-bs-toggle="tooltip" title="Đăng xuất">
+                    <i class="bi bi-box-arrow-left fs-5"></i>
+                </div>
+            </div>
+
+            
         </div>
     </div>
     <div id="busyindicator" style="display: none;">
         <img src="~/img/busy.gif" />
     </div>
+    @* Log out *@
+    <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="logoutModalLabel">Xác nhận đăng xuất</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                </div>
+                <div class="modal-body">
+                    Bạn có chắc chắn muốn đăng xuất không?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Huỷ</button>
+                    <form id="logoutForm" method="post" asp-controller="Account" asp-action="Logout">
+                        <button type="submit" class="btn btn-danger">Đăng xuất</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    @* Log out *@
     @* <footer class="border-top footer text-muted">
         <div class="container">
             &copy; 2025 - WebSupport - <a asp-area="" asp-controller="Home" asp-action="NewTicket">NewTicket</a>
