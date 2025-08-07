@@ -5,6 +5,7 @@
         ?? User.FindFirst("upn")?.Value;
     var currentPath = ViewContext.RouteData.Values["action"]?.ToString()?.ToLower();
 }
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -38,6 +39,7 @@
         }
     </style>
 </head>
+
 <body>
     <!-- Content -->
     <div class="wrapper d-flex">
@@ -113,9 +115,11 @@
             
         </div>
     </div>
+
     <div id="busyindicator" style="display: none;">
         <img src="~/img/busy.gif" />
     </div>
+
     @* Log out *@
     <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -137,26 +141,11 @@
         </div>
     </div>
     @* Log out *@
-    @* <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - WebSupport - <a asp-area="" asp-controller="Home" asp-action="NewTicket">NewTicket</a>
-        </div>
-    </footer> *@
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
-    <script type="text/javascript">
-        $(function () {
-            $('#menuicon').on('click', function () {
-                if ($('#sidebar').is(':visible')) {
-                    $('#sidebar').hide();
-                }
-                else {
-                    $('#sidebar').show();
-                }
-            });
-        });
-    </script>
+
 </body>
 </html>
