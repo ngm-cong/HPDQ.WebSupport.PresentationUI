@@ -70,11 +70,25 @@ namespace WebSupport.Controllers
             return View(new NewTicketViewModel { TicketTypes = ticketTypes });
         }
 
+        /// <summary>
+        /// Hiển thị trang giao diện để đăng nhập hệ thống.
+        /// </summary>
+        /// <returns>Giao diện đăng nhập hệ thống.</returns>
         public IActionResult Login()
         {
             return View();
         }
 
+        /// <summary>
+        /// Hiển thị trang lỗi chung của ứng dụng.
+        /// </summary>
+        /// <remarks>
+        /// Action này được cấu hình để ngăn việc lưu trữ cache của phản hồi, đảm bảo
+        /// người dùng luôn nhận được thông báo lỗi mới nhất.
+        /// </remarks>
+        /// <returns>
+        /// Một View hiển thị thông tin lỗi, bao gồm ID của yêu cầu (Request ID).
+        /// </returns>
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
