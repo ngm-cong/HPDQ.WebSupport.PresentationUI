@@ -1,61 +1,87 @@
 ﻿div.contentlist .item {
+    min-height: 80px;
     border: 1px solid #ccc;
-    /*border-radius: 5px;*/
+    border-radius: 5px;
     cursor: pointer;
     margin: 0;
-    padding: 10px;
+    padding: 0;
+    background-color: #fff;
 }
 
-div.contentlist .item:not(:last-child) {
-    border-bottom: 0;
-}
+    div.contentlist .item:not(:last-child) {
+        margin-bottom: 16px;
+        border-bottom: 0;
+    }
 
 .card-title {
-    /*background: #7fb3d5;*/
-    color: #6c757d !important;
+    height: 25px;
+    background: #7fb3d5;
+    color: #000 !important;
+    font-weight: bold;
+    padding: 2px 8px;
 }
 
 .text-container {
-    position: relative; /* needed for absolute positioning inside */
-    /* padding: 20px; */
-    /* background: #f0f0f0; */
-    /* width: 300px;
-        height: 100px; */
-    /* font-size: 16px; */
+    position: relative;
+    padding: 5px 8px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 50px;
+}
+
+.text-content {
+    flex: 1;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.4;
+    max-height: 2.8em;
+    margin-right: 16px;
 }
 
 .corner-label {
-    position: absolute;
-    bottom: 5px;
-    right: 5px;
+    position: static;
+    flex-shrink: 0;
     font-size: 12px;
-    background: #007bff;
     color: white;
     padding: 2px 6px;
     border-radius: 4px;
-    /*margin-left: 5px;*/
-    width: 74px;
-    height: 20px;
+    width: 80px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: auto;
 }
-.corner-label.disabled {
-    background: #E8E8E8;
-    display: none;
-}
-.corner-label.done {
-    background: #ff8c00;
-}
-.corner-label.closed {
-    background: #ef8282;
-}
-.corner-label.progress {
-    background: #198754;
-}
+
+    .corner-label.disabled {
+        background: #E8E8E8;
+        display: none;
+    }
+
+    .corner-label.done {
+        background: #28a745;
+    }
+
+    .corner-label.closed {
+        background: #dc3545;
+    }
+
+    .corner-label.progress {
+        background: #ffc107;
+    }
+
 div.contentlist .itemcontainer {
     height: 100px;
     display: inline-block;
 }
-div.contentlist .itemcontainer img {
-    height: 100px;
-    float: left;
-    cursor: pointer;
-}
+
+    div.contentlist .itemcontainer img {
+        height: 100px;
+        float: left;
+        cursor: pointer;
+    }
