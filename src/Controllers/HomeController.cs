@@ -1,9 +1,10 @@
 ﻿using HPDQ.WebSupport.DataEntitites;
+using HPDQ.WebSupport.Models;
+using HPDQ.WebSupport.Utilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using System.Security.Claims;
-using HPDQ.WebSupport.Models;
 
 namespace HPDQ.WebSupport.Controllers
 {
@@ -132,8 +133,82 @@ namespace HPDQ.WebSupport.Controllers
                 SearchOption = HPDQ.WebSupport.Criteria.SearchOption.OR,
             };
             var tickets = await HPDQ.WebSupport.Utilities.API.Instance.Ticket.Load(criteria);
-            ViewBag.Type = 1;
             return View("Index", tickets);
+        }
+
+        /// <summary>Lớp cấu trúc dữ liệu của sơ đồ.</summary>
+        private class LineChartModel
+        {
+            /// <summary>Tiêu đề hiển thị của một đối tượng dữ liệu trên sơ đồ.</summary>
+            public string Label { get; set; } = string.Empty;
+
+            /// <summary>Danh sách các giá trị của một đối tượng (Thứ tự tương ứng với danh sách tiêu đề của sơ đồ).</summary>
+            public IEnumerable<int>? Data { get; set; }
+
+            /// <summary>Màu khung viền của một đối tượng dữ liệu sẽ hiển thị trên sơ đồ.</summary>
+            public string BorderColor { get; set; } = string.Empty;
+
+            /// <summary>Màu khung nền của một đối tượng dữ liệu sẽ hiển thị trên sơ đồ.</summary>
+            public string BackgroundColor { get; set; } = string.Empty;
+
+            /// <summary>Tỉ lệ bo cong của những đường dữ liệu (Nhận giá trị từ 0-1).</summary>
+            public double Tension { get; set; }
+        }
+
+        /// <summary>
+        /// Hiển thị Dashboard.
+        /// </summary>
+        /// <returns>View Dashboard.</returns>
+        [Authorize]
+        public async Task<IActionResult> Dashboard()
+        {
+            var criteria = new Criteria.TicketCriteria
+            {
+                CreatedOnFr = DateTime.Now.Date.AddDays(-1 * DateTime.Now.Day),
+                ExcludeStatus = null,
+            };
+            var ticketsInMonth = await HPDQ.WebSupport.Utilities.API.Instance.Ticket.Load(criteria);
+            var rptValues = from x in ticketsInMonth
+                            group x by x.CreatedOn.Day into g
+                            select new
+                            {
+                                Date = g.Key,
+                                Total = g.Count(),
+                                Processed = g.Count(x => x.Status == TicketStatus.Done || x.Status == TicketStatus.Closed),
+                                InProgress = g.Count(x => x.Status == TicketStatus.InProgress),
+                            };
+            ViewBag.rptValues = new
+            {
+                labels = rptValues.Select(x => $"Ngày {x.Date}"),
+                datasets = new List<LineChartModel>()
+                {
+                    new LineChartModel
+                    {
+                        Label = "Yêu cầu mới",
+                        Data = rptValues.Select(x => x.Total),
+                        BorderColor = Globals.ChartFormats.ElementAt(0).BorderColor,
+                        BackgroundColor = Globals.ChartFormats.ElementAt(0).BackgroundColor,
+                        Tension = 0.4,
+                    },
+                    new LineChartModel
+                    {
+                        Label = "Đang xử lý",
+                        Data = rptValues.Select(x => x.InProgress),
+                        BorderColor = Globals.ChartFormats.ElementAt(1).BorderColor,
+                        BackgroundColor = Globals.ChartFormats.ElementAt(1).BackgroundColor,
+                        Tension = 0.4,
+                    },
+                    new LineChartModel
+                    {
+                        Label = "Đã xử lý",
+                        Data = rptValues.Select(x => x.Processed),
+                        BorderColor = Globals.ChartFormats.ElementAt(2).BorderColor,
+                        BackgroundColor = Globals.ChartFormats.ElementAt(2).BackgroundColor,
+                        Tension = 0.4,
+                    }
+                }
+            };
+            return View();
         }
     }
 }

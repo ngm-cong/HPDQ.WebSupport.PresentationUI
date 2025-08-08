@@ -50,12 +50,15 @@
             </a>
             <hr />
             <ul class="nav nav-pills flex-column mb-auto">
-                <li>
-                    <a asp-controller="Home" asp-action="Index" class="nav-link @(currentPath == "" ? "active" : "link-dark")">
-                        <i class="bi bi-bar-chart-line-fill"></i>
-                        Dashboard
-                    </a>
-                </li>
+                @if (User.IsInRole("Admin"))
+                {
+                    <li>
+                        <a asp-controller="Home" asp-action="Dashboard" class="nav-link @(currentPath == "dashboard" ? "active" : "link-dark")">
+                            <i class="bi bi-bar-chart-line-fill"></i>
+                            Dashboard
+                        </a>
+                    </li>
+                }
                 <li>
                     <a asp-controller="Home" asp-action="Index" class="nav-link @(currentPath == "index" ? "active" : "link-dark")">
                         <i class="bi bi-card-list"></i>
@@ -112,7 +115,7 @@
                 </div>
             </div>
 
-            
+
         </div>
     </div>
 

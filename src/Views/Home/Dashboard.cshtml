@@ -1,0 +1,44 @@
+﻿@{
+    ViewData["Title"] = "Dashboard";
+}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<canvas id="linechart" style="width: 100%; height: 800px;"></canvas>
+@section Scripts {
+    <script type="text/javascript">
+        $(document).ready(function() {
+            var rptValues = JSON.parse('@Json.Serialize(@ViewBag.rptValues)');
+            const ctx = document.getElementById('linechart');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: rptValues.labels,
+                    datasets: rptValues.datasets
+                },
+                options: {
+                    responsive: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Số lượng yêu cầu phát sinh tháng @System.DateTime.Now.Month'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Số lượng yêu cầu'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Ngày/tháng'
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+}
