@@ -39,6 +39,7 @@ div.contentlist .item:not(:last-child) {
 }
 .corner-label.disabled {
     background: #E8E8E8;
+    display: none;
 }
 .corner-label.done {
     background: #ff8c00;

@@ -20,7 +20,7 @@
     <div class="modal-dialog modal-fullscreen">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="myModalLabel">CHI TIẾT YÊU CẦU</h5>
+                <h5 class="modal-title" id="myModalLabel"><font style="font-weight: bold;">CHI TIẾT YÊU CẦU</font></h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -177,6 +177,9 @@
                 });
             });
             $('#btnconfirm').click(function () {
+                var desc = $('#txtdescription').val();
+                if (!desc || desc == '') return;
+
                 var uploadCompleted = false;
                 var files;
 
@@ -192,7 +195,7 @@
 
                 var bodydata = {
                     emp_id: '@emp_id',
-                    commentDesc: $('#txtdescription').val(),
+                    commentDesc: desc,
                     ticketId: $('#modelTag').val(),
                     files: files
                 };
