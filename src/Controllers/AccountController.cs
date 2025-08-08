@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
-namespace WebSupport.Controllers
+namespace HPDQ.WebSupport.Controllers
 {
     /// <summary>
     /// Controller xử lý các tác vụ liên quan đến tài khoản người dùng, bao gồm đăng nhập, đăng xuất và từ chối truy cập.

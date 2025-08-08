@@ -3,9 +3,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using System.Security.Claims;
-using WebSupport.Models;
+using HPDQ.WebSupport.Models;
 
-namespace WebSupport.Controllers
+namespace HPDQ.WebSupport.Controllers
 {
     /// <summary>
     /// Controller chính để xử lý các yêu cầu liên quan đến yêu cầu hỗ trợ.
@@ -52,7 +52,7 @@ namespace WebSupport.Controllers
                 ProgressBy_EMP_ID = emp_id!,
                 SearchOption = HPDQ.WebSupport.Criteria.SearchOption.OR,
             };
-            var tickets = await WebSupport.Utilities.API.Instance.Ticket.Load(criteria);
+            var tickets = await HPDQ.WebSupport.Utilities.API.Instance.Ticket.Load(criteria);
             return View(tickets);
         }
 
@@ -63,7 +63,7 @@ namespace WebSupport.Controllers
         [Authorize]
         public async Task<IActionResult> NewTicket()
         {
-            var ticketTypes = await WebSupport.Utilities.API.Instance.CodeDetail.Load(new HPDQ.WebSupport.Criteria.CodeDetailCriteria
+            var ticketTypes = await HPDQ.WebSupport.Utilities.API.Instance.CodeDetail.Load(new HPDQ.WebSupport.Criteria.CodeDetailCriteria
             {
                 Master = CodeDetailMaster.TicketType,
             });
@@ -111,7 +111,7 @@ namespace WebSupport.Controllers
                 ProgressBy_EMP_ID = null,
                 SearchOption = HPDQ.WebSupport.Criteria.SearchOption.ISNULL,
             };
-            var tickets = await WebSupport.Utilities.API.Instance.Ticket.Load(criteria);
+            var tickets = await HPDQ.WebSupport.Utilities.API.Instance.Ticket.Load(criteria);
             ViewBag.Type = 1;
             return View("Index", tickets);
         }
@@ -131,7 +131,7 @@ namespace WebSupport.Controllers
                 ProgressBy_EMP_ID = emp_id,
                 SearchOption = HPDQ.WebSupport.Criteria.SearchOption.OR,
             };
-            var tickets = await WebSupport.Utilities.API.Instance.Ticket.Load(criteria);
+            var tickets = await HPDQ.WebSupport.Utilities.API.Instance.Ticket.Load(criteria);
             ViewBag.Type = 1;
             return View("Index", tickets);
         }

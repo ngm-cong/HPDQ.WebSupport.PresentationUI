@@ -1,4 +1,4 @@
-﻿namespace WebSupport.Utilities
+﻿namespace HPDQ.WebSupport.Utilities
 {
     /// <summary>
     /// Chứa các biến, hàm toàn cục được sử dụng trong ứng dụng.

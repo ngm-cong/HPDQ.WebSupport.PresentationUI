@@ -1,4 +1,4 @@
-﻿namespace WebSupport.Utilities
+﻿namespace HPDQ.WebSupport.Utilities
 {
     /// <summary>
     /// Cung cấp một lớp cơ sở để định tuyến và tương tác với các endpoint API cụ thể.

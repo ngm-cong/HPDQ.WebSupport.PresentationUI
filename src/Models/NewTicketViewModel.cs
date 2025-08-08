@@ -1,6 +1,6 @@
 ﻿using HPDQ.WebSupport.DataEntitites;
 
-namespace WebSupport.Models
+namespace HPDQ.WebSupport.Models
 {
     public class NewTicketViewModel
     {

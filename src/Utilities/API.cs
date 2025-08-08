@@ -1,7 +1,7 @@
 ﻿using HPDQ.WebSupport.Criteria;
 using HPDQ.WebSupport.DataEntitites;
 
-namespace WebSupport.Utilities
+namespace HPDQ.WebSupport.Utilities
 {
     /// <summary>
     /// Cung cấp các phương thức để tương tác với API của hệ thống hỗ trợ.
@@ -35,8 +35,8 @@ namespace WebSupport.Utilities
         /// </remarks>
         public API()
         {
-            var restfulCore = (new Core.RESTful.RESTfulUtilities()).AddAuthenticationHeader(WebSupport.Utilities.Globals.APIKey!)
-                .SetBaseUrl(WebSupport.Utilities.Globals.APIUrl!);
+            var restfulCore = (new Core.RESTful.RESTfulUtilities()).AddAuthenticationHeader(HPDQ.WebSupport.Utilities.Globals.APIKey!)
+                .SetBaseUrl(HPDQ.WebSupport.Utilities.Globals.APIUrl!);
             Ticket.Configs(restfulCore, "Tickets");
             CodeDetail.Configs(restfulCore, "CodeDetails");
         }

@@ -1,8 +1,8 @@
 ﻿var builder = WebApplication.CreateBuilder(args);
 
 // Gán giá trị APIKey và APIUrl từ file cấu hình (ví dụ: appsettings.json) vào biến toàn cục trong Globals.
-WebSupport.Utilities.Globals.APIKey = builder.Configuration[$"APISettings:APIKey"];
-WebSupport.Utilities.Globals.APIUrl = builder.Configuration[$"APISettings:APIUrl"];
+HPDQ.WebSupport.Utilities.Globals.APIKey = builder.Configuration[$"APISettings:APIKey"];
+HPDQ.WebSupport.Utilities.Globals.APIUrl = builder.Configuration[$"APISettings:APIUrl"];
 
 // Thêm dịch vụ hỗ trợ Controller và View cho mô hình MVC.
 builder.Services.AddControllersWithViews();

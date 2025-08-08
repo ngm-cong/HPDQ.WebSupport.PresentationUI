@@ -1,4 +1,4 @@
-namespace WebSupport.Models
+namespace HPDQ.WebSupport.Models
 {
     public class ErrorViewModel
     {
