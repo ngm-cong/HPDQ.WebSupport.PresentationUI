@@ -6,37 +6,50 @@
 @section Scripts {
     <script type="text/javascript">
         $(document).ready(function() {
-            var rptValues = JSON.parse('@Json.Serialize(@ViewBag.rptValues)');
-            const ctx = document.getElementById('linechart');
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: rptValues.labels,
-                    datasets: rptValues.datasets
+            $.ajax({
+                url: '@Url.Action("DashboardViewData", "Home")',
+                method: 'GET',
+                headers: {
+                    'X-API-KEY': '@HPDQ.WebSupport.Utilities.Globals.APIKey'
                 },
-                options: {
-                    responsive: false,
-                    plugins: {
-                        title: {
-                            display: true,
-                            text: 'Số lượng yêu cầu phát sinh tháng @System.DateTime.Now.Month'
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Số lượng yêu cầu'
-                            }
+                dataType: 'json',
+                success: function(response) {
+                    console.log('Kết quả:', response);
+                    const ctx = document.getElementById('linechart');
+                    new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: response.data.labels,
+                            datasets: response.data.datasets
                         },
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Ngày/tháng'
+                        options: {
+                            responsive: false,
+                            plugins: {
+                                title: {
+                                    display: true,
+                                    text: 'SỐ LƯỢNG YÊU CẦU PHÁT SINH TRONG THÁNG @System.DateTime.Now.Month'
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    title: {
+                                        display: false,
+                                        text: 'Số lượng yêu cầu'
+                                    }
+                                },
+                                x: {
+                                    title: {
+                                        display: false,
+                                        text: 'Ngày/tháng'
+                                    }
+                                }
                             }
                         }
-                    }
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.error('Lỗi:', error);
                 }
             });
         });

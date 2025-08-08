@@ -136,6 +136,16 @@ namespace HPDQ.WebSupport.Controllers
             return View("Index", tickets);
         }
 
+        /// <summary>
+        /// Hiển thị Dashboard.
+        /// </summary>
+        /// <returns>View Dashboard.</returns>
+        [Authorize]
+        public IActionResult Dashboard()
+        {
+            return View();
+        }
+
         /// <summary>Lớp cấu trúc dữ liệu của sơ đồ.</summary>
         private class LineChartModel
         {
@@ -156,11 +166,18 @@ namespace HPDQ.WebSupport.Controllers
         }
 
         /// <summary>
-        /// Hiển thị Dashboard.
+        /// Lới cấu trúc dữ liệu dành cho hiển thị dashboard số lượng yêu cầu.
         /// </summary>
-        /// <returns>View Dashboard.</returns>
+        private class DashboardViewModel
+        {
+            public IEnumerable<string>? Labels { get; set; }
+            public IEnumerable<LineChartModel>? Datasets { get; set; }
+        }
+
+        /// <summary>Dữ liệu hiển thị lên dashboard số lượng yêu cầu.</summary>
+        /// <returns>Đối tượng mới của <see cref="DashboardViewModel"/>.</returns>
         [Authorize]
-        public async Task<IActionResult> Dashboard()
+        public async Task<APIResult> DashboardViewData()
         {
             var criteria = new Criteria.TicketCriteria
             {
@@ -177,38 +194,39 @@ namespace HPDQ.WebSupport.Controllers
                                 Processed = g.Count(x => x.Status == TicketStatus.Done || x.Status == TicketStatus.Closed),
                                 InProgress = g.Count(x => x.Status == TicketStatus.InProgress),
                             };
-            ViewBag.rptValues = new
+            return new APIResult<DashboardViewModel>
             {
-                labels = rptValues.Select(x => $"Ngày {x.Date}"),
-                datasets = new List<LineChartModel>()
+                Data = new DashboardViewModel
                 {
-                    new LineChartModel
-                    {
-                        Label = "Yêu cầu mới",
-                        Data = rptValues.Select(x => x.Total),
-                        BorderColor = Globals.ChartFormats.ElementAt(0).BorderColor,
-                        BackgroundColor = Globals.ChartFormats.ElementAt(0).BackgroundColor,
-                        Tension = 0.4,
+                    Labels = rptValues.Select(x => $"Ngày {x.Date}"),
+                    Datasets = new List<LineChartModel>() {
+                        new LineChartModel
+                        {
+                            Label = "Yêu cầu mới",
+                            Data = rptValues.Select(x => x.Total),
+                            BorderColor = Globals.ChartFormats.ElementAt(0).BorderColor,
+                            BackgroundColor = Globals.ChartFormats.ElementAt(0).BackgroundColor,
+                            Tension = 0.4,
+                        },
+                        new LineChartModel
+                        {
+                            Label = "Đang xử lý",
+                            Data = rptValues.Select(x => x.InProgress),
+                            BorderColor = Globals.ChartFormats.ElementAt(1).BorderColor,
+                            BackgroundColor = Globals.ChartFormats.ElementAt(1).BackgroundColor,
+                            Tension = 0.4,
+                        },
+                        new LineChartModel
+                        {
+                            Label = "Đã xử lý",
+                            Data = rptValues.Select(x => x.Processed),
+                            BorderColor = Globals.ChartFormats.ElementAt(2).BorderColor,
+                            BackgroundColor = Globals.ChartFormats.ElementAt(2).BackgroundColor,
+                            Tension = 0.4,
+                        }
                     },
-                    new LineChartModel
-                    {
-                        Label = "Đang xử lý",
-                        Data = rptValues.Select(x => x.InProgress),
-                        BorderColor = Globals.ChartFormats.ElementAt(1).BorderColor,
-                        BackgroundColor = Globals.ChartFormats.ElementAt(1).BackgroundColor,
-                        Tension = 0.4,
-                    },
-                    new LineChartModel
-                    {
-                        Label = "Đã xử lý",
-                        Data = rptValues.Select(x => x.Processed),
-                        BorderColor = Globals.ChartFormats.ElementAt(2).BorderColor,
-                        BackgroundColor = Globals.ChartFormats.ElementAt(2).BackgroundColor,
-                        Tension = 0.4,
-                    }
                 }
             };
-            return View();
         }
     }
 }
