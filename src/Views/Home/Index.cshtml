@@ -11,7 +11,10 @@
     {
         <div class="item" tag="@(model.Id)" tagEMP_ID="@(model.EMP_ID)" tagStatus="@((byte)model.Status)">
             <div class="card-title text-muted small">[@(model.CreatedOn.ToString("HH:mm dd/MM/yyyy"))] @(model.EMP_ID)</div>
-            <div class="text-container">@(model.Description)<div class="corner-label @(model.Status == HPDQ.WebSupport.DataEntitites.TicketStatus.Done ? "done" : "") @(model.Status == HPDQ.WebSupport.DataEntitites.TicketStatus.Closed ? "closed" : "") @(model.Status == HPDQ.WebSupport.DataEntitites.TicketStatus.InProgress ? "progress" : "")">@(model.Status.GetDescription())</div></div>
+            <div class="text-container">
+                <div class="text-content">@(model.Description)</div>
+                <div class="corner-label @(model.Status == HPDQ.WebSupport.DataEntitites.TicketStatus.Done ? "done" : "") @(model.Status == HPDQ.WebSupport.DataEntitites.TicketStatus.Closed ? "closed" : "") @(model.Status == HPDQ.WebSupport.DataEntitites.TicketStatus.InProgress ? "progress" : "")">@(model.Status.GetDescription())</div>
+            </div>
         </div>
     }
 </div>
@@ -216,6 +219,7 @@
 
                     formData = new FormData();
                     $('#divattachment').html(formDataFileLength());
+                    $('#txtdescription').val('');
                 });
             });
             initFileInput();

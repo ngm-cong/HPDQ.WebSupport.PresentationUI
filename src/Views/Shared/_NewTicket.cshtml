@@ -42,11 +42,11 @@
         } */
 
     #chatbox .item:not(.reply) {
-        margin-right: 100px;
+        margin-right: 200px;
     }
 
     div.contentlist .item.reply {
-        margin-left: 100px;
+        margin-left: 200px;
     }
 
     .wrapperfooter input[type=text] {
@@ -79,12 +79,13 @@
     }
 
         #chatbox .item.reply {
-            background: #E6F2FF;
-            text-align: right;
+            background: #F9F9F9;
+            cursor: default;
         }
 
         #chatbox .item:not(.reply) {
-            background: #F9F9F9;
+            background: #E6F2FF;
+            cursor: default;
         }
 
         #chatbox .item:not(:first-child) {
@@ -118,7 +119,7 @@
             <table>
                 <tr>
                     <td style="width: 100%;">
-                        <input id="txtdescription" type="text" />
+                        <textarea id="txtdescription" rows="3" style="width: 100%; resize: none;"></textarea>
                     </td>
                     <td style="white-space: nowrap;">
                         <div>
