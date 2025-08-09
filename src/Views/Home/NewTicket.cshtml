@@ -6,6 +6,7 @@
         ?? User.FindFirst("upn")?.Value;
 }
 @model NewTicketViewModel
+
 <style type="text/css">
     input[type=button] {
         width: 80px;
@@ -26,6 +27,7 @@
         color: #3b3c36;
     }
 </style>
+
 <div class="container-fluid p-3">
     <div class="card">
         <div class="card-body">
@@ -63,7 +65,7 @@
         </div>
     </div>
 </div>
-@* <partial name="_NewTicket" /> *@
+
 @section Scripts {
     <script src="~/js/ajaxutil.js"></script>
     <script src="~/js/fileinput.js"></script>

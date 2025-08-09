@@ -1,16 +1,15 @@
 ﻿div.contentlist .item {
     min-height: 80px;
+    background-color: #f9f9f9;
     border: 1px solid #ccc;
     border-radius: 5px;
     cursor: pointer;
     margin: 0;
     padding: 0;
-    background-color: #fff;
 }
 
     div.contentlist .item:not(:last-child) {
         margin-bottom: 16px;
-        border-bottom: 0;
     }
 
 .card-title {
@@ -47,6 +46,7 @@
     position: static;
     flex-shrink: 0;
     font-size: 12px;
+    background: #007bff;
     color: white;
     padding: 2px 6px;
     border-radius: 4px;
@@ -72,7 +72,7 @@
     }
 
     .corner-label.progress {
-        background: #ffc107;
+        background: #f3be1b;
     }
 
 div.contentlist .itemcontainer {

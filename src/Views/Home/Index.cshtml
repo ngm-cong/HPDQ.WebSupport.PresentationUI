@@ -5,6 +5,7 @@
         ?? User.FindFirst("preferred_username")?.Value
         ?? User.FindFirst("upn")?.Value;
 }
+
 @model IEnumerable<HPDQ.WebSupport.DataEntitites.Ticket>
 <div class="contentlist" id="contentlist">
     @foreach (var model in (Model ?? new List<HPDQ.WebSupport.DataEntitites.Ticket>()))
@@ -18,6 +19,7 @@
         </div>
     }
 </div>
+
 <!-- Modal -->
 <div class="modal fade" id="dialogModal" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-fullscreen">
@@ -26,17 +28,14 @@
                 <h5 class="modal-title" id="myModalLabel"><font style="font-weight: bold;">CHI TIẾT YÊU CẦU</font></h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body" style="overflow-y: hidden;">
                 <input id="modelTag" type="hidden" />
                 <partial name="_NewTicket" />
             </div>
-            @* <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">Save changes</button>
-            </div> *@
         </div>
     </div>
 </div>
+
 <!-- Modal -->
 <div class="modal fade" id="dialogModalImage" tabindex="-1" aria-labelledby="myModalLabelImage" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" style="max-width: 1000px; max-height: 600px;">
@@ -45,15 +44,12 @@
                 <h5 class="modal-title" id="myModalLabelImage">HÌNH ẢNH ĐÍNH KÈM</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body" style="overflow-y: hidden;">
             </div>
-            @* <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">Save changes</button>
-            </div> *@
         </div>
     </div>
 </div>
+
 @section Styles {
     <link rel="stylesheet" href="~/css/contentlist.css" />
 }
