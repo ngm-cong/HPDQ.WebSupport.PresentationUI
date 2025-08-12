@@ -73,15 +73,6 @@ namespace HPDQ.WebSupport.Controllers
         }
 
         /// <summary>
-        /// Hiển thị trang giao diện để đăng nhập hệ thống.
-        /// </summary>
-        /// <returns>Giao diện đăng nhập hệ thống.</returns>
-        public IActionResult Login()
-        {
-            return View();
-        }
-
-        /// <summary>
         /// Hiển thị trang lỗi chung của ứng dụng.
         /// </summary>
         /// <remarks>
