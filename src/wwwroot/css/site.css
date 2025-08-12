@@ -57,7 +57,7 @@ body {
 /* CONTENT */
 .content {
     flex-grow: 1;
-    overflow-y: auto;
+    overflow-y: hidden;
     padding: 8px 12px;
     background-color: #fff;
 }
