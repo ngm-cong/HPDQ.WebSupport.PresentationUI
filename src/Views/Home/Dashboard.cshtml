@@ -2,46 +2,251 @@
     ViewData["Title"] = "Dashboard";
 }
 <script src="~/js/chart.js"></script>
-<canvas id="linechart" style="width: 100%; height: 800px;"></canvas>
+
+<div id="chartNavbar" class="navbar navbar-expand-lg navbar-light bg-light mb-4 p-3 rounded shadow-sm">
+    <div class="container-fluid">
+        <span class="navbar-brand mb-0 h1">
+            <i class="bi bi-graph-up-arrow me-2"></i>Bảng điều khiển
+        </span>
+        <div class="d-flex flex-wrap gap-2">
+            <button class="btn btn-outline-primary d-flex align-items-center active" onclick="showChart('monthlyByType')">
+                <i class="bi bi-bar-chart-line-fill me-2"></i>
+                <span>Số lượng yêu cầu theo loại</span>
+            </button>
+            <button class="btn btn-outline-success d-flex align-items-center" onclick="showChart('currentStatus')">
+                <i class="bi bi-list-check me-2"></i>
+                <span>Số lượng yêu cầu hiện có</span>
+            </button>
+            <button class="btn btn-outline-info d-flex align-items-center" onclick="showChart('processingTime')">
+                <i class="bi bi-clock-history me-2"></i>
+                <span>Quản lý thời gian xử lý</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <label for="monthSelect" class="me-2">Chọn tháng:</label>
+                    <select id="monthSelect" class="form-select me-3" style="width: auto;">
+                        <option value="1">Tháng 1</option>
+                        <option value="2">Tháng 2</option>
+                        <option value="3">Tháng 3</option>
+                        <option value="4">Tháng 4</option>
+                        <option value="5">Tháng 5</option>
+                        <option value="6">Tháng 6</option>
+                        <option value="7">Tháng 7</option>
+                        <option value="8">Tháng 8</option>
+                        <option value="9">Tháng 9</option>
+                        <option value="10">Tháng 10</option>
+                        <option value="11">Tháng 11</option>
+                        <option value="12">Tháng 12</option>
+                    </select>
+
+                    <label for="yearSelect" class="me-2">Chọn năm:</label>
+                    <select id="yearSelect" class="form-select" style="width: auto;">
+                    </select>
+
+                    <button id="applyFilter" class="btn btn-primary ms-3">
+                        <i class="bi bi-check-circle me-1"></i> Áp dụng
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-body d-flex justify-content-end">
+                <div id="currentFilter" class="me-3 my-auto">
+                    <span class="fw-bold">Đang hiển thị dữ liệu: </span>
+                    <span id="currentMonthYear" class="text-primary">Tháng @System.DateTime.Now.Month/@System.DateTime.Now.Year</span>
+                </div>
+                <button id="refreshData" class="btn btn-outline-secondary d-flex align-items-center">
+                    <i class="bi bi-arrow-clockwise me-2"></i><span>Làm mới</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="chart-container mb-4">
+    <div id="monthlyByTypeChart" class="chart-item">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">SỐ LƯỢNG YÊU CẦU THEO LOẠI</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="monthlyByTypeCanvas" height="100"></canvas>
+            </div>
+        </div>
+    </div>
+    <div id="currentStatusChart" class="chart-item d-none">
+        <div class="card shadow-sm">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">SỐ LƯỢNG YÊU CẦU HIỆN CÓ THEO TRẠNG THÁI</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="currentStatusCanvas" height="100"></canvas>
+            </div>
+        </div>
+    </div>
+    <div id="processingTimeChart" class="chart-item d-none">
+        <div class="card shadow-sm">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">THỜI GIAN XỬ LÝ TRUNG BÌNH (GIỜ)</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="processingTimeCanvas" height="100"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .chart-container {
+            min-height: 400px;
+        }
+
+        .chart-item {
+            transition: all 0.3s ease;
+        }
+
+        .btn {
+            border-radius: 20px;
+            padding: 8px 16px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+            .btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            }
+
+            .btn.active {
+                background-color: var(--bs-primary);
+                color: white;
+            }
+
+        .btn-outline-success.active {
+            background-color: var(--bs-success);
+        }
+
+        .btn-outline-info.active {
+            background-color: var(--bs-info);
+        }
+    </style>
+}
+
 @section Scripts {
     <script type="text/javascript">
-        $(document).ready(function() {
+        let currentChart = 'monthlyByType';
+        let charts = {};
+        let selectedMonth = @System.DateTime.Now.Month;
+        let selectedYear = @System.DateTime.Now.Year;
+
+        function showChart(chartType) {
+            document.querySelectorAll('.chart-item').forEach(item => {
+                item.classList.add('d-none');
+            });
+            document.getElementById(chartType + 'Chart').classList.remove('d-none');
+            document.querySelectorAll('#chartNavbar .btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.closest('button').classList.add('active');
+            currentChart = chartType;
+            if (!charts[chartType]) {
+                createChart(chartType);
+            }
+        }
+
+        function createChart(chartType) {
+            switch(chartType) {
+                case 'monthlyByType':
+                    createMonthlyByTypeChart();
+                    break;
+                case 'currentStatus':
+                    createCurrentStatusChart();
+                    break;
+                case 'processingTime':
+                    createProcessingTimeChart();
+                    break;
+            }
+        }
+
+        function createMonthlyByTypeChart() {
+            const ctx = document.getElementById('monthlyByTypeCanvas').getContext('2d');
+
             $.ajax({
-                url: '@Url.Action("DashboardViewData", "Home")',
+                url: '@Url.Action("GetTicketDataByType", "Home")',
                 method: 'GET',
+                data: {
+                    month: selectedMonth,
+                    year: selectedYear
+                },
                 headers: {
                     'X-API-KEY': '@HPDQ.WebSupport.Utilities.Globals.APIKey'
                 },
                 dataType: 'json',
                 success: function(response) {
-                    console.log('Kết quả:', response);
-                    const ctx = document.getElementById('linechart');
-                    new Chart(ctx, {
-                        type: 'line',
-                        data: {
-                            labels: response.data.labels,
-                            datasets: response.data.datasets
-                        },
+                    const data = response.data || {
+                        labels: ['Phần cứng', 'Phần mềm', 'Mạng', 'Bảo mật', 'Khác'],
+                        datasets: [{
+                            label: 'Số lượng yêu cầu',
+                            data: [12, 19, 8, 5, 7],
+                            backgroundColor: [
+                                'rgba(255, 99, 132, 0.7)',
+                                'rgba(54, 162, 235, 0.7)',
+                                'rgba(255, 206, 86, 0.7)',
+                                'rgba(75, 192, 192, 0.7)',
+                                'rgba(153, 102, 255, 0.7)'
+                            ],
+                            borderColor: [
+                                'rgba(255, 99, 132, 1)',
+                                'rgba(54, 162, 235, 1)',
+                                'rgba(255, 206, 86, 1)',
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(153, 102, 255, 1)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    };
+
+                    if (charts.monthlyByType) {
+                        charts.monthlyByType.destroy();
+                    }
+
+                    charts.monthlyByType = new Chart(ctx, {
+                        type: 'bar',
+                        data: data,
                         options: {
-                            responsive: false,
+                            responsive: true,
                             plugins: {
+                                legend: {
+                                    display: false
+                                },
                                 title: {
                                     display: true,
-                                    text: 'SỐ LƯỢNG YÊU CẦU PHÁT SINH TRONG THÁNG @System.DateTime.Now.Month'
+                                    text: `SỐ LƯỢNG YÊU CẦU THEO LOẠI - Tháng ${selectedMonth}/${selectedYear}`
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            return `Số lượng: ${context.raw}`;
+                                        }
+                                    }
                                 }
                             },
                             scales: {
                                 y: {
                                     beginAtZero: true,
-                                    title: {
-                                        display: false,
-                                        text: 'Số lượng yêu cầu'
-                                    }
-                                },
-                                x: {
-                                    title: {
-                                        display: false,
-                                        text: 'Ngày/tháng'
+                                    ticks: {
+                                        precision: 0
                                     }
                                 }
                             }
@@ -49,9 +254,247 @@
                     });
                 },
                 error: function(xhr, status, error) {
-                    console.error('Lỗi:', error);
+                    console.error('Lỗi khi tải dữ liệu:', error);
+                    showToast('Không thể tải dữ liệu. Vui lòng thử lại sau.');
                 }
             });
+        }
+
+        function createCurrentStatusChart() {
+            const ctx = document.getElementById('currentStatusCanvas').getContext('2d');
+
+            $.ajax({
+                url: '@Url.Action("GetCurrentStatusData", "Home")',
+                method: 'GET',
+                data: {
+                    month: selectedMonth,
+                    year: selectedYear
+                },
+                headers: {
+                    'X-API-KEY': '@HPDQ.WebSupport.Utilities.Globals.APIKey'
+                },
+                dataType: 'json',
+                success: function(response) {
+                    const data = response.data || {
+                        labels: ['Mới tạo', 'Đang xử lý', 'Hoàn thành', 'Đã đóng'],
+                        datasets: [{
+                            label: 'Số lượng yêu cầu',
+                            data: [10, 15, 8, 5],
+                            backgroundColor: [
+                                'rgba(255, 99, 132, 0.7)',
+                                'rgba(255, 159, 64, 0.7)',
+                                'rgba(75, 192, 192, 0.7)',
+                                'rgba(54, 162, 235, 0.7)'
+                            ],
+                            borderColor: [
+                                'rgba(255, 99, 132, 1)',
+                                'rgba(255, 159, 64, 1)',
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(54, 162, 235, 1)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    };
+
+                    if (charts.currentStatus) {
+                        charts.currentStatus.destroy();
+                    }
+
+                    charts.currentStatus = new Chart(ctx, {
+                        type: 'bar',
+                        data: data,
+                        options: {
+                            indexAxis: 'y', // Thay đổi thành cột ngang
+                            responsive: true,
+                            plugins: {
+                                legend: {
+                                    display: false
+                                },
+                                title: {
+                                    display: true,
+                                    text: `SỐ LƯỢNG YÊU CẦU HIỆN CÓ THEO TRẠNG THÁI - Tháng ${selectedMonth}/${selectedYear}`
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            return `Số lượng: ${context.raw}`;
+                                        }
+                                    }
+                                }
+                            },
+                            scales: {
+                                x: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        precision: 0
+                                    }
+                                }
+                            }
+                        }
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.error('Lỗi khi tải dữ liệu:', error);
+                    showToast('Không thể tải dữ liệu. Vui lòng thử lại sau.');
+                }
+            });
+        }
+
+        function createProcessingTimeChart() {
+            const ctx = document.getElementById('processingTimeCanvas').getContext('2d');
+
+            $.ajax({
+                url: '@Url.Action("GetProcessingTimeData", "Home")',
+                method: 'GET',
+                data: {
+                    month: selectedMonth,
+                    year: selectedYear
+                },
+                headers: {
+                    'X-API-KEY': '@HPDQ.WebSupport.Utilities.Globals.APIKey'
+                },
+                dataType: 'json',
+                success: function(response) {
+                    const data = response.data || {
+                        labels: ['Tuần 1', 'Tuần 2', 'Tuần 3', 'Tuần 4'],
+                        datasets: [
+                            {
+                                label: 'Thời gian xử lý trung bình',
+                                data: [3.2, 2.8, 4.1, 3.5],
+                                borderColor: 'rgba(54, 162, 235, 1)',
+                                backgroundColor: 'rgba(54, 162, 235, 0.1)',
+                                borderWidth: 2,
+                                fill: true,
+                                tension: 0.4
+                            },
+                            {
+                                label: 'Thời gian xử lý tối đa',
+                                data: [5.5, 4.8, 6.2, 5.9],
+                                borderColor: 'rgba(255, 99, 132, 1)',
+                                backgroundColor: 'rgba(255, 99, 132, 0.1)',
+                                borderWidth: 2,
+                                fill: true,
+                                tension: 0.4
+                            }
+                        ]
+                    };
+
+                    if (charts.processingTime) {
+                        charts.processingTime.destroy();
+                    }
+
+                    charts.processingTime = new Chart(ctx, {
+                        type: 'line',
+                        data: data,
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: {
+                                    position: 'top'
+                                },
+                                title: {
+                                    display: true,
+                                    text: `THỜI GIAN XỬ LÝ TRUNG BÌNH (GIỜ) - Tháng ${selectedMonth}/${selectedYear}`
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            return `${context.dataset.label}: ${context.raw} giờ`;
+                                        }
+                                    }
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    title: {
+                                        display: true,
+                                        text: 'Giờ'
+                                    }
+                                }
+                            }
+                        }
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.error('Lỗi khi tải dữ liệu:', error);
+                    showToast('Không thể tải dữ liệu. Vui lòng thử lại sau.');
+                }
+            });
+        }
+
+        function refreshData() {
+            document.getElementById('busyindicator').style.display = 'block';
+
+            // Làm mới biểu đồ hiện tại với tháng/năm đã chọn
+            if (charts[currentChart]) {
+                charts[currentChart].destroy();
+                delete charts[currentChart];
+                createChart(currentChart);
+            }
+
+            setTimeout(() => {
+                document.getElementById('busyindicator').style.display = 'none';
+                showToast('Dữ liệu đã được cập nhật!');
+            }, 1000);
+        }
+
+        function applyFilter() {
+            selectedMonth = parseInt(document.getElementById('monthSelect').value);
+            selectedYear = parseInt(document.getElementById('yearSelect').value);
+
+            // Cập nhật hiển thị tháng/năm hiện tại
+            document.getElementById('currentMonthYear').textContent = `Tháng ${selectedMonth}/${selectedYear}`;
+
+            // Làm mới dữ liệu
+            refreshData();
+        }
+
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'position-fixed bottom-0 end-0 p-3';
+            toast.style.zIndex = '5';
+            toast.innerHTML = `
+                <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="toast-header">
+                        <strong class="me-auto">Thông báo</strong>
+                        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                    <div class="toast-body">
+                        ${message}
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        $(document).ready(function() {
+            // Khởi tạo năm hiện tại và 5 năm trước đó
+            const currentYear = new Date().getFullYear();
+            const yearSelect = document.getElementById('yearSelect');
+
+            for (let year = currentYear; year >= currentYear - 3; year--) {
+                const option = document.createElement('option');
+                option.value = year;
+                option.textContent = year;
+                yearSelect.appendChild(option);
+            }
+
+            // Đặt giá trị mặc định
+            document.getElementById('monthSelect').value = selectedMonth;
+            document.getElementById('yearSelect').value = selectedYear;
+
+            // Tạo biểu đồ mặc định
+            createChart('monthlyByType');
+
+            // Gắn sự kiện cho nút áp dụng
+            document.getElementById('applyFilter').addEventListener('click', applyFilter);
+
+            // Gắn sự kiện cho nút làm mới
+            document.getElementById('refreshData').addEventListener('click', refreshData);
         });
     </script>
 }
