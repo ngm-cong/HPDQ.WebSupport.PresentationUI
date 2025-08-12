@@ -298,6 +298,7 @@
                         });
                         loadImages();
                         var dialogModal = new bootstrap.Modal(document.getElementById('dialogModal'));
+                        $('#txtdescription').val('');
                         dialogModal.show();
                     });
                 }
@@ -417,6 +418,14 @@
                     }
                     location.reload();
                 });
+            });
+            document.getElementById('dialogModal').addEventListener('shown.bs.modal', function () {
+                var scrollDiv = $('#chatbox');
+                scrollDiv.animate({
+                  scrollTop: scrollDiv.prop("scrollHeight")
+                }, 1000); // 1000ms = 1 giây
+                // scrollDiv.scrollTop(scrollDiv.prop("scrollHeight"));
+                console.log('dialogModal', 'shown.bs.modal');
             });
             document.getElementById('dialogModalImage').addEventListener('shown.bs.modal', function () {
                 this.focus();

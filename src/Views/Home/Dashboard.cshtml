@@ -183,7 +183,7 @@
             const ctx = document.getElementById('monthlyByTypeCanvas').getContext('2d');
 
             $.ajax({
-                url: '@Url.Action("GetTicketDataByType", "Home")',
+                url: '@Url.Action("DashboardViewData", "Home", new { rptType = 0 })',
                 method: 'GET',
                 data: {
                     month: selectedMonth,
@@ -264,7 +264,7 @@
             const ctx = document.getElementById('currentStatusCanvas').getContext('2d');
 
             $.ajax({
-                url: '@Url.Action("GetCurrentStatusData", "Home")',
+                url: '@Url.Action("DashboardViewData", "Home", new { rptType = 1 })',
                 method: 'GET',
                 data: {
                     month: selectedMonth,
@@ -344,7 +344,7 @@
             const ctx = document.getElementById('processingTimeCanvas').getContext('2d');
 
             $.ajax({
-                url: '@Url.Action("GetProcessingTimeData", "Home")',
+                url: '@Url.Action("DashboardViewData", "Home", new { rptType = 2 })',
                 method: 'GET',
                 data: {
                     month: selectedMonth,

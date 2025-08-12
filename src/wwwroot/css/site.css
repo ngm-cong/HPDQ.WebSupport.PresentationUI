@@ -99,3 +99,9 @@ body {
     cursor: pointer;
 }
 /*GiangDNB*/
+
+.lbversion {
+    color: #a8a8a8;
+    font-size: 8pt;
+    text-align: right;
+}
