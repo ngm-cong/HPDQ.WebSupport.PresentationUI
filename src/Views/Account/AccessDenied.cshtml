@@ -4,46 +4,25 @@
 
 <style>
     .access-denied-container {
-        height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background: #f8f9fa;
+        min-height: 100vh;
     }
 
     .access-denied-box {
-        background: white;
-        padding: 40px;
-        border-radius: 10px;
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-        text-align: center;
         max-width: 500px;
         width: 90%;
+        padding: 2.5rem;
     }
 
         .access-denied-box i {
-            font-size: 60px;
-            color: #dc3545;
-            margin-bottom: 15px;
-        }
-
-        .access-denied-box h2 {
-            font-weight: bold;
-            margin-bottom: 10px;
-            color: #333;
-        }
-
-        .access-denied-box p {
-            margin-bottom: 20px;
-            color: #666;
+            font-size: 3.75rem;
         }
 </style>
 
-<div class="access-denied-container">
-    <div class="access-denied-box">
-        <i class="bi bi-shield-lock-fill"></i>
-        <h2>403 - Truy cập bị từ chối</h2>
-        <p>Bạn không có quyền truy cập vào chức năng này.<br />Vui lòng liên hệ quản trị viên nếu bạn nghĩ đây là lỗi.</p>
+<div class="access-denied-container d-flex justify-content-center align-items-center bg-light">
+    <div class="access-denied-box bg-white text-center rounded-3 shadow-lg mx-auto">
+        <i class="bi bi-shield-lock-fill text-danger mb-3"></i>
+        <h2 class="fw-bold mb-2 text-dark">403 - Truy cập bị từ chối</h2>
+        <p class="mb-4 text-secondary">Bạn không có quyền truy cập vào chức năng này.<br />Vui lòng liên hệ quản trị viên nếu bạn nghĩ đây là lỗi.</p>
         <a href="/" class="btn btn-primary">
             <i class="bi bi-arrow-left-circle"></i> Quay về trang chủ
         </a>
