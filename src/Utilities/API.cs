@@ -28,6 +28,11 @@ namespace HPDQ.WebSupport.Utilities
         public CodeDetailRoute CodeDetail { get; set; } = new CodeDetailRoute();
 
         /// <summary>
+        /// Đối tượng cung cấp các phương thức để truy cập các API liên quan đến các lịch sử điều chỉnh trạng thái của yêu cầu.
+        /// </summary>
+        public TicketStatusHistoryRoute TicketStatusHistory { get; set; } = new TicketStatusHistoryRoute();
+
+        /// <summary>
         /// Khởi tạo một đối tượng mới của lớp API.
         /// </summary>
         /// <remarks>
@@ -39,6 +44,7 @@ namespace HPDQ.WebSupport.Utilities
                 .SetBaseUrl(HPDQ.WebSupport.Utilities.Globals.APIUrl!);
             Ticket.Configs(restfulCore, "Tickets");
             CodeDetail.Configs(restfulCore, "CodeDetails");
+            TicketStatusHistory.Configs(restfulCore, "TicketStatusHistories");
         }
 
         /// <summary>
@@ -62,6 +68,19 @@ namespace HPDQ.WebSupport.Utilities
             public async Task<IEnumerable<CodeDetail>?> Load(CodeDetailCriteria criteria)
             {
                 var retVal = await routeAPI.Post<APIResult<IEnumerable<CodeDetail>>>("Load", criteria);
+                if (retVal != null && retVal.ErrorCode == 0 && retVal.Data != null) return retVal.Data;
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Cung cấp các phương thức để tương tác với dữ liệu lịch sử điều chỉnh trạng thái của yêu cầu thông qua API.
+        /// </summary>
+        public class TicketStatusHistoryRoute : Utilities.APIRoute
+        {
+            public async Task<IEnumerable<TicketStatusHistory>?> Load(TicketStatusHistoryCriteria criteria)
+            {
+                var retVal = await routeAPI.Post<APIResult<IEnumerable<TicketStatusHistory>>>("Load", criteria);
                 if (retVal != null && retVal.ErrorCode == 0 && retVal.Data != null) return retVal.Data;
                 return null;
             }

@@ -154,7 +154,7 @@ namespace HPDQ.WebSupport.Controllers
             public string Label { get; set; } = string.Empty;
 
             /// <summary>Danh sách các giá trị của một đối tượng (Thứ tự tương ứng với danh sách tiêu đề của sơ đồ).</summary>
-            public IEnumerable<int>? Data { get; set; }
+            public IEnumerable<double>? Data { get; set; }
 
             /// <summary>Màu khung viền của một đối tượng dữ liệu sẽ hiển thị trên sơ đồ.</summary>
             public IEnumerable<string>? BorderColor { get; set; }
@@ -213,7 +213,7 @@ namespace HPDQ.WebSupport.Controllers
                                     Data = from l in labels
                                            join d in rptByIssueValues on l equals d.Label into ld
                                            from d in ld.DefaultIfEmpty()
-                                           select d?.Total ?? 0,
+                                           select d?.Total ?? 0d,
                                     BorderColor = Globals.ChartFormats.Select(x => x.BorderColor).Take(labels.Count()),
                                     BackgroundColor = Globals.ChartFormats.Select(x => x.BackgroundColor).Take(labels.Count()),
                                     Tension = 0.4,
@@ -244,9 +244,53 @@ namespace HPDQ.WebSupport.Controllers
                                 new LineChartModel
                                 {
                                     Label = "Số lượng yêu cầu",
-                                    Data = new List<int> { rptValues.Sum(x => x.Total) - inProgress - processed, inProgress, processed },
+                                    Data = new List<double> { rptValues.Sum(x => x.Total) - inProgress - processed, inProgress, processed },
                                     BorderColor = Globals.ChartFormats.Select(x => x.BorderColor).Take(labels.Count()),
                                     BackgroundColor = Globals.ChartFormats.Select(x => x.BackgroundColor).Take(labels.Count()),
+                                    Tension = 0.4,
+                                },
+                            },
+                        }
+                    };
+                case 2:
+                    var processedTickets = ticketsInMonth?.Where(x => x.Status == TicketStatus.Done || x.Status == TicketStatus.Closed) ?? new List<Ticket>();
+                    var ticketStatusHistoryCriteria = new Criteria.TicketStatusHistoryCriteria
+                    {
+                        TicketIds = processedTickets.Select(x => x.Id),
+                    };
+                    var ticketStatusHistories = await HPDQ.WebSupport.Utilities.API.Instance.TicketStatusHistory.Load(ticketStatusHistoryCriteria) ?? new List<TicketStatusHistory>();
+                    var historyDatas = ticketStatusHistories.GroupBy(x => x.TicketId).Select(x => new { TicketId = x.Key, ProcessedOn = x.Max(c => c.CreatedOn) });
+                    var rptByTimeValues = from x in ticketsInMonth
+                                          join h in historyDatas on x.Id equals h.TicketId
+                                          group new { x.CreatedOn, h.ProcessedOn } by x.CreatedOn.Day / 7 + 1 into g
+                                          select new
+                                          {
+                                              Tuan = g.Key,
+                                              TrungBinh = Math.Round(g.Select(c => (c.ProcessedOn - c.CreatedOn).TotalHours).Sum() / g.Count(), 1),
+                                              ToiDa = Math.Round(g.Select(c => (c.ProcessedOn - c.CreatedOn).TotalHours).Max(), 1),
+                                              TongSo = g.Count(),
+                                          };
+                    labels = rptByTimeValues.Select(x => $"Tuần {x}").ToList();
+                    return new APIResult<DashboardViewModel>
+                    {
+                        Data = new DashboardViewModel
+                        {
+                            Labels = labels,
+                            Datasets = new List<LineChartModel>() {
+                                new LineChartModel
+                                {
+                                    Label = "Thời gian xử lý trung bình",
+                                    Data = rptByTimeValues.Select(x => x.TrungBinh),
+                                    BorderColor = Globals.ChartFormats.Select(x => x.BorderColor).Take(1),
+                                    BackgroundColor = Globals.ChartFormats.Select(x => x.BackgroundColor).Take(1),
+                                    Tension = 0.4,
+                                },
+                                new LineChartModel
+                                {
+                                    Label = "Thời gian xử lý tối đa",
+                                    Data = rptByTimeValues.Select(x => x.ToiDa),
+                                    BorderColor = Globals.ChartFormats.Select(x => x.BorderColor).Skip(1).Take(1),
+                                    BackgroundColor = Globals.ChartFormats.Select(x => x.BackgroundColor).Skip(1).Take(1),
                                     Tension = 0.4,
                                 },
                             },
