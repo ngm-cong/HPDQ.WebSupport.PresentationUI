@@ -2,20 +2,19 @@
     ViewData["Title"] = "Dashboard";
 }
 <script src="~/js/chart.js"></script>
-
 <div id="chartNavbar" class="navbar navbar-expand-lg navbar-light bg-light mb-4 p-3 rounded shadow-sm">
     <div class="container-fluid">
         <span class="navbar-brand mb-0 h1">
             <i class="bi bi-graph-up-arrow me-2"></i>Bảng điều khiển
         </span>
         <div class="d-flex flex-wrap gap-2">
-            <button class="btn btn-outline-primary d-flex align-items-center active" onclick="showChart('monthlyByType')">
-                <i class="bi bi-bar-chart-line-fill me-2"></i>
-                <span>Số lượng yêu cầu theo loại</span>
-            </button>
-            <button class="btn btn-outline-success d-flex align-items-center" onclick="showChart('currentStatus')">
+            <button class="btn btn-outline-success d-flex align-items-center active" onclick="showChart('currentStatus')">
                 <i class="bi bi-list-check me-2"></i>
                 <span>Số lượng yêu cầu hiện có</span>
+            </button>
+            <button class="btn btn-outline-primary d-flex align-items-center" onclick="showChart('monthlyByType')">
+                <i class="bi bi-bar-chart-line-fill me-2"></i>
+                <span>Số lượng yêu cầu theo loại</span>
             </button>
             <button class="btn btn-outline-info d-flex align-items-center" onclick="showChart('processingTime')">
                 <i class="bi bi-clock-history me-2"></i>
@@ -24,7 +23,6 @@
         </div>
     </div>
 </div>
-
 <div class="row mb-4">
     <div class="col-md-6">
         <div class="card shadow-sm">
@@ -45,11 +43,9 @@
                         <option value="11">Tháng 11</option>
                         <option value="12">Tháng 12</option>
                     </select>
-
                     <label for="yearSelect" class="me-2">Chọn năm:</label>
                     <select id="yearSelect" class="form-select" style="width: auto;">
                     </select>
-
                     <button id="applyFilter" class="btn btn-primary ms-3">
                         <i class="bi bi-check-circle me-1"></i> Áp dụng
                     </button>
@@ -57,7 +53,6 @@
             </div>
         </div>
     </div>
-
     <div class="col-md-6">
         <div class="card shadow-sm">
             <div class="card-body d-flex justify-content-end">
@@ -72,9 +67,8 @@
         </div>
     </div>
 </div>
-
 <div class="chart-container mb-4">
-    <div id="monthlyByTypeChart" class="chart-item">
+    <div id="monthlyByTypeChart" class="chart-item d-none">
         <div class="card shadow-sm">
             <div class="card-header bg-primary text-white">
                 <h5 class="mb-0">SỐ LƯỢNG YÊU CẦU THEO LOẠI</h5>
@@ -84,7 +78,7 @@
             </div>
         </div>
     </div>
-    <div id="currentStatusChart" class="chart-item d-none">
+    <div id="currentStatusChart" class="chart-item">
         <div class="card shadow-sm">
             <div class="card-header bg-success text-white">
                 <h5 class="mb-0">SỐ LƯỢNG YÊU CẦU HIỆN CÓ THEO TRẠNG THÁI</h5>
@@ -105,7 +99,6 @@
         </div>
     </div>
 </div>
-
 @section Styles {
     <style>
         .chart-container {
@@ -142,14 +135,12 @@
         }
     </style>
 }
-
 @section Scripts {
     <script type="text/javascript">
-        let currentChart = 'monthlyByType';
+        let currentChart = 'currentStatus';
         let charts = {};
         let selectedMonth = @System.DateTime.Now.Month;
         let selectedYear = @System.DateTime.Now.Year;
-
         function showChart(chartType) {
             document.querySelectorAll('.chart-item').forEach(item => {
                 item.classList.add('d-none');
@@ -164,7 +155,6 @@
                 createChart(chartType);
             }
         }
-
         function createChart(chartType) {
             switch(chartType) {
                 case 'monthlyByType':
@@ -178,9 +168,14 @@
                     break;
             }
         }
-
         function createMonthlyByTypeChart() {
             const ctx = document.getElementById('monthlyByTypeCanvas').getContext('2d');
+
+            // Hiển thị loading trên canvas
+            ctx.font = '16px Arial';
+            ctx.fillStyle = '#666';
+            ctx.textAlign = 'center';
+            ctx.fillText('Đang tải dữ liệu...', ctx.canvas.width / 2, ctx.canvas.height / 2);
 
             $.ajax({
                 url: '@Url.Action("DashboardViewData", "Home", new { rptType = 0 })',
@@ -194,6 +189,9 @@
                 },
                 dataType: 'json',
                 success: function(response) {
+                    // Xóa canvas trước khi vẽ lại
+                    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
                     const data = response.data || {
                         labels: ['Phần cứng', 'Phần mềm', 'Mạng', 'Bảo mật', 'Khác'],
                         datasets: [{
@@ -221,11 +219,17 @@
                         charts.monthlyByType.destroy();
                     }
 
+                    // Đảm bảo canvas có đúng kích thước trước khi tạo biểu đồ
+                    const canvas = document.getElementById('monthlyByTypeCanvas');
+                    canvas.style.width = '100%';
+                    canvas.style.height = '500px';
+
                     charts.monthlyByType = new Chart(ctx, {
                         type: 'bar',
                         data: data,
                         options: {
-                            responsive: false,
+                            responsive: true,
+                            maintainAspectRatio: false,
                             plugins: {
                                 legend: {
                                     display: false
@@ -255,13 +259,23 @@
                 },
                 error: function(xhr, status, error) {
                     console.error('Lỗi khi tải dữ liệu:', error);
+                    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+                    ctx.font = '16px Arial';
+                    ctx.fillStyle = '#f00';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('Không thể tải dữ liệu. Vui lòng thử lại sau.', ctx.canvas.width / 2, ctx.canvas.height / 2);
                     showToast('Không thể tải dữ liệu. Vui lòng thử lại sau.');
                 }
             });
         }
-
         function createCurrentStatusChart() {
             const ctx = document.getElementById('currentStatusCanvas').getContext('2d');
+
+            // Hiển thị loading trên canvas
+            ctx.font = '16px Arial';
+            ctx.fillStyle = '#666';
+            ctx.textAlign = 'center';
+            ctx.fillText('Đang tải dữ liệu...', ctx.canvas.width / 2, ctx.canvas.height / 2);
 
             $.ajax({
                 url: '@Url.Action("DashboardViewData", "Home", new { rptType = 1 })',
@@ -275,6 +289,9 @@
                 },
                 dataType: 'json',
                 success: function(response) {
+                    // Xóa canvas trước khi vẽ lại
+                    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
                     const data = response.data || {
                         labels: ['Mới tạo', 'Đang xử lý', 'Hoàn thành', 'Đã đóng'],
                         datasets: [{
@@ -300,12 +317,18 @@
                         charts.currentStatus.destroy();
                     }
 
+                    // Đảm bảo canvas có đúng kích thước trước khi tạo biểu đồ
+                    const canvas = document.getElementById('currentStatusCanvas');
+                    canvas.style.width = '100%';
+                    canvas.style.height = '500px';
+
                     charts.currentStatus = new Chart(ctx, {
                         type: 'bar',
                         data: data,
                         options: {
                             indexAxis: 'y', // Thay đổi thành cột ngang
-                            responsive: false,
+                            responsive: true,
+                            maintainAspectRatio: false,
                             plugins: {
                                 legend: {
                                     display: false
@@ -335,13 +358,23 @@
                 },
                 error: function(xhr, status, error) {
                     console.error('Lỗi khi tải dữ liệu:', error);
+                    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+                    ctx.font = '16px Arial';
+                    ctx.fillStyle = '#f00';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('Không thể tải dữ liệu. Vui lòng thử lại sau.', ctx.canvas.width / 2, ctx.canvas.height / 2);
                     showToast('Không thể tải dữ liệu. Vui lòng thử lại sau.');
                 }
             });
         }
-
         function createProcessingTimeChart() {
             const ctx = document.getElementById('processingTimeCanvas').getContext('2d');
+
+            // Hiển thị loading trên canvas
+            ctx.font = '16px Arial';
+            ctx.fillStyle = '#666';
+            ctx.textAlign = 'center';
+            ctx.fillText('Đang tải dữ liệu...', ctx.canvas.width / 2, ctx.canvas.height / 2);
 
             $.ajax({
                 url: '@Url.Action("DashboardViewData", "Home", new { rptType = 2 })',
@@ -355,6 +388,9 @@
                 },
                 dataType: 'json',
                 success: function(response) {
+                    // Xóa canvas trước khi vẽ lại
+                    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
                     const data = response.data || {
                         labels: ['Tuần 1', 'Tuần 2', 'Tuần 3', 'Tuần 4'],
                         datasets: [
@@ -383,11 +419,17 @@
                         charts.processingTime.destroy();
                     }
 
+                    // Đảm bảo canvas có đúng kích thước trước khi tạo biểu đồ
+                    const canvas = document.getElementById('processingTimeCanvas');
+                    canvas.style.width = '100%';
+                    canvas.style.height = '500px';
+
                     charts.processingTime = new Chart(ctx, {
                         type: 'line',
                         data: data,
                         options: {
-                            responsive: false,
+                            responsive: true,
+                            maintainAspectRatio: false,
                             plugins: {
                                 legend: {
                                     position: 'top'
@@ -418,27 +460,34 @@
                 },
                 error: function(xhr, status, error) {
                     console.error('Lỗi khi tải dữ liệu:', error);
+                    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+                    ctx.font = '16px Arial';
+                    ctx.fillStyle = '#f00';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('Không thể tải dữ liệu. Vui lòng thử lại sau.', ctx.canvas.width / 2, ctx.canvas.height / 2);
                     showToast('Không thể tải dữ liệu. Vui lòng thử lại sau.');
                 }
             });
         }
-
         function refreshData() {
+            // Hiển thị busy indicator
             document.getElementById('busyindicator').style.display = 'block';
 
-            // Làm mới biểu đồ hiện tại với tháng/năm đã chọn
+            // Hủy biểu đồ hiện tại nếu có
             if (charts[currentChart]) {
                 charts[currentChart].destroy();
                 delete charts[currentChart];
-                createChart(currentChart);
             }
 
+            // Tạo lại biểu đồ với dữ liệu mới
+            createChart(currentChart);
+
+            // Ẩn busy indicator sau một khoảng thời gian đủ để biểu đồ tải
             setTimeout(() => {
                 document.getElementById('busyindicator').style.display = 'none';
                 showToast('Dữ liệu đã được cập nhật!');
-            }, 1000);
+            }, 1500); // Tăng thời gian chờ để đảm bảo biểu đồ tải xong
         }
-
         function applyFilter() {
             selectedMonth = parseInt(document.getElementById('monthSelect').value);
             selectedYear = parseInt(document.getElementById('yearSelect').value);
@@ -446,10 +495,18 @@
             // Cập nhật hiển thị tháng/năm hiện tại
             document.getElementById('currentMonthYear').textContent = `Tháng ${selectedMonth}/${selectedYear}`;
 
+            // Vô hiệu hóa nút áp dụng để tránh nhấn nhiều lần
+            const applyButton = document.getElementById('applyFilter');
+            applyButton.disabled = true;
+
             // Làm mới dữ liệu
             refreshData();
-        }
 
+            // Kích hoạt lại nút sau khi dữ liệu được tải
+            setTimeout(() => {
+                applyButton.disabled = false;
+            }, 1500);
+        }
         function showToast(message) {
             const toast = document.createElement('div');
             toast.className = 'position-fixed bottom-0 end-0 p-3';
@@ -470,25 +527,34 @@
                 toast.remove();
             }, 3000);
         }
-
         $(document).ready(function() {
             // Khởi tạo năm hiện tại và 5 năm trước đó
             const currentYear = new Date().getFullYear();
             const yearSelect = document.getElementById('yearSelect');
-
             for (let year = currentYear; year >= currentYear - 3; year--) {
                 const option = document.createElement('option');
                 option.value = year;
                 option.textContent = year;
                 yearSelect.appendChild(option);
             }
-
             // Đặt giá trị mặc định
             document.getElementById('monthSelect').value = selectedMonth;
             document.getElementById('yearSelect').value = selectedYear;
 
+            // Hiển thị biểu đồ currentStatus mặc định
+            document.querySelectorAll('.chart-item').forEach(item => {
+                item.classList.add('d-none');
+            });
+            document.getElementById('currentStatusChart').classList.remove('d-none');
+
+            // Đảm bảo nút currentStatus là active
+            document.querySelectorAll('#chartNavbar .btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector('#chartNavbar button[onclick="showChart(\'currentStatus\')"]').classList.add('active');
+
             // Tạo biểu đồ mặc định
-            createChart('monthlyByType');
+            createChart('currentStatus');
 
             // Gắn sự kiện cho nút áp dụng
             document.getElementById('applyFilter').addEventListener('click', applyFilter);
