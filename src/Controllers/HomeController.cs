@@ -63,6 +63,7 @@ namespace HPDQ.WebSupport.Controllers
         /// </summary>
         /// <returns>View với một ViewModel chứa danh sách các loại vấn đề của yêu cầu.</returns>
         [Authorize]
+        [Route("taomoiyeucau")]
         public async Task<IActionResult> NewTicket()
         {
             var ticketTypes = await HPDQ.WebSupport.Utilities.API.Instance.CodeDetail.Load(new HPDQ.WebSupport.Criteria.CodeDetailCriteria
@@ -96,6 +97,7 @@ namespace HPDQ.WebSupport.Controllers
         /// </remarks>
         /// <returns>View chứa danh sách các yêu cầu chưa được xử lý.</returns>
         [Authorize(Roles = "Admin")]
+        [Route("theodoiyeucau")]
         public async Task<IActionResult> List()
         {
             var emp_id = _userEMP_ID();
@@ -114,6 +116,7 @@ namespace HPDQ.WebSupport.Controllers
         /// </summary>
         /// <returns>View chứa lịch sử danh sách các yêu cầu.</returns>
         [Authorize]
+        [Route("lichsuyeucau")]
         public async Task<IActionResult> History()
         {
             var emp_id = _userEMP_ID();
@@ -133,6 +136,7 @@ namespace HPDQ.WebSupport.Controllers
         /// </summary>
         /// <returns>View Dashboard.</returns>
         [Authorize]
+        [Route("dashboard")]
         public IActionResult Dashboard()
         {
             return View();
