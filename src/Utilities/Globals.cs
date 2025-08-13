@@ -28,6 +28,11 @@
         /// </summary>
         public static string? APIUrl { get; set; }
 
+        /// <summary>
+        /// Địa chỉ của API dạng domain dành cho các truy xuất API bằng ajax client-side.
+        /// </summary>
+        public static string? DomainAPIUrl { get; set; }
+
         /// <summary>Danh sách các cài đặt dữ liệu trên chart sắp xếp theo thứ tự.</summary>
         public static IEnumerable<ChartFormat> ChartFormats = new List<ChartFormat>
         {

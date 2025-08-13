@@ -79,7 +79,7 @@
                 var uploadCompleted = false;
                 var files;
                 var uploadVal = uploadFileInputs(
-                    '@HPDQ.WebSupport.Utilities.Globals.APIUrl/Upload/Upload',
+                    '@HPDQ.WebSupport.Utilities.Globals.DomainAPIUrl/Upload/Upload',
                     '@HPDQ.WebSupport.Utilities.Globals.APIKey',
                     uploadCompleted,
                     files
@@ -100,7 +100,7 @@
                 };
                 console.log('Tickets/Create', bodydata);
 
-                postData('@HPDQ.WebSupport.Utilities.Globals.APIUrl/Tickets/Create',
+                postData('@HPDQ.WebSupport.Utilities.Globals.DomainAPIUrl/Tickets/Create',
                     '@HPDQ.WebSupport.Utilities.Globals.APIKey',
                     bodydata,
                     function (response) {

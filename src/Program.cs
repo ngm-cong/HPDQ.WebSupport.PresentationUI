@@ -1,4 +1,5 @@
-﻿using Serilog;
+﻿using Microsoft.AspNetCore.DataProtection;
+using Serilog;
 using Serilog.Events;
 
 // ✳️ Cấu hình logger từ rất sớm (trước khi builder được tạo)
@@ -24,10 +25,13 @@ try
     // Gán giá trị APIKey và APIUrl từ file cấu hình (ví dụ: appsettings.json) vào biến toàn cục trong Globals.
     HPDQ.WebSupport.Utilities.Globals.APIKey = builder.Configuration[$"APISettings:APIKey"];
     HPDQ.WebSupport.Utilities.Globals.APIUrl = builder.Configuration[$"APISettings:APIUrl"];
+    HPDQ.WebSupport.Utilities.Globals.DomainAPIUrl = builder.Configuration[$"APISettings:DomainAPIUrl"] ?? HPDQ.WebSupport.Utilities.Globals.APIUrl;
 
     // Thêm dịch vụ hỗ trợ Controller và View cho mô hình MVC.
     builder.Services.AddControllersWithViews();
 
+    builder.Services.AddDataProtection()
+        .PersistKeysToFileSystem(new DirectoryInfo("/app/keys"));
     // Cấu hình dịch vụ xác thực Cookie-based Authentication.
     builder.Services.AddAuthentication("MyCookieAuth")
         .AddCookie("MyCookieAuth", options =>

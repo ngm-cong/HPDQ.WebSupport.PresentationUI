@@ -253,7 +253,7 @@
                                 commentId: $(this).attr('tagId')
                             };
                         }
-                        postData('@HPDQ.WebSupport.Utilities.Globals.APIUrl/Attachments/Load', '@HPDQ.WebSupport.Utilities.Globals.APIKey', bodydata, function(response) {
+                        postData('@HPDQ.WebSupport.Utilities.Globals.DomainAPIUrl/Attachments/Load', '@HPDQ.WebSupport.Utilities.Globals.APIKey', bodydata, function(response) {
                             if (response.data.length > 0) {
                                 $(`.content.contentlist div.item:eq(${index}) div.corner-label`).attr('class', className.replace(' disabled', ''));
                                 var itemcontainer = $('<div class="itemcontainer"></div>');
@@ -264,7 +264,7 @@
                                         return true;
                                     }
                                     $.ajax({
-                                        url: `@HPDQ.WebSupport.Utilities.Globals.APIUrl/Upload/Get/${value.fileName}`,
+                                        url: `@HPDQ.WebSupport.Utilities.Globals.DomainAPIUrl/Upload/Get/${value.fileName}`,
                                         method: 'GET',
                                         headers: {
                                             'X-API-KEY': '@HPDQ.WebSupport.Utilities.Globals.APIKey'
@@ -284,7 +284,7 @@
                     });
                 }
                 function loadComments(bodydata) {
-                    postData('@HPDQ.WebSupport.Utilities.Globals.APIUrl/Comments/Load', '@HPDQ.WebSupport.Utilities.Globals.APIKey', bodydata, function(response) {
+                    postData('@HPDQ.WebSupport.Utilities.Globals.DomainAPIUrl/Comments/Load', '@HPDQ.WebSupport.Utilities.Globals.APIKey', bodydata, function(response) {
                         if (response.errorCode != 0)
                         {
                             window.location.href = '/Home/Index';
@@ -309,7 +309,7 @@
                 var bodydata = {
                     id: $(this).attr('tag')
                 };
-                postData('@HPDQ.WebSupport.Utilities.Globals.APIUrl/Tickets/Load', '@HPDQ.WebSupport.Utilities.Globals.APIKey', bodydata, function(response) {
+                postData('@HPDQ.WebSupport.Utilities.Globals.DomainAPIUrl/Tickets/Load', '@HPDQ.WebSupport.Utilities.Globals.APIKey', bodydata, function(response) {
                     if (response.errorCode != 0)
                     {
                         window.location.href = '/Home/Index';
@@ -340,7 +340,7 @@
                 var uploadCompleted = false;
                 var files;
 
-                var uploadVal = uploadFileInputs('@HPDQ.WebSupport.Utilities.Globals.APIUrl/Upload/Upload', '@HPDQ.WebSupport.Utilities.Globals.APIKey', uploadCompleted, files);
+                var uploadVal = uploadFileInputs('@HPDQ.WebSupport.Utilities.Globals.DomainAPIUrl/Upload/Upload', '@HPDQ.WebSupport.Utilities.Globals.APIKey', uploadCompleted, files);
                 uploadCompleted = uploadVal.uploadCompleted;
                 files = uploadVal.files;
                 if (uploadCompleted == false) {
@@ -356,7 +356,7 @@
                     ticketId: $('#modelTag').val(),
                     files: files
                 };
-                postData('@HPDQ.WebSupport.Utilities.Globals.APIUrl/Comments/Create', '@HPDQ.WebSupport.Utilities.Globals.APIKey', bodydata, function(response) {
+                postData('@HPDQ.WebSupport.Utilities.Globals.DomainAPIUrl/Comments/Create', '@HPDQ.WebSupport.Utilities.Globals.APIKey', bodydata, function(response) {
                     if (response.errorCode != 0)
                     {
                         alert(response.message);
@@ -384,7 +384,7 @@
                         status: 1,
                         progressBy_EMP_ID: '@emp_id',
                     };
-                    postData('@HPDQ.WebSupport.Utilities.Globals.APIUrl/Tickets/Update?emp_id=@emp_id', '@HPDQ.WebSupport.Utilities.Globals.APIKey', bodydata, function(response) {
+                    postData('@HPDQ.WebSupport.Utilities.Globals.DomainAPIUrl/Tickets/Update?emp_id=@emp_id', '@HPDQ.WebSupport.Utilities.Globals.APIKey', bodydata, function(response) {
                         if (response.errorCode != 0)
                         {
                             alert(response.message);
@@ -400,7 +400,7 @@
                     id: $('#modelTag').val(),
                     status: 2,
                 };
-                postData('@HPDQ.WebSupport.Utilities.Globals.APIUrl/Tickets/Update?emp_id=@emp_id', '@HPDQ.WebSupport.Utilities.Globals.APIKey', bodydata, function(response) {
+                postData('@HPDQ.WebSupport.Utilities.Globals.DomainAPIUrl/Tickets/Update?emp_id=@emp_id', '@HPDQ.WebSupport.Utilities.Globals.APIKey', bodydata, function(response) {
                     if (response.errorCode != 0)
                     {
                         alert(response.message);
@@ -414,7 +414,7 @@
                     id: $('#modelTag').val(),
                     status: 3,
                 };
-                postData('@HPDQ.WebSupport.Utilities.Globals.APIUrl/Tickets/Update?emp_id=@emp_id', '@HPDQ.WebSupport.Utilities.Globals.APIKey', bodydata, function(response) {
+                postData('@HPDQ.WebSupport.Utilities.Globals.DomainAPIUrl/Tickets/Update?emp_id=@emp_id', '@HPDQ.WebSupport.Utilities.Globals.APIKey', bodydata, function(response) {
                     if (response.errorCode != 0)
                     {
                         alert(response.message);
@@ -452,7 +452,7 @@
                     commentId: $(element.parentElement.parentElement).attr('tagid')
                 };
             }
-            postData('@HPDQ.WebSupport.Utilities.Globals.APIUrl/Attachments/Load', '@HPDQ.WebSupport.Utilities.Globals.APIKey', bodydata, function(response) {
+            postData('@HPDQ.WebSupport.Utilities.Globals.DomainAPIUrl/Attachments/Load', '@HPDQ.WebSupport.Utilities.Globals.APIKey', bodydata, function(response) {
                 console.log(response);
                 if (response.data.length > 0) {
                     $.each(response.data, function(index, value) {
@@ -461,7 +461,7 @@
                             return true;
                         }
                         $.ajax({
-                            url: `@HPDQ.WebSupport.Utilities.Globals.APIUrl/Upload/Get/${value.fileName}`,
+                            url: `@HPDQ.WebSupport.Utilities.Globals.DomainAPIUrl/Upload/Get/${value.fileName}`,
                             method: 'GET',
                             headers: {
                                 'X-API-KEY': '@HPDQ.WebSupport.Utilities.Globals.APIKey'
