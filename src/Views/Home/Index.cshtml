@@ -204,6 +204,10 @@
             color: #fff;
             border: 1px solid #ccc;
         }
+
+        #chatbox .text-container .corner-label {
+            cursor: pointer;
+        }
     </style>
 }
 @section Scripts {
@@ -429,6 +433,9 @@
             });
             document.getElementById('dialogModalImage').addEventListener('shown.bs.modal', function () {
                 this.focus();
+            });
+            $('#dialogModalImage').on('hidden.bs.modal', function (e) {
+                $('#dialogModal').focus();
             });
         });
         function showImagePopup(element, isTicket) {
