@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.ResponseCompression;
 using Serilog;
 using Serilog.Events;
 
@@ -27,6 +28,17 @@ try
     HPDQ.WebSupport.Utilities.Globals.APIUrl = builder.Configuration[$"APISettings:APIUrl"];
     HPDQ.WebSupport.Utilities.Globals.DomainAPIUrl = builder.Configuration[$"APISettings:DomainAPIUrl"] ?? HPDQ.WebSupport.Utilities.Globals.APIUrl;
 
+    // Thêm dịch vụ nén phản hồi & Cấu hình các tùy chọn cho Gzip
+    builder.Services.AddResponseCompression(options =>
+    {
+        // Chỉ nén các kiểu dữ liệu cụ thể
+        options.EnableForHttps = true;
+        options.Providers.Add<GzipCompressionProvider>();
+    }).Configure<GzipCompressionProviderOptions>(options =>
+    {
+        options.Level = System.IO.Compression.CompressionLevel.Optimal;
+    });
+
     // Thêm dịch vụ hỗ trợ Controller và View cho mô hình MVC.
     builder.Services.AddControllersWithViews();
 
@@ -52,6 +64,8 @@ try
         app.UseHsts();
     }
 
+    // Sử dụng middleware nén phản hồi
+    app.UseResponseCompression();
     // Chuyển hướng các yêu cầu HTTP sang HTTPS.
     app.UseHttpsRedirection();
     // Cho phép các tệp tĩnh (static files) như CSS, JavaScript, hình ảnh, ...
