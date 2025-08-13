@@ -108,6 +108,7 @@ namespace HPDQ.WebSupport.Controllers
             };
             var tickets = await HPDQ.WebSupport.Utilities.API.Instance.Ticket.Load(criteria);
             ViewBag.Type = 1;
+            ViewData["Title"] = "Theo dõi yêu cầu";
             return View("Index", tickets);
         }
 
@@ -128,6 +129,7 @@ namespace HPDQ.WebSupport.Controllers
                 SearchOption = HPDQ.WebSupport.Criteria.SearchOption.OR,
             };
             var tickets = await HPDQ.WebSupport.Utilities.API.Instance.Ticket.Load(criteria);
+            ViewData["Title"] = "Lịch sử yêu cầu";
             return View("Index", tickets);
         }
 
