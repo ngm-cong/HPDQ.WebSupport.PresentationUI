@@ -5,11 +5,11 @@ using Serilog.Events;
 
 // ✳️ Cấu hình logger từ rất sớm (trước khi builder được tạo)
 Log.Logger = new LoggerConfiguration()
-    .MinimumLevel.Debug()
+    .MinimumLevel.Error()   // ⚠️ Chỉ định mức tối thiểu là Error
     .Enrich.FromLogContext()
     .WriteTo.Console()
     .WriteTo.File("logs/log.txt"
-        , restrictedToMinimumLevel: LogEventLevel.Error // chỉ ghi lỗi
+        , restrictedToMinimumLevel: LogEventLevel.Error // Chỉ ghi lỗi
         , rollingInterval: RollingInterval.Day
         , shared: true
     )
