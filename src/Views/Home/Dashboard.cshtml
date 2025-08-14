@@ -3,6 +3,7 @@
 }
 <script src="~/js/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.js"></script>
 <div id="chartNavbar" class="navbar navbar-expand-lg navbar-light bg-light mb-4 p-3 rounded shadow-sm">
     <div class="container-fluid">
         <span class="navbar-brand mb-0 h1">
@@ -729,6 +730,31 @@
 
             // Gắn sự kiện cho nút làm mới
             document.getElementById('refreshData').addEventListener('click', refreshData);
+
+            // Tạo một kết nối tới Hub
+            const connection = new signalR.HubConnectionBuilder()
+                .withUrl("@HPDQ.WebSupport.Utilities.Globals.SignalRUrl/signalrhub", {
+                    headers: {
+                        "X-API-KEY": '@HPDQ.WebSupport.Utilities.Globals.APIKey'
+                    }
+                })
+                .build();
+            // Lắng nghe phương thức "ReceiveMessage" từ server
+            connection.on("ReceiveMessage", (user, message) => {
+                // Xử lý dữ liệu nhận được, ví dụ: hiển thị lên trang
+                // const li = document.createElement("li");
+                // li.textContent = `${user}: ${message}`;
+                // document.getElementById("messagesList").appendChild(li);
+                console.log('signalrhub', 'ReceiveMessage', `${user}: ${message}`);
+            });
+            // Bắt đầu kết nối
+            connection.start()
+                .then(() => {
+                    console.log("Connected to SignalR hub!");
+                })
+                .catch(err => {
+                    console.error(err);
+                });
         });
     </script>
 }

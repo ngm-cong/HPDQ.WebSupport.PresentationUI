@@ -27,6 +27,7 @@ try
     HPDQ.WebSupport.Utilities.Globals.APIKey = builder.Configuration[$"APISettings:APIKey"];
     HPDQ.WebSupport.Utilities.Globals.APIUrl = builder.Configuration[$"APISettings:APIUrl"];
     HPDQ.WebSupport.Utilities.Globals.DomainAPIUrl = builder.Configuration[$"APISettings:DomainAPIUrl"] ?? HPDQ.WebSupport.Utilities.Globals.APIUrl;
+    HPDQ.WebSupport.Utilities.Globals.SignalRUrl = builder.Configuration[$"APISettings:SignalRUrl"];
 
     // Thêm dịch vụ nén phản hồi & Cấu hình các tùy chọn cho Gzip
     builder.Services.AddResponseCompression(options =>
@@ -82,6 +83,12 @@ try
     app.MapControllerRoute(
         name: "default",
         pattern: "{controller=Home}/{action=Index}/{id?}");
+
+    Core.RESTful.Utilities.RegisterAPI<HPDQ.WebSupport.Utilities.SignalRAPI>(() => (new Core.RESTful.RESTfulUtilities()).AddAuthenticationHeader(HPDQ.WebSupport.Utilities.Globals.APIKey!)
+            .SetBaseUrl(HPDQ.WebSupport.Utilities.Globals.SignalRUrl!));
+    Core.RESTful.Utilities.RegisterAPI<HPDQ.WebSupport.Utilities.API>(() => (new Core.RESTful.RESTfulUtilities()).AddAuthenticationHeader(HPDQ.WebSupport.Utilities.Globals.APIKey!)
+            .SetBaseUrl(HPDQ.WebSupport.Utilities.Globals.APIUrl!));
+
     // Chạy ứng dụng web.
     app.Run();
 }

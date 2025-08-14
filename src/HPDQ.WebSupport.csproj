@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <PackageReference Include="HPDQ.WebSupport.DataEntitites" Version="1.0.11" />
+    <PackageReference Include="HPDQ.WebSupport.Utilities" Version="1.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.ResponseCompression" Version="2.3.0" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.22.1" />
     <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
