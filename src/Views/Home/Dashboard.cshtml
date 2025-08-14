@@ -2,6 +2,7 @@
     ViewData["Title"] = "Dashboard";
 }
 <script src="~/js/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
 <div id="chartNavbar" class="navbar navbar-expand-lg navbar-light bg-light mb-4 p-3 rounded shadow-sm">
     <div class="container-fluid">
         <span class="navbar-brand mb-0 h1">
@@ -20,10 +21,14 @@
                 <i class="bi bi-clock-history me-2"></i>
                 <span>Quản lý thời gian xử lý</span>
             </button>
+            <button class="btn btn-outline-success d-flex align-items-center active" onclick="showChart('summary')">
+                <i class="bi bi-list-check me-2"></i>
+                <span>Tổng quan</span>
+            </button>
         </div>
     </div>
 </div>
-<div class="row mb-4">
+<div class="row mb-4" style="display: none;">
     <div class="col-md-6">
         <div class="card shadow-sm">
             <div class="card-body">
@@ -98,6 +103,27 @@
             </div>
         </div>
     </div>
+    <div id="summaryChart" class="chart-item d-none">
+        <div class="card shadow-sm">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">TỔNG QUAN</h5>
+            </div>
+            <div class="card-body">
+                <div>
+                    <table style="width: 100%;">
+                        <tr>
+                            <td style="width: 50%;">
+                                <canvas id="summaryMonthlyByTypeCanvas" class="rptcanvas"></canvas>
+                            </td>
+                            <td style="width: 50%;">
+                                <canvas id="summaryMonthlyByStatusCanvas" class="rptcanvas"></canvas>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 @section Styles {
     <style>
@@ -142,10 +168,13 @@
 }
 @section Scripts {
     <script type="text/javascript">
+        // Đăng ký plugin
+        Chart.register(ChartDataLabels);
+
         let currentChart = 'currentStatus';
         let charts = {};
-        let selectedMonth = @System.DateTime.Now.Month;
-        let selectedYear = @System.DateTime.Now.Year;
+        let selectedMonth = parseInt('@System.DateTime.Now.Month');
+        let selectedYear = parseInt('@System.DateTime.Now.Year');
         function showChart(chartType) {
             document.querySelectorAll('.chart-item').forEach(item => {
                 item.classList.add('d-none');
@@ -154,14 +183,15 @@
             document.querySelectorAll('#chartNavbar .btn').forEach(btn => {
                 btn.classList.remove('active');
             });
-            event.target.closest('button').classList.add('active');
+            // event.target.closest('button').classList.add('active');
             currentChart = chartType;
             if (!charts[chartType]) {
                 createChart(chartType);
             }
         }
         function createChart(chartType) {
-            switch(chartType) {
+            console.log('createChart', chartType);
+            switch (chartType) {
                 case 'monthlyByType':
                     createMonthlyByTypeChart();
                     break;
@@ -170,6 +200,9 @@
                     break;
                 case 'processingTime':
                     createProcessingTimeChart();
+                    break;
+                case 'summary':
+                    createSummaryChart();
                     break;
             }
         }
@@ -274,7 +307,10 @@
             });
         }
         function createCurrentStatusChart() {
-            const ctx = document.getElementById('currentStatusCanvas').getContext('2d');
+            createCurrentStatusChartOnElement('currentStatusCanvas');
+        }
+        function createCurrentStatusChartOnElement(chartId) {
+            const ctx = document.getElementById(chartId).getContext('2d');
 
             // Hiển thị loading trên canvas
             ctx.font = '16px Arial';
@@ -323,7 +359,7 @@
                     }
 
                     // Đảm bảo canvas có đúng kích thước trước khi tạo biểu đồ
-                    const canvas = document.getElementById('currentStatusCanvas');
+                    const canvas = document.getElementById(chartId);
                     canvas.style.width = '100%';
                     canvas.style.height = '500px';
 
@@ -458,6 +494,133 @@
                                         display: true,
                                         text: 'Giờ'
                                     }
+                                }
+                            }
+                        }
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.error('Lỗi khi tải dữ liệu:', error);
+                    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+                    ctx.font = '16px Arial';
+                    ctx.fillStyle = '#f00';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('Không thể tải dữ liệu. Vui lòng thử lại sau.', ctx.canvas.width / 2, ctx.canvas.height / 2);
+                    showToast('Không thể tải dữ liệu. Vui lòng thử lại sau.');
+                }
+            });
+        }
+        function createSummaryChart() {
+            createCurrentStatusChartOnElement('summaryMonthlyByStatusCanvas');
+            const ctx = document.getElementById('summaryMonthlyByTypeCanvas').getContext('2d');
+
+            // Hiển thị loading trên canvas
+            ctx.font = '16px Arial';
+            ctx.fillStyle = '#666';
+            ctx.textAlign = 'center';
+            ctx.fillText('Đang tải dữ liệu...', ctx.canvas.width / 2, ctx.canvas.height / 2);
+
+            $.ajax({
+                url: '@Url.Action("DashboardViewData", "Home", new { rptType = 0 })',
+                method: 'GET',
+                data: {
+                    month: selectedMonth,
+                    year: selectedYear
+                },
+                headers: {
+                    'X-API-KEY': '@HPDQ.WebSupport.Utilities.Globals.APIKey'
+                },
+                dataType: 'json',
+                success: function(response) {
+                    // Xóa canvas trước khi vẽ lại
+                    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+                    const data = response.data || {
+                        labels: ['Phần cứng', 'Phần mềm', 'Mạng', 'Bảo mật', 'Khác'],
+                        datasets: [{
+                            label: 'Số lượng yêu cầu',
+                            data: [12, 19, 8, 5, 7],
+                            backgroundColor: [
+                                'rgba(255, 99, 132, 0.7)',
+                                'rgba(54, 162, 235, 0.7)',
+                                'rgba(255, 206, 86, 0.7)',
+                                'rgba(75, 192, 192, 0.7)',
+                                'rgba(153, 102, 255, 0.7)'
+                            ],
+                            borderColor: [
+                                'rgba(255, 99, 132, 1)',
+                                'rgba(54, 162, 235, 1)',
+                                'rgba(255, 206, 86, 1)',
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(153, 102, 255, 1)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    };
+
+                    if (charts.monthlyByType) {
+                        charts.monthlyByType.destroy();
+                    }
+
+                    // Đảm bảo canvas có đúng kích thước trước khi tạo biểu đồ
+                    const canvas = document.getElementById('monthlyByTypeCanvas');
+                    canvas.style.width = '100%';
+                    canvas.style.height = '500px';
+
+                    charts.monthlyByType = new Chart(ctx, {
+                        type: 'pie',
+                        data: data,
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    // Đặt 'display' là 'true' để hiển thị mô tả
+                                    display: true,
+                                    position: 'bottom' // Có thể đặt 'top', 'bottom', 'left', 'right'
+
+                                },
+                                title: {
+                                    display: true,
+                                    text: `SỐ LƯỢNG YÊU CẦU THEO LOẠI - THÁNG ${selectedMonth}/${selectedYear}`
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            let label = context.label || '';
+                                            if (label) {
+                                                label += ': ';
+                                            }
+                                            if (context.parsed !== null) {
+                                                const total = context.chart.data.datasets[0].data.reduce((sum, value) => sum + value, 0);
+                                                const value = context.parsed;
+                                                const percentage = ((value / total) * 100).toFixed(2) + '%';
+                                                label += percentage;
+                                            }
+                                            return label;
+                                        }
+                                    }
+                                },
+                                // Cấu hình plugin datalabels
+                                datalabels: {
+                                    formatter: (value, context) => {
+                                        const total = context.chart.data.datasets[0].data.reduce((sum, val) => sum + val, 0);
+                                        const percentage = ((value / total) * 100).toFixed(2) + '%';
+                                        return percentage;
+                                    },
+                                    color: '#000' // Màu chữ
+                                    // font: {
+                                    //     weight: 'bold',
+                                    //     size: 14
+                                    // },
+                                    // textShadowBlur: 2, // Tạo hiệu ứng bóng đổ cho dễ đọc
+                                    // textShadowColor: 'rgba(0, 0, 0, 0.7)'
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    // ...
+                                    display: false // Ẩn trục y nếu bạn muốn code gọn hơn
                                 }
                             }
                         }

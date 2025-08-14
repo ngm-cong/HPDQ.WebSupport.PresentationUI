@@ -294,7 +294,7 @@ namespace HPDQ.WebSupport.Controllers
                         }
                     };
                 default:
-                    return null;
+                    return new APIResult<DashboardViewModel> { };
             }
         }
     }
