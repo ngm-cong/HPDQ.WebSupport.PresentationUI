@@ -184,7 +184,7 @@
             document.querySelectorAll('#chartNavbar .btn').forEach(btn => {
                 btn.classList.remove('active');
             });
-            // event.target.closest('button').classList.add('active');
+            event.target.closest('button').classList.add('active');
             currentChart = chartType;
             if (!charts[chartType]) {
                 createChart(chartType);
@@ -657,6 +657,7 @@
                 showToast('Dữ liệu đã được cập nhật!');
             }, 1500); // Tăng thời gian chờ để đảm bảo biểu đồ tải xong
         }
+
         function applyFilter() {
             selectedMonth = parseInt(document.getElementById('monthSelect').value);
             selectedYear = parseInt(document.getElementById('yearSelect').value);
@@ -746,6 +747,9 @@
                 // li.textContent = `${user}: ${message}`;
                 // document.getElementById("messagesList").appendChild(li);
                 console.log('signalrhub', 'ReceiveMessage', `${user}: ${message}`);
+                if (currentChart == 'summary') {
+                    createSummaryChart();
+                }
             });
             // Bắt đầu kết nối
             connection.start()
