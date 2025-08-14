@@ -35,17 +35,16 @@
                 <div id="requestDetailModal" class="wrapper">
                     <div id="chatbox" class="content contentlist card">
                     </div>
-
                     <div class="card wrapperfooter">
                         <div style="text-align: left;">
                             <table>
                                 <tr>
-                                    <td style="width: 100%; font-weight: bold; text-decoration: underline;">Thông tin phản hồi</td>
+                                    <td class="footertitle">Thông tin phản hồi</td>
                                     <td style="white-space: nowrap;">
                                         <div id="divattachment"></div>
                                         <img id="imgattachment" src="/img/attachment.png" />
                                     </td>
-                                    <td style="white-space: nowrap; text-decoration: underline; color: #06428B; cursor: pointer;">
+                                    <td class="footerfuncbutton">
                                         <span id="lblclose" class="function">Đóng</span>
                                         <span id="lblcomplete" class="function">Hoàn thành</span>
                                         <span id="lblaccept" class="function">Tiếp nhận</span>
@@ -92,135 +91,7 @@
 
 @section Styles {
     <link rel="stylesheet" href="~/css/contentlist.css" />
-    <style type="text/css">
-        #requestDetailModal {
-            position: relative;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        #chatbox {
-            height: calc(100vh - 220px);
-            position: absolute;
-            top: 0;
-            bottom: 130px;
-            left: 0;
-            right: 0;
-            overflow-y: auto;
-            padding: 10px;
-            background: #fafafa;
-        }
-
-            #chatbox .item {
-                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-                border-radius: 4px;
-                min-height: fit-content;
-            }
-
-                #chatbox .item.reply {
-                    background: #F6F6F6;
-                    cursor: default;
-                    margin-right: 250px;
-                }
-
-                    #chatbox .item.reply .card-title {
-                        background: #ddd;
-                    }
-
-                #chatbox .item:not(.reply) {
-                    background: #E6F2FF;
-                    cursor: default;
-                    margin-left: 250px;
-                }
-
-                #chatbox .item:not(:first-child) {
-                    margin-top: 10px;
-                }
-
-                #chatbox .item:not(:last-child) {
-                    border-bottom: 1px solid #ccc;
-                }
-
-        #divattachment {
-            display: inline-block;
-            color: red;
-            font-weight: bold;
-        }
-
-        #imgattachment {
-            display: none;
-            margin-right: 10px;
-        }
-
-        .function {
-            display: none;
-            margin-right: 20px;
-        }
-
-        .wrapperfooter {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 130px;
-            background: white;
-            border-top: 1px solid #ccc;
-            padding: 10px;
-        }
-
-            .wrapperfooter input[type=text] {
-                width: 100%;
-                height: 80px;
-                margin: 0;
-                border: 1px solid #D1D5DA;
-            }
-
-            .wrapperfooter input[type=button] {
-                width: 80px;
-                height: 80px;
-                border-radius: 4px;
-            }
-
-                .wrapperfooter input[type=button]:hover {
-                    background-color: #0056b3 !important;
-                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-                }
-
-            .wrapperfooter input[type=text]:focus {
-                border: none;
-                outline-color: #a9cce3;
-                outline-width: 1px;
-            }
-
-        #txtdescription {
-            width: 100%;
-            resize: none;
-            margin-top: 8px;
-        }
-
-        #btnconfirm {
-            background: #2980b9;
-            color: #fff;
-            border: 1px solid #ccc;
-        }
-
-        #chatbox .text-container .corner-label {
-            cursor: pointer;
-        }
-
-        #dialogModal .modal-header {
-            padding: 8px;
-            background: #06428B;
-        }
-        #myModalLabel {
-            font-weight: bold;
-            color: white;
-        }
-        #dialogModal .modal-content {
-            background: #f0f0f0;
-        }
-    </style>
+    <link rel="stylesheet" href="~/css/home.css" />
 }
 @section Scripts {
     <script src="~/js/fileinput.js"></script>
