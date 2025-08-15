@@ -87,6 +87,11 @@
                     </div>
                     <input type="password" class="form-control p-3 rounded" id="password" name="password" placeholder="Mật khẩu" required>
                 </div>
+                @if (string.IsNullOrEmpty(ViewBag.Error) == false) {
+                    <div style="margin-bottom: 10px; color: red;">
+                        @ViewBag.Error
+                    </div>
+                }
                 <button type="submit" class="btn btn-primary w-100 p-3 fw-bold rounded">Đăng nhập</button>
             </form>
         </div>

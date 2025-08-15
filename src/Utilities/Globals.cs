@@ -36,6 +36,9 @@
         /// <summary>Địa chỉ của dịch vụ SignalR.</summary>
         public static string? SignalRUrl { get; set; }
 
+        /// <summary>Địa chỉ của API của dịch vụ đăng nhập.</summary>
+        public static string? AuthenticateAPIUrl { get; set; }
+
         /// <summary>Danh sách các cài đặt dữ liệu trên chart sắp xếp theo thứ tự.</summary>
         public static IEnumerable<ChartFormat> ChartFormats = new List<ChartFormat>
         {

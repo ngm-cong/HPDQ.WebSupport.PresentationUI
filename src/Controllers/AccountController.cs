@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
 namespace HPDQ.WebSupport.Controllers
@@ -28,6 +29,50 @@ namespace HPDQ.WebSupport.Controllers
         public IActionResult AccessDenied() => View();
 
         /// <summary>
+        /// Lớp chứa thông tin giải mã được của API đăng nhập.
+        /// </summary>
+        private class AuthenticateModel
+        {
+            /// <summary>Mã NV</summary>
+            public string? EMP_ID { get; set; }
+            /// <summary>Họ tên nhân viên</summary>
+            public string? FullName { get; set; }
+        }
+
+        /// <summary>Hàm giải mã token thông tin đăng nhập.</summary>
+        /// <param name="jwtToken">Token thông tin đăng nhập</param>
+        /// <returns>Lớp thông tin đăng nhập.</returns>
+        /// <exception cref="Exception"></exception>
+        private AuthenticateModel JWTDecode(string jwtToken)
+        {
+            // 1. Create a token handler
+            var handler = new JwtSecurityTokenHandler();
+
+            // Check if the token is in a valid format
+            if (handler.CanReadToken(jwtToken))
+            {
+                // 2. Read the token without validating the signature
+                var token = handler.ReadJwtToken(jwtToken);
+
+                // 3. Access the token claims
+                Console.WriteLine("Token Header:");
+                Console.WriteLine(token.Header.SerializeToJson());
+
+                Console.WriteLine("\nToken Payload (Claims):");
+                foreach (var claim in token.Claims)
+                {
+                    Console.WriteLine($"{claim.Type}: {claim.Value}");
+                }
+
+                return new AuthenticateModel { EMP_ID = token.Claims.First(x => x.Type == "MaNV").Value, FullName = token.Claims.First(x => x.Type == "unique_name").Value };
+            }
+            else
+            {
+                throw new Exception("Invalid JWT format.");
+            }
+        }
+
+        /// <summary>
         /// Xử lý yêu cầu đăng nhập từ người dùng.
         /// </summary>
         /// <param name="emp_id">Mã của nhân viên.</param>
@@ -38,24 +83,32 @@ namespace HPDQ.WebSupport.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(string emp_id, string password)
         {
-            // Ví dụ kiểm tra username/password đơn giản
-            var role = "User";
-            if (emp_id.ToLower() == "admin") role = "Admin";
-            if (password == "123")
+            var empToken = await HPDQ.WebSupport.Utilities.AuthenticateAPI.Instance.Authenticate.Login("HPDQ18461", "1");
+
+            if (string.IsNullOrEmpty(empToken) == false)
             {
-                var claims = new List<Claim> {
+                var emp = JWTDecode(empToken);
+
+                // Ví dụ kiểm tra username/password đơn giản
+                var role = "User";
+                if (emp_id.ToLower() == "admin") role = "Admin";
+                if (password == "123")
+                {
+                    var claims = new List<Claim> {
                     new Claim(ClaimTypes.NameIdentifier, emp_id),
+                    new Claim(ClaimTypes.GivenName, emp.FullName!),
                     new Claim(ClaimTypes.Role, role)
                 };
 
-                var claimsIdentity = new ClaimsIdentity(claims, "MyCookieAuth");
+                    var claimsIdentity = new ClaimsIdentity(claims, "MyCookieAuth");
 
-                await HttpContext.SignInAsync("MyCookieAuth", new ClaimsPrincipal(claimsIdentity));
+                    await HttpContext.SignInAsync("MyCookieAuth", new ClaimsPrincipal(claimsIdentity));
 
-                return RedirectToAction("Index", "Home");
+                    return RedirectToAction("Index", "Home");
+                }
             }
 
-            ViewBag.Error = "Login failed";
+            ViewBag.Error = "Sai thông tin đăng nhập!";
             return View();
         }
 

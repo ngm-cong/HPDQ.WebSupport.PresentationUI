@@ -108,7 +108,7 @@
 
             <!-- Footer -->
             <div class="footer d-flex justify-content-end align-items-center">
-                <div id="username">@Html.Raw(emp_id)</div>
+                <div id="username">[@Html.Raw(emp_id)] @User.FindFirst(ClaimTypes.GivenName)?.Value</div>
                 <div id="logout_btn" class="ms-3 fw-bold" data-bs-toggle="tooltip" title="Đăng xuất">
                     <i class="bi bi-box-arrow-left fs-5"></i>
                 </div>
