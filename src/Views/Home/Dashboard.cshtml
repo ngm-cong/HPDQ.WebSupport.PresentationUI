@@ -10,20 +10,20 @@
             <i class="bi bi-graph-up-arrow me-2"></i>Bảng điều khiển
         </span>
         <div class="d-flex flex-wrap gap-2">
-            <button class="btn btn-outline-success d-flex align-items-center active" onclick="showChart('currentStatus')">
+            <button class="btn btn-outline-success d-flex align-items-center showChart active" tag="currentStatus">
                 <i class="bi bi-list-check me-2"></i>
                 <span>Số lượng yêu cầu hiện có</span>
             </button>
-            <button class="btn btn-outline-primary d-flex align-items-center" onclick="showChart('monthlyByType')">
+            <button class="btn btn-outline-primary d-flex align-items-center showChart" tag="monthlyByType">
                 <i class="bi bi-bar-chart-line-fill me-2"></i>
                 <span>Số lượng yêu cầu theo loại</span>
             </button>
-            <button class="btn btn-outline-info d-flex align-items-center" onclick="showChart('processingTime')">
+            <button class="btn btn-outline-info d-flex align-items-center showChart" tag="processingTime">
                 <i class="bi bi-clock-history me-2"></i>
                 <span>Quản lý thời gian xử lý</span>
             </button>
-            <button class="btn btn-outline-success d-flex align-items-center active" onclick="showChart('summary')">
-                <i class="bi bi-list-check me-2"></i>
+            <button class="btn btn-outline-primary d-flex align-items-center showChart" tag="summary">
+                <i class="bi bi-bar-chart-line-fill me-2"></i>
                 <span>Tổng quan</span>
             </button>
         </div>
@@ -94,7 +94,7 @@
             </div>
         </div>
     </div>
-    <div id="processingTimeChart" class="chart-item d-none">
+    <div id="processingTimeChart" class="chart-item">
         <div class="card shadow-sm">
             <div class="card-header bg-info text-white">
                 <h5 class="mb-0">THỜI GIAN XỬ LÝ TRUNG BÌNH (GIỜ)</h5>
@@ -104,7 +104,7 @@
             </div>
         </div>
     </div>
-    <div id="summaryChart" class="chart-item d-none">
+    <div id="summaryChart" class="chart-item">
         <div class="card shadow-sm">
             <div class="card-header bg-success text-white">
                 <h5 class="mb-0">TỔNG QUAN</h5>
@@ -176,7 +176,7 @@
         let charts = {};
         let selectedMonth = parseInt('@System.DateTime.Now.Month');
         let selectedYear = parseInt('@System.DateTime.Now.Year');
-        function showChart(chartType) {
+        function showChart(chartType, event) {
             document.querySelectorAll('.chart-item').forEach(item => {
                 item.classList.add('d-none');
             });
@@ -355,8 +355,8 @@
                         }]
                     };
 
-                    if (charts.currentStatus) {
-                        charts.currentStatus.destroy();
+                    if (charts.chartId) {
+                        charts.chartId.destroy();
                     }
 
                     // Đảm bảo canvas có đúng kích thước trước khi tạo biểu đồ
@@ -364,7 +364,7 @@
                     canvas.style.width = '100%';
                     canvas.style.height = '500px';
 
-                    charts.currentStatus = new Chart(ctx, {
+                    charts.chartId = new Chart(ctx, {
                         type: 'bar',
                         data: data,
                         options: {
@@ -559,8 +559,8 @@
                         }]
                     };
 
-                    if (charts.monthlyByType) {
-                        charts.monthlyByType.destroy();
+                    if (charts.summaryMonthlyByType) {
+                        charts.summaryMonthlyByType.destroy();
                     }
 
                     // Đảm bảo canvas có đúng kích thước trước khi tạo biểu đồ
@@ -568,7 +568,7 @@
                     canvas.style.width = '100%';
                     canvas.style.height = '500px';
 
-                    charts.monthlyByType = new Chart(ctx, {
+                    charts.summaryMonthlyByType = new Chart(ctx, {
                         type: 'doughnut',
                         data: data,
                         options: {
@@ -721,7 +721,7 @@
             document.querySelectorAll('#chartNavbar .btn').forEach(btn => {
                 btn.classList.remove('active');
             });
-            document.querySelector('#chartNavbar button[onclick="showChart(\'currentStatus\')"]').classList.add('active');
+            document.querySelector('#chartNavbar button[tag="currentStatus"]').classList.add('active');
 
             // Tạo biểu đồ mặc định
             createChart('currentStatus');
@@ -759,6 +759,11 @@
                 .catch(err => {
                     console.error(err);
                 });
+
+            // Click các tab header
+            $('button.showChart').on('click', (event) => {
+                showChart($(event.currentTarget).attr('tag'), event);
+            });
         });
     </script>
 }
