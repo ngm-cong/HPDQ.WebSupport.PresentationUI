@@ -172,7 +172,7 @@
         // Đăng ký plugin
         Chart.register(ChartDataLabels);
 
-        let currentChart = 'currentStatus';
+        let currentChart = 'summary';
         let charts = {};
         let selectedMonth = parseInt('@System.DateTime.Now.Month');
         let selectedYear = parseInt('@System.DateTime.Now.Year');
@@ -191,7 +191,6 @@
             }
         }
         function createChart(chartType) {
-            console.log('createChart', chartType);
             switch (chartType) {
                 case 'monthlyByType':
                     createMonthlyByTypeChart();
@@ -697,6 +696,21 @@
                 toast.remove();
             }, 3000);
         }
+        function setActiveChart(chartName) {
+            console.log('setActiveChart', chartName);
+            // Hiển thị biểu đồ currentStatus mặc định
+            document.querySelectorAll('.chart-item').forEach(item => {
+                item.classList.add('d-none');
+            });
+            document.getElementById(`${chartName}Chart`).classList.remove('d-none');
+            // Đảm bảo nút currentStatus là active
+            document.querySelectorAll('#chartNavbar .btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`#chartNavbar button[tag="${chartName}"]`).classList.add('active');
+            // Tạo biểu đồ mặc định
+            createChart(chartName);
+        }
         $(document).ready(function() {
             // Khởi tạo năm hiện tại và 5 năm trước đó
             const currentYear = new Date().getFullYear();
@@ -711,20 +725,8 @@
             document.getElementById('monthSelect').value = selectedMonth;
             document.getElementById('yearSelect').value = selectedYear;
 
-            // Hiển thị biểu đồ currentStatus mặc định
-            document.querySelectorAll('.chart-item').forEach(item => {
-                item.classList.add('d-none');
-            });
-            document.getElementById('currentStatusChart').classList.remove('d-none');
-
             // Đảm bảo nút currentStatus là active
-            document.querySelectorAll('#chartNavbar .btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            document.querySelector('#chartNavbar button[tag="currentStatus"]').classList.add('active');
-
-            // Tạo biểu đồ mặc định
-            createChart('currentStatus');
+            setActiveChart('summary');
 
             // Gắn sự kiện cho nút áp dụng
             document.getElementById('applyFilter').addEventListener('click', applyFilter);
