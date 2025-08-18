@@ -1,4 +1,9 @@
-﻿div.contentlist .item {
+﻿div.contentlist {
+    height: calc(100vh - 110px);
+    overflow-y: auto;
+}
+
+div.contentlist .item {
     min-height: 80px;
     background-color: #f9f9f9;
     border: 1px solid #ccc;
