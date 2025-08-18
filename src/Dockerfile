@@ -17,8 +17,8 @@ ARG GITHUB_PAT
 
 # Cấu hình NuGet và xác thực với GitHub Packages
 # Sử dụng 'dotnet nuget add source' để thêm nguồn gói
-RUN dotnet nuget add source https://nuget.pkg.github.com/ngm-cong/index.json -n "github" -u "${GITHUB_USERNAME}" -p "${GITHUB_PAT}" --store-password-in-clear-text
-RUN dotnet nuget locals all --clear
+RUN dotnet nuget add source https://nuget.pkg.github.com/ngm-cong/index.json -n "github" -u "${GITHUB_USERNAME}" -p "${GITHUB_PAT}" --store-password-in-clear-text  && \
+	dotnet nuget locals all --clear
 
 # Sao chép các file dự án và restore
 COPY ["HPDQ.WebSupport.csproj", "."]

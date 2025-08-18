@@ -143,7 +143,6 @@
                                 $(`.content.contentlist div.item:eq(${index})`).append(itemcontainer);
                                 $.each(response.data, function(index, value) {
                                     if (!/\.jpe?g$|\.png$/i.test(value.fileName)) {
-                                        console.log('value.fileName: ', value.fileName);
                                         return true;
                                     }
                                     $.ajax({
@@ -154,7 +153,6 @@
                                         },
                                         dataType: 'json',
                                         success: function(response) {
-                                            console.log('Kết quả:', response, $(`.content.contentlist div.item:eq(${index}) div.itemcontainer`).outerHTML);
                                             itemcontainer.append(`<img src="data:image/png;base64,${response.data}" />`);
                                         },
                                         error: function(xhr, status, error) {
@@ -199,7 +197,6 @@
                         return;
                     }
                     $('.content.contentlist').html('');
-                    console.log('response.data[0].emp_id: ', response.data[0]);
                     var className = 'item';
                     if (response.data[0].emp_id != '@emp_id') {
                         className = 'item reply';
@@ -312,7 +309,6 @@
                   scrollTop: scrollDiv.prop("scrollHeight")
                 }, 1000); // 1000ms = 1 giây
                 // scrollDiv.scrollTop(scrollDiv.prop("scrollHeight"));
-                console.log('dialogModal', 'shown.bs.modal');
             });
             document.getElementById('dialogModalImage').addEventListener('shown.bs.modal', function () {
                 this.focus();
@@ -336,11 +332,9 @@
                 };
             }
             postData('@HPDQ.WebSupport.Utilities.Globals.DomainAPIUrl/Attachments/Load', '@HPDQ.WebSupport.Utilities.Globals.APIKey', bodydata, function(response) {
-                console.log(response);
                 if (response.data.length > 0) {
                     $.each(response.data, function(index, value) {
                         if (!/\.jpe?g$|\.png$/i.test(value.fileName)) {
-                            console.log('value.fileName: ', value.fileName);
                             return true;
                         }
                         $.ajax({
@@ -351,7 +345,6 @@
                             },
                             dataType: 'json',
                             success: function(response) {
-                                // console.log('Kết quả:', response.data);
                                 $('#dialogModalImage div.modal-body').append(`<div><img src="data:image/png;base64,${response.data}" /></div>`);
                                 $('#dialogModalImage').focus();
                             },
