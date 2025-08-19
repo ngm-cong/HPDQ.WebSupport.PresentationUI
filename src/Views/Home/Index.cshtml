@@ -36,6 +36,18 @@
                     <div id="chatbox" class="content contentlist card">
                     </div>
                     <div class="card wrapperfooter">
+                        <div style="min-height: 26px;">
+                            <div id="divprocessby" style="display: none;">
+                                <table>
+                                    <tr>
+                                        <td style="font-weight: bold;">Nhân sự xử lý: </td>
+                                        <td>
+                                            <label id="lblempprocessbyname" style="color: mediumblue; cursor: pointer;"></label>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
                         <div style="text-align: left;">
                             <table>
                                 <tr>
@@ -77,13 +89,13 @@
 
 <!-- Modal -->
 <div class="modal fade" id="dialogModalImage" tabindex="-1" aria-labelledby="myModalLabelImage" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" style="max-width: 1000px; max-height: 600px;">
-        <div class="modal-content" style="max-height: 600px; overflow-y: auto;">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="max-height: calc(100vh - 150px); overflow-y: auto;">
             <div class="modal-header">
                 <h5 class="modal-title" id="myModalLabelImage">HÌNH ẢNH ĐÍNH KÈM</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body" style="overflow-y: hidden;">
+            <div class="modal-body" style="overflow-y: auto;">
             </div>
         </div>
     </div>
@@ -92,6 +104,17 @@
 @section Styles {
     <link rel="stylesheet" href="~/css/contentlist.css" />
     <link rel="stylesheet" href="~/css/home.css" />
+    <style type="text/css">
+        #dialogModalImage .modal-dialog {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            max-width: 90vw;
+        }
+        #dialogModalImage .modal-content {
+            width: fit-content;
+        }
+    </style>
 }
 @section Scripts {
     <script src="~/js/fileinput.js"></script>
@@ -123,6 +146,7 @@
                 else $('#lblcomplete').hide();
                 if ($(this).attr('tagEMP_ID') == '@emp_id' && $(this).attr('tagStatus') == '2') $('#lblclose').show();
                 else $('#lblclose').hide();
+                $('#divprocessby').hide();
                 function loadImages() {
                     $('.content.contentlist div.item').each(function(index, element) {
                         var className = $(`.content.contentlist div.item:eq(${index}) div.corner-label`).attr('class');
@@ -164,7 +188,7 @@
                         });
                     });
                 }
-                function loadComments(bodydata) {
+                function loadComments(bodydata, progressbyempid) {
                     postData('@HPDQ.WebSupport.Utilities.Globals.DomainAPIUrl/Comments/Load', '@HPDQ.WebSupport.Utilities.Globals.APIKey', bodydata, function(response) {
                         if (response.errorCode != 0)
                         {
@@ -184,6 +208,10 @@
                         loadImages();
                         var dialogModal = new bootstrap.Modal(document.getElementById('dialogModal'));
                         $('#txtdescription').val('');
+                        if (progressbyempid && progressbyempid != '') {
+                            $('#divprocessby').show();
+                            $('#lblempprocessbyname').html(progressbyempid);
+                        }
                         dialogModal.show();
                     });
                 }
@@ -210,7 +238,7 @@
                     bodydata = {
                         ticketId: $('#modelTag').val()
                     };
-                    loadComments(bodydata);
+                    loadComments(bodydata, response.data[0].progressBy_EMP_ID);
                 });
             });
             $('#btnconfirm').click(function () {
@@ -355,8 +383,8 @@
                     });
                 }
             });
-            var dialogModal = new bootstrap.Modal(document.getElementById('dialogModalImage'), { backdrop: true, keyboard: true });
-            dialogModal.show();
+            var dialogModalImage = new bootstrap.Modal(document.getElementById('dialogModalImage'), { backdrop: true, keyboard: true });
+            dialogModalImage.show();
         }
     </script>
 }
