@@ -1,0 +1,3 @@
+﻿* 1.0.1
+- Điều chỉnh bố cục overflow trên các trang: Danh sách, Chi tiết.
+- Bổ sung hiển thị thông tin mã nhân viên xử trí.
