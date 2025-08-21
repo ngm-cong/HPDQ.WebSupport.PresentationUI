@@ -8,6 +8,34 @@
 
 @model IEnumerable<HPDQ.WebSupport.DataEntitites.Ticket>
 
+<form method="get" class="row gy-2 align-items-center mb-3" id="requestFilterForm">
+    <div class="col-auto">
+        <select class="form-select" name="RequestType" id="filterRequestType">
+            <option value="">-- Loại yêu cầu --</option>
+            <option value="">Loại 1</option>
+            <option value="">Loại 2</option>
+        </select>
+    </div>
+    <div class="col-auto">
+        <select class="form-select" name="Status" id="filterStatus">
+            <option value="">-- Trạng thái --</option>
+            <option value="">Mới</option>
+            <option value="">Đang xử lý</option>
+            <option value="">Đã xử lý</option>
+            <option value="">Hoàn thành</option>
+        </select>
+    </div>
+    <div class="col-auto">
+        <input type="text" class="form-control" name="RequestId" id="filterRequestId" placeholder="Tìm theo mã yêu cầu">
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-search"></i> Tìm kiếm
+        </button>
+        <a href="#" class="btn btn-secondary">Xoá lọc</a>
+    </div>
+</form>
+
 <div class="contentlist" id="contentlist">
     @foreach (var model in (Model ?? new List<HPDQ.WebSupport.DataEntitites.Ticket>()))
     {
@@ -117,6 +145,22 @@
         #dialogModal .modal-body {
             padding: 5px;
             border-radius: 5px;
+        }
+
+        #dialogModalImage .modal-body > div {
+            margin-bottom: 8px;
+        }
+
+            #dialogModalImage .modal-body > div:last-child {
+                margin-bottom: 0;
+            }
+
+        #dialogModalImage .modal-body img {
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            display: block;
+            max-width: 100%;
+            height: auto;
         }
     </style>
 }
