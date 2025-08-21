@@ -63,15 +63,12 @@
                         Danh sách yêu cầu
                     </a>
                 </li>
-                @if (User.IsInRole("Admin") == false)
-                {
-                    <li>
-                        <a asp-controller="Home" asp-action="NewTicket" class="nav-link @(currentPath == "newticket" ? "active" : "link-dark")">
-                            <i class="bi bi-file-earmark-plus"></i>
-                            Tạo yêu cầu mới
-                        </a>
-                    </li>
-                }
+                <li>
+                    <a asp-controller="Home" asp-action="NewTicket" class="nav-link @(currentPath == "newticket" ? "active" : "link-dark")">
+                        <i class="bi bi-file-earmark-plus"></i>
+                        Tạo yêu cầu mới
+                    </a>
+                </li>
                 @if (User.IsInRole("Admin"))
                 {
                     <li>
