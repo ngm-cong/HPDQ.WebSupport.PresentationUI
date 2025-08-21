@@ -10,29 +10,34 @@
 
 <form method="get" class="row gy-2 align-items-center mb-3" id="requestFilterForm">
     <div class="col-auto">
-        <select class="form-select" name="RequestType" id="filterRequestType">
+        <select class="form-select" name="TicketType" id="filterRequestType">
             <option value="">-- Loại yêu cầu --</option>
-            <option value="">Loại 1</option>
-            <option value="">Loại 2</option>
+            @if (ViewBag.TicketTypes != null && ViewBag.TicketTypes is IEnumerable<HPDQ.WebSupport.DataEntitites.CodeDetail>)
+            {
+                foreach (var item in (ViewBag.TicketTypes as IEnumerable<HPDQ.WebSupport.DataEntitites.CodeDetail>)!)
+                {
+                    <option value="@item.Code">@item.Description</option>
+                }
+            }
         </select>
     </div>
     <div class="col-auto">
-        <select class="form-select" name="Status" id="filterStatus">
+        <select class="form-select" name="TicketStatus" id="filterStatus">
             <option value="">-- Trạng thái --</option>
-            <option value="">Mới</option>
-            <option value="">Đang xử lý</option>
-            <option value="">Đã xử lý</option>
-            <option value="">Hoàn thành</option>
+            @foreach(var item in Enum.GetValues<HPDQ.WebSupport.DataEntitites.TicketStatus>())
+            {
+                <option value="@((byte)item)">@item.GetDescription()</option>
+            }
         </select>
     </div>
     <div class="col-auto">
-        <input type="text" class="form-control" name="RequestId" id="filterRequestId" placeholder="Tìm theo mã yêu cầu">
+        <input type="text" class="form-control" name="SearchText" id="filterRequestId" placeholder="Tìm theo nội dung yêu cầu">
     </div>
     <div class="col-auto">
         <button type="submit" class="btn btn-primary">
             <i class="bi bi-search"></i> Tìm kiếm
         </button>
-        <a href="#" class="btn btn-secondary">Xoá lọc</a>
+        <a href="#" class="btn btn-secondary" onclick="clearfilter()">Xoá lọc</a>
     </div>
 </form>
 
@@ -187,6 +192,10 @@
             const year = date.getFullYear();
 
             return `${hours}:${minutes} ${day}/${month}/${year}`;
+        }
+        function clearfilter() {
+            $('#filterRequestId').val('');
+            $('#requestFilterForm').submit();
         }
         $(function () {
             $('#contentlist .item').click(function () {

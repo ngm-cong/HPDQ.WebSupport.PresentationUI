@@ -45,7 +45,8 @@ namespace HPDQ.WebSupport.Controllers
         /// </summary>
         /// <returns>View chứa danh sách các yêu cầu.</returns>
         [Authorize]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(byte? ticketType = null, DataEntitites.TicketStatus? ticketStatus = null
+            , string? searchText = null)
         {
             var emp_id = _userEMP_ID();
             var criteria = new HPDQ.WebSupport.Criteria.TicketCriteria
@@ -54,7 +55,11 @@ namespace HPDQ.WebSupport.Controllers
                 ProgressBy_EMP_ID = emp_id!,
                 SearchOption = HPDQ.WebSupport.Criteria.SearchOption.OR,
             };
+            if (ticketType != null) criteria.Type = ticketType;
+            if (ticketStatus != null) criteria.Status = ticketStatus;
+            if (string.IsNullOrEmpty(searchText) == false) criteria.SearchText = searchText;
             var tickets = await HPDQ.WebSupport.Utilities.API.Instance.Ticket.Load(criteria);
+            ViewBag.TicketTypes = await HPDQ.WebSupport.Utilities.API.Instance.CodeDetail.Load(new Criteria.CodeDetailCriteria { Master = CodeDetailMaster.TicketType });
             return View(tickets);
         }
 

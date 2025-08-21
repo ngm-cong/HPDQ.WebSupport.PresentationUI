@@ -91,14 +91,14 @@ namespace HPDQ.WebSupport.Controllers
 
                 // Ví dụ kiểm tra username/password đơn giản
                 var role = "User";
-                if (emp_id.ToLower() == "admin") role = "Admin";
+                if (emp_id.ToLower().Contains("admin")) role = "Admin";
                 if (password == "123")
                 {
                     var claims = new List<Claim> {
-                    new Claim(ClaimTypes.NameIdentifier, emp_id),
-                    new Claim(ClaimTypes.GivenName, emp.FullName!),
-                    new Claim(ClaimTypes.Role, role)
-                };
+                        new Claim(ClaimTypes.NameIdentifier, emp_id),
+                        new Claim(ClaimTypes.GivenName, emp.FullName!),
+                        new Claim(ClaimTypes.Role, role)
+                    };
 
                     var claimsIdentity = new ClaimsIdentity(claims, "MyCookieAuth");
 
