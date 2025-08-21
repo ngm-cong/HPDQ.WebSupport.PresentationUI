@@ -39,38 +39,38 @@ namespace HPDQ.WebSupport.Controllers
             public string? FullName { get; set; }
         }
 
-        /// <summary>Hàm giải mã token thông tin đăng nhập.</summary>
-        /// <param name="jwtToken">Token thông tin đăng nhập</param>
-        /// <returns>Lớp thông tin đăng nhập.</returns>
-        /// <exception cref="Exception"></exception>
-        private AuthenticateModel JWTDecode(string jwtToken)
-        {
-            // 1. Create a token handler
-            var handler = new JwtSecurityTokenHandler();
+        ///// <summary>Hàm giải mã token thông tin đăng nhập.</summary>
+        ///// <param name="jwtToken">Token thông tin đăng nhập</param>
+        ///// <returns>Lớp thông tin đăng nhập.</returns>
+        ///// <exception cref="Exception"></exception>
+        //private AuthenticateModel JWTDecode(string jwtToken)
+        //{
+        //    // 1. Create a token handler
+        //    var handler = new JwtSecurityTokenHandler();
 
-            // Check if the token is in a valid format
-            if (handler.CanReadToken(jwtToken))
-            {
-                // 2. Read the token without validating the signature
-                var token = handler.ReadJwtToken(jwtToken);
+        //    // Check if the token is in a valid format
+        //    if (handler.CanReadToken(jwtToken))
+        //    {
+        //        // 2. Read the token without validating the signature
+        //        var token = handler.ReadJwtToken(jwtToken);
 
-                // 3. Access the token claims
-                Console.WriteLine("Token Header:");
-                Console.WriteLine(token.Header.SerializeToJson());
+        //        // 3. Access the token claims
+        //        Console.WriteLine("Token Header:");
+        //        Console.WriteLine(token.Header.SerializeToJson());
 
-                Console.WriteLine("\nToken Payload (Claims):");
-                foreach (var claim in token.Claims)
-                {
-                    Console.WriteLine($"{claim.Type}: {claim.Value}");
-                }
+        //        Console.WriteLine("\nToken Payload (Claims):");
+        //        foreach (var claim in token.Claims)
+        //        {
+        //            Console.WriteLine($"{claim.Type}: {claim.Value}");
+        //        }
 
-                return new AuthenticateModel { EMP_ID = token.Claims.First(x => x.Type == "MaNV").Value, FullName = token.Claims.First(x => x.Type == "unique_name").Value };
-            }
-            else
-            {
-                throw new Exception("Invalid JWT format.");
-            }
-        }
+        //        return new AuthenticateModel { EMP_ID = token.Claims.First(x => x.Type == "MaNV").Value, FullName = token.Claims.First(x => x.Type == "unique_name").Value };
+        //    }
+        //    else
+        //    {
+        //        throw new Exception("Invalid JWT format.");
+        //    }
+        //}
 
         /// <summary>
         /// Xử lý yêu cầu đăng nhập từ người dùng.
@@ -83,20 +83,22 @@ namespace HPDQ.WebSupport.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(string emp_id, string password)
         {
-            var empToken = await HPDQ.WebSupport.Utilities.AuthenticateAPI.Instance.Authenticate.Login("HPDQ18461", "1");
-
-            if (string.IsNullOrEmpty(empToken) == false)
+            try
             {
-                var emp = JWTDecode(empToken);
+                var empToken = await HPDQ.WebSupport.Utilities.AuthenticateAPI.Instance.Authenticate.Login(emp_id, password);
 
-                // Ví dụ kiểm tra username/password đơn giản
-                var role = "User";
-                if (emp_id.ToLower().Contains("admin")) role = "Admin";
-                if (password == "123")
+                if (empToken?.success == true && string.IsNullOrEmpty(empToken?.token) == false
+                     && string.IsNullOrEmpty(empToken?.hoTen) == false
+                     && empToken?.maPhongBan > 0)
                 {
+                    //var emp = JWTDecode(empToken.token!);
+
+                    // Ví dụ kiểm tra username/password đơn giản
+                    var role = "User";
+                    if (empToken.maPhongBan == 1961) role = "Admin";
                     var claims = new List<Claim> {
                         new Claim(ClaimTypes.NameIdentifier, emp_id),
-                        new Claim(ClaimTypes.GivenName, emp.FullName!),
+                        new Claim(ClaimTypes.GivenName, empToken.hoTen!),
                         new Claim(ClaimTypes.Role, role)
                     };
 
@@ -107,8 +109,10 @@ namespace HPDQ.WebSupport.Controllers
                     return RedirectToAction("Index", "Home");
                 }
             }
-
-            ViewBag.Error = "Sai thông tin đăng nhập!";
+            catch
+            {
+                ViewBag.Error = "Sai thông tin đăng nhập!";
+            }
             return View();
         }
 
