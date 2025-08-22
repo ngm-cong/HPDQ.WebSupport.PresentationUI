@@ -40,6 +40,42 @@ namespace HPDQ.WebSupport.Controllers
         }
 
         /// <summary>
+        /// Sao chép các thuộc tính (properties) có cùng tên và kiểu dữ liệu từ một đối tượng sang một đối tượng mới.
+        /// </summary>
+        /// <typeparam name="T">Kiểu dữ liệu của đối tượng đầu ra.</typeparam>
+        /// <param name="input">Đối tượng đầu vào chứa dữ liệu cần sao chép.</param>
+        /// <returns>Một đối tượng mới có kiểu T đã được sao chép dữ liệu.</returns>
+        private T CopyValue<T>(object input)
+        {
+            T output = Activator.CreateInstance<T>();
+            var properties = input.GetType().GetProperties();
+            var outProperties = typeof(T).GetProperties();
+            properties = (from p in properties
+                          join op in outProperties on new { p.Name, p.PropertyType } equals new { op.Name, op.PropertyType }
+                          select p).ToArray();
+            foreach (var prop in properties)
+            {
+                prop.SetValue(output, prop.GetValue(input, null));
+            }
+            return output;
+        }
+
+        /// <summary>Hàm lấy các dữ liệu dùng chung cho view Home.Index.</summary>
+        /// <param name="tickets">Danh sách yêu cầu hiển thị lên view Home.Index.</param>
+        /// <returns>Danh sách dữ liệu loại yêu cầu hiển thị bổ sung lên view Home.Index.</returns>
+        private async Task<IEnumerable<CodeDetail>> LoadAndFillTicketTypes(List<HomeViewModel>? tickets)
+        {
+            var ticketTypes = (await HPDQ.WebSupport.Utilities.API.Instance.CodeDetail.Load(new Criteria.CodeDetailCriteria { Master = CodeDetailMaster.TicketType }))!;
+            if (tickets?.Count > 0)
+            {
+                (from t in tickets
+                 join tt in ticketTypes on t.Type equals tt.Code
+                 select new { t, tt }).ToList().ForEach(x => x.t.TypeDescription = x.tt.Description);
+            }
+            return ticketTypes;
+        }
+
+        /// <summary>
         /// Hiển thị danh sách yêu cầu của người dùng hiện tại, bao gồm các yêu cầu đã tạo và các yêu cầu đang xử lý.
         /// </summary>
         /// <returns>View chứa danh sách các yêu cầu.</returns>
@@ -47,19 +83,27 @@ namespace HPDQ.WebSupport.Controllers
         public async Task<IActionResult> Index(byte? ticketType = null, DataEntitites.TicketStatus? ticketStatus = null
             , string? searchText = null)
         {
-            var emp_id = _userEMP_ID();
-            var criteria = new HPDQ.WebSupport.Criteria.TicketCriteria
+            try
             {
-                EMP_ID = emp_id!,
-                ProgressBy_EMP_ID = emp_id!,
-                SearchOption = HPDQ.WebSupport.Criteria.SearchOption.OR,
-            };
-            if (ticketType != null) criteria.Type = ticketType;
-            if (ticketStatus != null) criteria.Status = ticketStatus;
-            if (string.IsNullOrEmpty(searchText) == false) criteria.SearchText = searchText;
-            var tickets = await HPDQ.WebSupport.Utilities.API.Instance.Ticket.Load(criteria);
-            ViewBag.TicketTypes = await HPDQ.WebSupport.Utilities.API.Instance.CodeDetail.Load(new Criteria.CodeDetailCriteria { Master = CodeDetailMaster.TicketType });
-            return View(tickets);
+                var emp_id = _userEMP_ID();
+                var criteria = new HPDQ.WebSupport.Criteria.TicketCriteria
+                {
+                    EMP_ID = emp_id!,
+                    ProgressBy_EMP_ID = emp_id!,
+                    SearchOption = HPDQ.WebSupport.Criteria.SearchOption.OR,
+                };
+                if (ticketType != null) criteria.Type = ticketType;
+                if (ticketStatus != null) criteria.Status = ticketStatus;
+                if (string.IsNullOrEmpty(searchText) == false) criteria.SearchText = searchText;
+                var tickets = (await HPDQ.WebSupport.Utilities.API.Instance.Ticket.Load(criteria))?.Select(x => CopyValue<HomeViewModel>(x)).ToList();
+                ViewBag.TicketTypes = await LoadAndFillTicketTypes(tickets);
+                return View(tickets);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                throw;
+            }
         }
 
         /// <summary>
@@ -114,8 +158,8 @@ namespace HPDQ.WebSupport.Controllers
             if (ticketType != null) criteria.Type = ticketType;
             if (ticketStatus != null) criteria.Status = ticketStatus;
             if (string.IsNullOrEmpty(searchText) == false) criteria.SearchText = searchText;
-            var tickets = await HPDQ.WebSupport.Utilities.API.Instance.Ticket.Load(criteria);
-            ViewBag.TicketTypes = await HPDQ.WebSupport.Utilities.API.Instance.CodeDetail.Load(new Criteria.CodeDetailCriteria { Master = CodeDetailMaster.TicketType });
+            var tickets = (await HPDQ.WebSupport.Utilities.API.Instance.Ticket.Load(criteria))?.Select(x => CopyValue<HomeViewModel>(x)).ToList();
+            ViewBag.TicketTypes = await LoadAndFillTicketTypes(tickets);
             ViewBag.Type = 1;
             ViewData["Title"] = "Theo dõi yêu cầu";
             return View("Index", tickets);
@@ -141,8 +185,8 @@ namespace HPDQ.WebSupport.Controllers
             if (ticketType != null) criteria.Type = ticketType;
             if (ticketStatus != null) criteria.Status = ticketStatus;
             if (string.IsNullOrEmpty(searchText) == false) criteria.SearchText = searchText;
-            var tickets = await HPDQ.WebSupport.Utilities.API.Instance.Ticket.Load(criteria);
-            ViewBag.TicketTypes = await HPDQ.WebSupport.Utilities.API.Instance.CodeDetail.Load(new Criteria.CodeDetailCriteria { Master = CodeDetailMaster.TicketType });
+            var tickets = (await HPDQ.WebSupport.Utilities.API.Instance.Ticket.Load(criteria))?.Select(x => CopyValue<HomeViewModel>(x)).ToList();
+            ViewBag.TicketTypes = await LoadAndFillTicketTypes(tickets);
             ViewData["Title"] = "Lịch sử yêu cầu";
             return View("Index", tickets);
         }

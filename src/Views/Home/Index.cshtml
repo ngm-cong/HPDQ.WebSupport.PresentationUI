@@ -42,7 +42,7 @@
 </form>
 
 <div class="contentlist" id="contentlist">
-    @foreach (var model in (Model ?? new List<HPDQ.WebSupport.DataEntitites.Ticket>()))
+    @foreach (var model in (Model ?? new List<HomeViewModel>()))
     {
         <div class="item" tag="@(model.Id)" tagEMP_ID="@(model.EMP_ID)" tagStatus="@((byte)model.Status)">
             <div class="card-title text-muted small">[@(model.CreatedOn.ToString("HH:mm dd/MM/yyyy"))] [#@(model.Code)] @(model.EMP_ID)</div>
