@@ -45,7 +45,7 @@
     @foreach (var model in (Model ?? new List<HomeViewModel>()))
     {
         <div class="item" tag="@(model.Id)" tagEMP_ID="@(model.EMP_ID)" tagStatus="@((byte)model.Status)">
-            <div class="card-title text-muted small">[@(model.CreatedOn.ToString("HH:mm dd/MM/yyyy"))] [#@(model.Code)] @(model.EMP_ID)</div>
+            <div class="card-title text-muted small">[@(model.CreatedOn.ToString("HH:mm dd/MM/yyyy"))] [#@(model.Code)] @(model.FullName)</div>
             <div class="text-container">
                 <div class="text-content">@(model.Description)</div>
                 <div class="corner-label @(model.Status == HPDQ.WebSupport.DataEntitites.TicketStatus.Done ? "done" : "") @(model.Status == HPDQ.WebSupport.DataEntitites.TicketStatus.Closed ? "closed" : "") @(model.Status == HPDQ.WebSupport.DataEntitites.TicketStatus.InProgress ? "progress" : "")">@(model.Status.GetDescription())</div>
@@ -261,7 +261,7 @@
                                 className = 'item reply';
                             }
                             $('.content.contentlist').append(`<div class="${className}" tagId="${value.id}">
-                                <div class="card-title text-muted small">[${formatDateTime(value.createdOn)}] ${value.emp_id}</div>
+                                <div class="card-title text-muted small">[${formatDateTime(value.createdOn)}] ${value.fullName}</div>
                                 <div class="text-container">${value.commentDesc}<div class="corner-label disabled" onclick="showImagePopup(this, false)">Đính kèm</div></div>
                             </div>`);
                         });
@@ -290,7 +290,7 @@
                         className = 'item reply';
                     }
                     $('.content.contentlist').append(`<div class="${className}" tagId="${response.data[0].id}">
-                        <div class="card-title text-muted small">[${formatDateTime(response.data[0].createdOn)}] ${response.data[0].emp_id}</div>
+                        <div class="card-title text-muted small">[${formatDateTime(response.data[0].createdOn)}] ${response.data[0].fullName}</div>
                         <div class="text-container">${response.data[0].description}<div class="corner-label disabled" onclick="showImagePopup(this, true)">Đính kèm</div></div>
                     </div>`);
                     $('#modelTag').val(bodydata.id);
@@ -298,7 +298,7 @@
                     bodydata = {
                         ticketId: $('#modelTag').val()
                     };
-                    loadComments(bodydata, response.data[0].progressBy_EMP_ID);
+                    loadComments(bodydata, response.data[0].progressByEMPFullName);
                 });
             });
             $('#btnconfirm').click(function () {
@@ -322,7 +322,8 @@
                     emp_id: '@emp_id',
                     commentDesc: desc,
                     ticketId: $('#modelTag').val(),
-                    files: files
+                    files: files,
+                    fullName: '@Html.Raw(User.FindFirst(ClaimTypes.GivenName)?.Value)'
                 };
                 postData('@HPDQ.WebSupport.Utilities.Globals.DomainAPIUrl/Comments/Create', '@HPDQ.WebSupport.Utilities.Globals.APIKey', bodydata, function(response) {
                     if (response.errorCode != 0)
