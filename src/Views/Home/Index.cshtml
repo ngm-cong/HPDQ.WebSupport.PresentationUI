@@ -336,7 +336,7 @@
                         className = 'item reply';
                     }
                     $('.content.contentlist').append(`<div class="${className}">
-                        <div class="card-title text-muted small">[@DateTime.Now.ToString("HH:mm dd/MM/yyyy")] ${response.data.emp_id}</div>
+                        <div class="card-title text-muted small">[@DateTime.Now.ToString("HH:mm dd/MM/yyyy")] ${response.data.fullName}</div>
                         <div class="text-container">${response.data.commentDesc}<div class="corner-label">Đính kèm</div></div>
                     </div>`);
 
