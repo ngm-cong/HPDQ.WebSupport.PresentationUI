@@ -230,6 +230,69 @@ namespace HPDQ.WebSupport.Controllers
             public IEnumerable<LineChartModel>? Datasets { get; set; }
         }
 
+        private async Task<DashboardViewModel> RptType0(IEnumerable<Ticket>? ticketsInMonth)
+        {
+            var issueTypes = await HPDQ.WebSupport.Utilities.API.Instance.CodeDetail.Load(new Criteria.CodeDetailCriteria { Master = CodeDetailMaster.TicketType }) ?? new List<CodeDetail>();
+            var rptByIssueValues = from x in ticketsInMonth
+                                   join t in issueTypes on x.Type equals t.Code
+                                   group x by t.Description into g
+                                   orderby g.Key
+                                   select new
+                                   {
+                                       Label = g.Key,
+                                       Total = g.Count(),
+                                   };
+            var labels = issueTypes.Select(x => x.Description).OrderBy(x => x).ToList();
+            var outVal = new DashboardViewModel
+            {
+                Labels = labels,
+                Datasets = new List<LineChartModel>
+                            {
+                                new LineChartModel
+                                {
+                                    Label = "Số lượng yêu cầu",
+                                    Data = from l in labels
+                                           join d in rptByIssueValues on l equals d.Label into ld
+                                           from d in ld.DefaultIfEmpty()
+                                           select d?.Total ?? 0d,
+                                    BorderColor = Globals.ChartFormats.Select(x => x.BorderColor).Take(labels.Count()),
+                                    BackgroundColor = Globals.ChartFormats.Select(x => x.BackgroundColor).Take(labels.Count()),
+                                    Tension = 0.4,
+                                }
+                            }
+            };
+            return outVal;
+        }
+        private DashboardViewModel RptType1(IEnumerable<Ticket>? ticketsInMonth)
+        {
+            var rptValues = from x in ticketsInMonth
+                            group x by x.CreatedOn.Day into g
+                            select new
+                            {
+                                Date = g.Key,
+                                Total = g.Count(),
+                                Processed = g.Count(x => x.Status == TicketStatus.Done || x.Status == TicketStatus.Closed),
+                                InProgress = g.Count(x => x.Status == TicketStatus.InProgress),
+                            };
+            var labels = new List<string> { "Yêu cầu mới", "Đang xử lý", "Đã xử lý" };
+            var inProgress = rptValues.Sum(x => x.InProgress);
+            var processed = rptValues.Sum(x => x.Processed);
+            return new DashboardViewModel
+            {
+                Labels = labels,
+                Datasets = new List<LineChartModel>() {
+                    new LineChartModel
+                    {
+                        Label = "Số lượng yêu cầu",
+                        Data = new List<double> { rptValues.Sum(x => x.Total) - inProgress - processed, inProgress, processed },
+                        BorderColor = Globals.ChartFormats.Select(x => x.BorderColor).Take(labels.Count()),
+                        BackgroundColor = Globals.ChartFormats.Select(x => x.BackgroundColor).Take(labels.Count()),
+                        Tension = 0.4,
+                    },
+                },
+            };
+        }
+
         /// <summary>Dữ liệu hiển thị lên dashboard số lượng yêu cầu.</summary>
         /// <returns>Đối tượng mới của <see cref="DashboardViewModel"/>.</returns>
         [Authorize]
@@ -244,68 +307,15 @@ namespace HPDQ.WebSupport.Controllers
             switch (rptType)
             {
                 case 0:
-                    var issueTypes = await HPDQ.WebSupport.Utilities.API.Instance.CodeDetail.Load(new Criteria.CodeDetailCriteria { Master = CodeDetailMaster.TicketType }) ?? new List<CodeDetail>();
-                    var rptByIssueValues = from x in ticketsInMonth
-                                           join t in issueTypes on x.Type equals t.Code
-                                           group x by t.Description into g
-                                           orderby g.Key
-                                           select new
-                                           {
-                                               Label = g.Key,
-                                               Total = g.Count(),
-                                           };
-                    var labels = issueTypes.Select(x => x.Description).OrderBy(x => x).ToList();
                     var outVal = new APIResult<DashboardViewModel>
                     {
-                        Data = new DashboardViewModel
-                        {
-                            Labels = labels,
-                            Datasets = new List<LineChartModel>
-                            {
-                                new LineChartModel
-                                {
-                                    Label = "Số lượng yêu cầu",
-                                    Data = from l in labels
-                                           join d in rptByIssueValues on l equals d.Label into ld
-                                           from d in ld.DefaultIfEmpty()
-                                           select d?.Total ?? 0d,
-                                    BorderColor = Globals.ChartFormats.Select(x => x.BorderColor).Take(labels.Count()),
-                                    BackgroundColor = Globals.ChartFormats.Select(x => x.BackgroundColor).Take(labels.Count()),
-                                    Tension = 0.4,
-                                }
-                            }
-                        }
+                        Data = await RptType0(ticketsInMonth),
                     };
                     return outVal;
                 case 1:
-                    var rptValues = from x in ticketsInMonth
-                                    group x by x.CreatedOn.Day into g
-                                    select new
-                                    {
-                                        Date = g.Key,
-                                        Total = g.Count(),
-                                        Processed = g.Count(x => x.Status == TicketStatus.Done || x.Status == TicketStatus.Closed),
-                                        InProgress = g.Count(x => x.Status == TicketStatus.InProgress),
-                                    };
-                    labels = new List<string> { "Yêu cầu mới", "Đang xử lý", "Đã xử lý" };
-                    var inProgress = rptValues.Sum(x => x.InProgress);
-                    var processed = rptValues.Sum(x => x.Processed);
                     return new APIResult<DashboardViewModel>
                     {
-                        Data = new DashboardViewModel
-                        {
-                            Labels = labels,
-                            Datasets = new List<LineChartModel>() {
-                                new LineChartModel
-                                {
-                                    Label = "Số lượng yêu cầu",
-                                    Data = new List<double> { rptValues.Sum(x => x.Total) - inProgress - processed, inProgress, processed },
-                                    BorderColor = Globals.ChartFormats.Select(x => x.BorderColor).Take(labels.Count()),
-                                    BackgroundColor = Globals.ChartFormats.Select(x => x.BackgroundColor).Take(labels.Count()),
-                                    Tension = 0.4,
-                                },
-                            },
-                        }
+                        Data = RptType1(ticketsInMonth),
                     };
                 case 2:
                     var processedTickets = ticketsInMonth?.Where(x => x.Status == TicketStatus.Done || x.Status == TicketStatus.Closed) ?? new List<Ticket>();
@@ -325,7 +335,7 @@ namespace HPDQ.WebSupport.Controllers
                                               ToiDa = Math.Round(g.Select(c => (c.ProcessedOn - c.CreatedOn).TotalHours).Max(), 1),
                                               TongSo = g.Count(),
                                           };
-                    labels = rptByTimeValues.Select(x => $"Tuần {x}").ToList();
+                    var labels = rptByTimeValues.Select(x => $"Tuần {x}").ToList();
                     return new APIResult<DashboardViewModel>
                     {
                         Data = new DashboardViewModel
@@ -349,6 +359,15 @@ namespace HPDQ.WebSupport.Controllers
                                     Tension = 0.4,
                                 },
                             },
+                        }
+                    };
+                case 3: //equal 0,1
+                    return new APIResult<IEnumerable<DashboardViewModel>>
+                    {
+                        Data = new List<DashboardViewModel>
+                        {
+                            await RptType0(ticketsInMonth),
+                            RptType1(ticketsInMonth),
                         }
                     };
                 default:

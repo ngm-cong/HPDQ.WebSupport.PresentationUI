@@ -208,12 +208,7 @@
         }
         function createMonthlyByTypeChart() {
             const ctx = document.getElementById('monthlyByTypeCanvas').getContext('2d');
-
-            // Hiển thị loading trên canvas
-            ctx.font = '16px Arial';
-            ctx.fillStyle = '#666';
-            ctx.textAlign = 'center';
-            ctx.fillText('Đang tải dữ liệu...', ctx.canvas.width / 2, ctx.canvas.height / 2);
+            showLoadingOnChart(ctx)
 
             $.ajax({
                 url: '@Url.Action("DashboardViewData", "Home", new { rptType = 0 })',
@@ -296,27 +291,13 @@
                     });
                 },
                 error: function(xhr, status, error) {
-                    console.error('Lỗi khi tải dữ liệu:', error);
-                    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-                    ctx.font = '16px Arial';
-                    ctx.fillStyle = '#f00';
-                    ctx.textAlign = 'center';
-                    ctx.fillText('Không thể tải dữ liệu. Vui lòng thử lại sau.', ctx.canvas.width / 2, ctx.canvas.height / 2);
-                    showToast('Không thể tải dữ liệu. Vui lòng thử lại sau.');
+                    showErrorOnChart(ctx);
                 }
             });
         }
         function createCurrentStatusChart() {
-            createCurrentStatusChartOnElement('currentStatusCanvas');
-        }
-        function createCurrentStatusChartOnElement(chartId) {
-            const ctx = document.getElementById(chartId).getContext('2d');
-
-            // Hiển thị loading trên canvas
-            ctx.font = '16px Arial';
-            ctx.fillStyle = '#666';
-            ctx.textAlign = 'center';
-            ctx.fillText('Đang tải dữ liệu...', ctx.canvas.width / 2, ctx.canvas.height / 2);
+            const ctx = document.getElementById('currentStatusCanvas').getContext('2d');
+            showLoadingOnChart(ctx);
 
             $.ajax({
                 url: '@Url.Action("DashboardViewData", "Home", new { rptType = 1 })',
@@ -330,9 +311,6 @@
                 },
                 dataType: 'json',
                 success: function(response) {
-                    // Xóa canvas trước khi vẽ lại
-                    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-
                     const data = response.data || {
                         labels: ['Mới tạo', 'Đang xử lý', 'Hoàn thành', 'Đã đóng'],
                         datasets: [{
@@ -353,69 +331,79 @@
                             borderWidth: 1
                         }]
                     };
-
-                    if (charts.chartId) {
-                        charts.chartId.destroy();
-                    }
-
-                    // Đảm bảo canvas có đúng kích thước trước khi tạo biểu đồ
-                    const canvas = document.getElementById(chartId);
-                    canvas.style.width = '100%';
-                    canvas.style.height = '500px';
-
-                    charts.chartId = new Chart(ctx, {
-                        type: 'bar',
-                        data: data,
-                        options: {
-                            indexAxis: 'y', // Thay đổi thành cột ngang
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: {
-                                legend: {
-                                    display: false
-                                },
-                                title: {
-                                    display: true,
-                                    text: `SỐ LƯỢNG YÊU CẦU HIỆN CÓ THEO TRẠNG THÁI - Tháng ${selectedMonth}/${selectedYear}`
-                                },
-                                tooltip: {
-                                    callbacks: {
-                                        label: function(context) {
-                                            return `Số lượng: ${context.raw}`;
-                                        }
-                                    }
-                                }
-                            },
-                            scales: {
-                                x: {
-                                    beginAtZero: true,
-                                    ticks: {
-                                        precision: 0
-                                    }
-                                }
-                            }
-                        }
-                    });
+                    createCurrentStatusChartOnElementWithData(ctx, 'currentStatusCanvas', data);
                 },
                 error: function(xhr, status, error) {
-                    console.error('Lỗi khi tải dữ liệu:', error);
-                    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-                    ctx.font = '16px Arial';
-                    ctx.fillStyle = '#f00';
-                    ctx.textAlign = 'center';
-                    ctx.fillText('Không thể tải dữ liệu. Vui lòng thử lại sau.', ctx.canvas.width / 2, ctx.canvas.height / 2);
-                    showToast('Không thể tải dữ liệu. Vui lòng thử lại sau.');
+                    showErrorOnChart(ctx);
                 }
             });
         }
-        function createProcessingTimeChart() {
-            const ctx = document.getElementById('processingTimeCanvas').getContext('2d');
+        function createCurrentStatusChartOnElementWithData(ctx, chartId, data) {
+            // Xóa canvas trước khi vẽ lại
+            ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
+            if (charts[chartId]) {
+                charts[chartId].destroy();
+            }
+
+            // Đảm bảo canvas có đúng kích thước trước khi tạo biểu đồ
+            const canvas = document.getElementById(chartId);
+            canvas.style.width = '100%';
+            canvas.style.height = '500px';
+
+            charts[chartId] = new Chart(ctx, {
+                type: 'bar',
+                data: data,
+                options: {
+                    indexAxis: 'y', // Thay đổi thành cột ngang
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        title: {
+                            display: true,
+                            text: `SỐ LƯỢNG YÊU CẦU HIỆN CÓ THEO TRẠNG THÁI - Tháng ${selectedMonth}/${selectedYear}`
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `Số lượng: ${context.raw}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            ticks: {
+                                precision: 0
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        function showLoadingOnChart(ctx) {
             // Hiển thị loading trên canvas
             ctx.font = '16px Arial';
             ctx.fillStyle = '#666';
             ctx.textAlign = 'center';
             ctx.fillText('Đang tải dữ liệu...', ctx.canvas.width / 2, ctx.canvas.height / 2);
+        }
+        function showErrorOnChart(ctx) {
+            console.error('Lỗi khi tải dữ liệu:', error);
+            ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+            ctx.font = '16px Arial';
+            ctx.fillStyle = '#f00';
+            ctx.textAlign = 'center';
+            ctx.fillText('Không thể tải dữ liệu. Vui lòng thử lại sau.', ctx.canvas.width / 2, ctx.canvas.height / 2);
+            showToast('Không thể tải dữ liệu. Vui lòng thử lại sau.');
+        }
+        function createProcessingTimeChart() {
+            const ctx = document.getElementById('processingTimeCanvas').getContext('2d');
+            showLoadingOnChart(ctx);
 
             $.ajax({
                 url: '@Url.Action("DashboardViewData", "Home", new { rptType = 2 })',
@@ -500,28 +488,18 @@
                     });
                 },
                 error: function(xhr, status, error) {
-                    console.error('Lỗi khi tải dữ liệu:', error);
-                    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-                    ctx.font = '16px Arial';
-                    ctx.fillStyle = '#f00';
-                    ctx.textAlign = 'center';
-                    ctx.fillText('Không thể tải dữ liệu. Vui lòng thử lại sau.', ctx.canvas.width / 2, ctx.canvas.height / 2);
-                    showToast('Không thể tải dữ liệu. Vui lòng thử lại sau.');
+                    showErrorOnChart(ctx);
                 }
             });
         }
         function createSummaryChart() {
-            createCurrentStatusChartOnElement('summaryMonthlyByStatusCanvas');
+            const ctxRpt0 = document.getElementById('summaryMonthlyByStatusCanvas').getContext('2d');
             const ctx = document.getElementById('summaryMonthlyByTypeCanvas').getContext('2d');
-
-            // Hiển thị loading trên canvas
-            ctx.font = '16px Arial';
-            ctx.fillStyle = '#666';
-            ctx.textAlign = 'center';
-            ctx.fillText('Đang tải dữ liệu...', ctx.canvas.width / 2, ctx.canvas.height / 2);
+            showLoadingOnChart(ctxRpt0);
+            showLoadingOnChart(ctx);
 
             $.ajax({
-                url: '@Url.Action("DashboardViewData", "Home", new { rptType = 0 })',
+                url: '@Url.Action("DashboardViewData", "Home", new { rptType = 3 })',
                 method: 'GET',
                 data: {
                     month: selectedMonth,
@@ -535,7 +513,7 @@
                     // Xóa canvas trước khi vẽ lại
                     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
-                    const data = response.data || {
+                    const data = response.data[1] || {
                         labels: ['Phần cứng', 'Phần mềm', 'Mạng', 'Bảo mật', 'Khác'],
                         datasets: [{
                             label: 'Số lượng yêu cầu',
@@ -625,15 +603,32 @@
                             }
                         }
                     });
+
+                    const data0 = response.data[0] || {
+                        labels: ['Mới tạo', 'Đang xử lý', 'Hoàn thành', 'Đã đóng'],
+                        datasets: [{
+                            label: 'Số lượng yêu cầu',
+                            data: [10, 15, 8, 5],
+                            backgroundColor: [
+                                'rgba(255, 99, 132, 0.7)',
+                                'rgba(255, 159, 64, 0.7)',
+                                'rgba(75, 192, 192, 0.7)',
+                                'rgba(54, 162, 235, 0.7)'
+                            ],
+                            borderColor: [
+                                'rgba(255, 99, 132, 1)',
+                                'rgba(255, 159, 64, 1)',
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(54, 162, 235, 1)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    };
+                    createCurrentStatusChartOnElementWithData(ctxRpt0, 'summaryMonthlyByStatusCanvas', data0);
                 },
                 error: function(xhr, status, error) {
-                    console.error('Lỗi khi tải dữ liệu:', error);
-                    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-                    ctx.font = '16px Arial';
-                    ctx.fillStyle = '#f00';
-                    ctx.textAlign = 'center';
-                    ctx.fillText('Không thể tải dữ liệu. Vui lòng thử lại sau.', ctx.canvas.width / 2, ctx.canvas.height / 2);
-                    showToast('Không thể tải dữ liệu. Vui lòng thử lại sau.');
+                    showErrorOnChart(ctxRpt0);
+                    showErrorOnChart(ctx);
                 }
             });
         }
