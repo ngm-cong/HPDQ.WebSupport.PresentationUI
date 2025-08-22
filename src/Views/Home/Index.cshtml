@@ -194,9 +194,12 @@
             return `${hours}:${minutes} ${day}/${month}/${year}`;
         }
         function clearfilter() {
+            $('#filterRequestType').val('');
+            $('#filterStatus').val('');
             $('#filterRequestId').val('');
             $('#requestFilterForm').submit();
         }
+        // Hàm Loaded
         $(function () {
             $('#contentlist .item').click(function () {
                 if ($(this).attr('tagEMP_ID') != '@emp_id' && $(this).attr('tagStatus') == '1') $('#lblcomplete').show();
@@ -336,11 +339,11 @@
                         <div class="text-container">${response.data.commentDesc}<div class="corner-label">Đính kèm</div></div>
                     </div>`);
 
+                    $('#fileinput').val('');
                     formData = new FormData();
                     $('#divattachment').html(formDataFileLength());
                     $('#txtdescription').val('');
                 });
-                $('#fileinput').val('');
             });
             initFileInput();
             if ('@ViewBag.Type' == '1') {
@@ -396,6 +399,12 @@
                 }, 1000); // 1000ms = 1 giây
                 // scrollDiv.scrollTop(scrollDiv.prop("scrollHeight"));
             });
+            $('#dialogModal').on('hidden.bs.modal', function () {
+                $('#fileinput').val('');
+                formData = new FormData();
+                $('#divattachment').html(formDataFileLength());
+                $('#txtdescription').val('');
+            });
             document.getElementById('dialogModalImage').addEventListener('shown.bs.modal', function () {
                 this.focus();
             });
@@ -430,7 +439,21 @@
                     $('#divattachment').html(formDataFileLength());
                 }
             });
+            const urlParams = new URLSearchParams(window.location.search);
+            const tickettype = urlParams.get('TicketType');
+            const ticketstatus = urlParams.get('TicketStatus');
+            const searchtext = urlParams.get('SearchText');
+            if (tickettype && tickettype != null && tickettype != '') {
+                $('#filterRequestType').val(tickettype);
+            }
+            if (ticketstatus && ticketstatus != null && ticketstatus != '') {
+                $('#filterStatus').val(ticketstatus);
+            }
+            if (searchtext && searchtext != null && searchtext != '') {
+                $('#filterRequestId').val(searchtext);
+            }
         });
+        // Hàm Loaded
         function showImagePopup(element, isTicket) {
             var elclass = $(element).attr('class');
             if (elclass.includes('disabled')) return;
