@@ -3,19 +3,19 @@
     overflow-y: auto;
 }
 
-div.contentlist .item {
-    min-height: 80px;
-    background-color: #f9f9f9;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    cursor: pointer;
-    margin: 0;
-    padding: 0;
-}
-
-    div.contentlist .item:not(:last-child) {
-        margin-bottom: 16px;
+    div.contentlist .item {
+        min-height: 80px;
+        background-color: #f9f9f9;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        cursor: pointer;
+        margin: 0;
+        padding: 0;
     }
+
+        div.contentlist .item:not(:last-child) {
+            margin-bottom: 16px;
+        }
 
 .card-title {
     height: 25px;
@@ -45,6 +45,7 @@ div.contentlist .item {
     line-height: 1.4;
     max-height: 2.8em;
     margin-right: 16px;
+    white-space: pre-line;
 }
 
 .corner-label {
