@@ -4,7 +4,6 @@ using HPDQ.WebSupport.Utilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
-using System.Linq;
 using System.Security.Claims;
 
 namespace HPDQ.WebSupport.Controllers
@@ -103,7 +102,8 @@ namespace HPDQ.WebSupport.Controllers
         /// <returns>View chứa danh sách các yêu cầu chưa được xử lý.</returns>
         [Authorize(Roles = "Admin")]
         [Route("theodoiyeucau")]
-        public async Task<IActionResult> List()
+        public async Task<IActionResult> List(byte? ticketType = null, DataEntitites.TicketStatus? ticketStatus = null
+            , string? searchText = null)
         {
             var emp_id = _userEMP_ID();
             var criteria = new HPDQ.WebSupport.Criteria.TicketCriteria
@@ -111,7 +111,11 @@ namespace HPDQ.WebSupport.Controllers
                 ProgressBy_EMP_ID = null,
                 SearchOption = HPDQ.WebSupport.Criteria.SearchOption.ISNULL,
             };
+            if (ticketType != null) criteria.Type = ticketType;
+            if (ticketStatus != null) criteria.Status = ticketStatus;
+            if (string.IsNullOrEmpty(searchText) == false) criteria.SearchText = searchText;
             var tickets = await HPDQ.WebSupport.Utilities.API.Instance.Ticket.Load(criteria);
+            ViewBag.TicketTypes = await HPDQ.WebSupport.Utilities.API.Instance.CodeDetail.Load(new Criteria.CodeDetailCriteria { Master = CodeDetailMaster.TicketType });
             ViewBag.Type = 1;
             ViewData["Title"] = "Theo dõi yêu cầu";
             return View("Index", tickets);
@@ -123,7 +127,8 @@ namespace HPDQ.WebSupport.Controllers
         /// <returns>View chứa lịch sử danh sách các yêu cầu.</returns>
         [Authorize]
         [Route("lichsuyeucau")]
-        public async Task<IActionResult> History()
+        public async Task<IActionResult> History(byte? ticketType = null, DataEntitites.TicketStatus? ticketStatus = null
+            , string? searchText = null)
         {
             var emp_id = _userEMP_ID();
             var criteria = new HPDQ.WebSupport.Criteria.TicketCriteria
@@ -133,7 +138,11 @@ namespace HPDQ.WebSupport.Controllers
                 ProgressBy_EMP_ID = emp_id,
                 SearchOption = HPDQ.WebSupport.Criteria.SearchOption.OR,
             };
+            if (ticketType != null) criteria.Type = ticketType;
+            if (ticketStatus != null) criteria.Status = ticketStatus;
+            if (string.IsNullOrEmpty(searchText) == false) criteria.SearchText = searchText;
             var tickets = await HPDQ.WebSupport.Utilities.API.Instance.Ticket.Load(criteria);
+            ViewBag.TicketTypes = await HPDQ.WebSupport.Utilities.API.Instance.CodeDetail.Load(new Criteria.CodeDetailCriteria { Master = CodeDetailMaster.TicketType });
             ViewData["Title"] = "Lịch sử yêu cầu";
             return View("Index", tickets);
         }
