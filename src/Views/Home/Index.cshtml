@@ -45,7 +45,7 @@
     @foreach (var model in (Model ?? new List<HPDQ.WebSupport.DataEntitites.Ticket>()))
     {
         <div class="item" tag="@(model.Id)" tagEMP_ID="@(model.EMP_ID)" tagStatus="@((byte)model.Status)">
-            <div class="card-title text-muted small">[@(model.CreatedOn.ToString("HH:mm dd/MM/yyyy"))] [@(model.Code)] @(model.EMP_ID)</div>
+            <div class="card-title text-muted small">[@(model.CreatedOn.ToString("HH:mm dd/MM/yyyy"))] [#@(model.Code)] @(model.EMP_ID)</div>
             <div class="text-container">
                 <div class="text-content">@(model.Description)</div>
                 <div class="corner-label @(model.Status == HPDQ.WebSupport.DataEntitites.TicketStatus.Done ? "done" : "") @(model.Status == HPDQ.WebSupport.DataEntitites.TicketStatus.Closed ? "closed" : "") @(model.Status == HPDQ.WebSupport.DataEntitites.TicketStatus.InProgress ? "progress" : "")">@(model.Status.GetDescription())</div>
@@ -103,7 +103,7 @@
                             <table>
                                 <tr>
                                     <td style="width: 100%;">
-                                        <textarea id="txtdescription" rows="3"></textarea>
+                                        <textarea id="txtdescription" rows="3" contenteditable="true"></textarea>
                                     </td>
                                     <td style="white-space: nowrap;">
                                         <div>
@@ -340,6 +340,7 @@
                     $('#divattachment').html(formDataFileLength());
                     $('#txtdescription').val('');
                 });
+                $('#fileinput').val('');
             });
             initFileInput();
             if ('@ViewBag.Type' == '1') {
@@ -400,6 +401,34 @@
             });
             $('#dialogModalImage').on('hidden.bs.modal', function (e) {
                 $('#dialogModal').focus();
+            });
+            $('#txtdescription').on('paste', function(event) {
+                var items = (event.originalEvent || event).clipboardData.items;
+
+                if (items.length > 0 && items[0].type.indexOf('text') >= 0) return;
+
+                // Prevent the default paste behavior (which might insert a large image)
+                event.preventDefault();
+
+                // Check for an image in the clipboard data
+                for (var i = 0; i < items.length; i++) {
+                    var file = items[i].getAsFile();
+
+                    // Create a new DataTransfer object
+                    var dataTransfer = new DataTransfer();
+
+                    // Add the file to the DataTransfer object
+                    dataTransfer.items.add(file);
+
+                    // Get your file input element (assuming it has ID 'your-file-input')
+                    var fileInput = document.getElementById('fileinput');
+
+                    // Set the files property of the file input
+                    fileInput.files = dataTransfer.files;
+
+                    formData.append("files", file);
+                    $('#divattachment').html(formDataFileLength());
+                }
             });
         });
         function showImagePopup(element, isTicket) {
