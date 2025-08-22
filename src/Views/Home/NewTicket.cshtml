@@ -96,7 +96,8 @@
                     emp_id: '@emp_id',
                     description: $('#txtdescription').val(),
                     files: files,
-                    type: $('#cbotype').val()
+                    type: $('#cbotype').val(),
+                    fullName: '@Html.Raw(User.FindFirst(ClaimTypes.GivenName)?.Value)'
                 };
 
                 postData('@HPDQ.WebSupport.Utilities.Globals.DomainAPIUrl/Tickets/Create',
