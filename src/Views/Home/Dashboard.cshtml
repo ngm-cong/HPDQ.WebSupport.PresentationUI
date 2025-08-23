@@ -109,18 +109,14 @@
             <div class="card-header bg-success text-white">
                 <h5 class="mb-0">TỔNG QUAN</h5>
             </div>
-            <div class="card-body">
-                <div>
-                    <table style="width: 100%;">
-                        <tr>
-                            <td style="width: 50%;">
-                                <canvas id="summaryMonthlyByTypeCanvas" class="rptcanvas"></canvas>
-                            </td>
-                            <td style="width: 50%;">
-                                <canvas id="summaryMonthlyByStatusCanvas" class="rptcanvas"></canvas>
-                            </td>
-                        </tr>
-                    </table>
+            <div class="card-body" style="display: flex; flex-direction: column; gap: 10px;">
+                <div style="display: flex; gap: 10px; height: 50%">
+                    <div style="flex: 1;"><canvas id="summaryMonthlyByTypeCanvas" class="rptcanvas"></canvas></div>
+                    <div style="flex: 1;"><canvas id="summaryMonthlyByStatusCanvas" class="rptcanvas"></canvas></div>
+                </div>
+                <div style="display: flex; gap: 10px; height: 50%">
+                    <div style="flex: 1;"><canvas id="summaryUnFinishedCanvas" class="rptcanvas"></canvas></div>
+                    <div style="flex: 1;"><canvas id="summaryDailyByTypeCanvas" class="rptcanvas"></canvas></div>
                 </div>
             </div>
         </div>
@@ -130,10 +126,23 @@
     <style>
         .chart-container {
             min-height: 400px;
+            height: calc(100vh - 230px);
         }
 
         .chart-item {
             transition: all 0.3s ease;
+            width: 100%;
+            height: 100%;
+        }
+
+        .chart-item .card.shadow-sm, .chart-item .card.shadow-sm .card-body {
+            width: 100%;
+            height: 92%;
+        }
+
+        .chart-item .card.shadow-sm .card-body table {
+            margin: 0;
+            padding: 0;
         }
 
         .btn:not(#toggleSidebar) {
@@ -163,7 +172,7 @@
 
         .rptcanvas {
             width: 100%;
-            height: 500px;
+            /* height: 500px; */
         }
     </style>
 }
@@ -338,7 +347,11 @@
                 }
             });
         }
-        function createCurrentStatusChartOnElementWithData(ctx, chartId, data) {
+        function createCurrentStatusChartOnElementWithData(ctx, chartId, data, title) {
+            if (!title || title == '') {
+                title = `SỐ LƯỢNG YÊU CẦU THEO TRẠNG THÁI - THÁNG ${selectedMonth}/${selectedYear}`;
+            }
+
             // Xóa canvas trước khi vẽ lại
             ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
@@ -348,8 +361,6 @@
 
             // Đảm bảo canvas có đúng kích thước trước khi tạo biểu đồ
             const canvas = document.getElementById(chartId);
-            canvas.style.width = '100%';
-            canvas.style.height = '500px';
 
             charts[chartId] = new Chart(ctx, {
                 type: 'bar',
@@ -364,7 +375,7 @@
                         },
                         title: {
                             display: true,
-                            text: `SỐ LƯỢNG YÊU CẦU HIỆN CÓ THEO TRẠNG THÁI - Tháng ${selectedMonth}/${selectedYear}`
+                            text: title
                         },
                         tooltip: {
                             callbacks: {
@@ -495,8 +506,12 @@
         function createSummaryChart() {
             const ctxRpt0 = document.getElementById('summaryMonthlyByStatusCanvas').getContext('2d');
             const ctx = document.getElementById('summaryMonthlyByTypeCanvas').getContext('2d');
+            const ctxRpt2 = document.getElementById('summaryUnFinishedCanvas').getContext('2d');
+            const ctxRpt3 = document.getElementById('summaryDailyByTypeCanvas').getContext('2d');
             showLoadingOnChart(ctxRpt0);
             showLoadingOnChart(ctx);
+            showLoadingOnChart(ctxRpt2);
+            showLoadingOnChart(ctxRpt3);
 
             $.ajax({
                 url: '@Url.Action("DashboardViewData", "Home", new { rptType = 3 })',
@@ -540,11 +555,6 @@
                         charts.summaryMonthlyByType.destroy();
                     }
 
-                    // Đảm bảo canvas có đúng kích thước trước khi tạo biểu đồ
-                    const canvas = document.getElementById('monthlyByTypeCanvas');
-                    canvas.style.width = '100%';
-                    canvas.style.height = '500px';
-
                     charts.summaryMonthlyByType = new Chart(ctx, {
                         type: 'doughnut',
                         data: data,
@@ -553,14 +563,22 @@
                             maintainAspectRatio: false,
                             plugins: {
                                 legend: {
-                                    // Đặt 'display' là 'true' để hiển thị mô tả
-                                    display: true,
-                                    position: 'bottom' // Có thể đặt 'top', 'bottom', 'left', 'right'
-
+                                    display: true, // Đặt 'display' là 'true' để hiển thị mô tả
+                                    position: 'bottom', // Có thể đặt 'top', 'bottom', 'left', 'right'
+                                    labels: {
+                                      // Hàm này sẽ tạo ra các mục legend
+                                      generateLabels: (chart) => {
+                                        const datasets = chart.data.datasets;
+                                        return datasets[0].data.map((data, i) => ({
+                                          text: chart.data.labels[i] + ': ' + data, // Thêm số lượng vào nhãn
+                                          fillStyle: datasets[0].backgroundColor[i]
+                                        }));
+                                      }
+                                    }
                                 },
                                 title: {
                                     display: true,
-                                    text: `SỐ LƯỢNG YÊU CẦU THEO LOẠI - THÁNG ${selectedMonth}/${selectedYear}`
+                                    text: `SỐ LƯỢNG YÊU CẦU THEO TÌNH TRẠNG - THÁNG ${selectedMonth}/${selectedYear}`
                                 },
                                 tooltip: {
                                     callbacks: {
@@ -587,12 +605,6 @@
                                         return percentage;
                                     },
                                     color: '#000' // Màu chữ
-                                    // font: {
-                                    //     weight: 'bold',
-                                    //     size: 14
-                                    // },
-                                    // textShadowBlur: 2, // Tạo hiệu ứng bóng đổ cho dễ đọc
-                                    // textShadowColor: 'rgba(0, 0, 0, 0.7)'
                                 }
                             },
                             scales: {
@@ -604,31 +616,139 @@
                         }
                     });
 
-                    const data0 = response.data[0] || {
-                        labels: ['Mới tạo', 'Đang xử lý', 'Hoàn thành', 'Đã đóng'],
-                        datasets: [{
-                            label: 'Số lượng yêu cầu',
-                            data: [10, 15, 8, 5],
-                            backgroundColor: [
-                                'rgba(255, 99, 132, 0.7)',
-                                'rgba(255, 159, 64, 0.7)',
-                                'rgba(75, 192, 192, 0.7)',
-                                'rgba(54, 162, 235, 0.7)'
-                            ],
-                            borderColor: [
-                                'rgba(255, 99, 132, 1)',
-                                'rgba(255, 159, 64, 1)',
-                                'rgba(75, 192, 192, 1)',
-                                'rgba(54, 162, 235, 1)'
-                            ],
-                            borderWidth: 1
-                        }]
-                    };
-                    createCurrentStatusChartOnElementWithData(ctxRpt0, 'summaryMonthlyByStatusCanvas', data0);
+                    // Biểu bồ ticket chưa được xử trí theo loại
+                    ctxRpt2.clearRect(0, 0, ctxRpt2.canvas.width, ctxRpt2.canvas.height); // Xóa canvas trước khi vẽ lại
+
+                    const data4 = response.data[3];
+                    console.log(data);
+                    console.log(data4);
+
+                    if (charts.summaryUnFinishedCanvas) {
+                        charts.summaryUnFinishedCanvas.destroy();
+                    }
+
+                    charts.summaryUnFinishedCanvas = new Chart(ctxRpt2, {
+                        type: 'doughnut',
+                        data: data4,
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    // Đặt 'display' là 'true' để hiển thị mô tả
+                                    display: true,
+                                    position: 'bottom', // Có thể đặt 'top', 'bottom', 'left', 'right'
+                                    labels: {
+                                      // Hàm này sẽ tạo ra các mục legend
+                                      generateLabels: (chart) => {
+                                        const datasets = chart.data.datasets;
+                                        return datasets[0].data.map((data, i) => ({
+                                          text: chart.data.labels[i] + ': ' + data, // Thêm số lượng vào nhãn
+                                          fillStyle: datasets[0].backgroundColor[i]
+                                        }));
+                                      }
+                                    }
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'SỐ LƯỢNG YÊU CẦU CHƯA ĐƯỢC XỬ TRÍ THEO LOẠI'
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            let label = context.label || '';
+                                            if (label) {
+                                                label += ': ';
+                                            }
+                                            if (context.parsed !== null) {
+                                                const total = context.chart.data.datasets[0].data.reduce((sum, value) => sum + value, 0);
+                                                const value = context.parsed;
+                                                const percentage = ((value / total) * 100).toFixed(2) + '%';
+                                                label += percentage;
+                                            }
+                                            return label;
+                                        }
+                                    }
+                                },
+                                // Cấu hình plugin datalabels
+                                datalabels: {
+                                    formatter: (value, context) => {
+                                        const total = context.chart.data.datasets[0].data.reduce((sum, val) => sum + val, 0);
+                                        const percentage = ((value / total) * 100).toFixed(2) + '%';
+                                        return percentage;
+                                    },
+                                    color: '#000' // Màu chữ
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    // ...
+                                    display: false // Ẩn trục y nếu bạn muốn code gọn hơn
+                                }
+                            }
+                        }
+                    });
+                    // Biểu bồ ticket chưa được xử trí theo loại
+
+                    const data0 = response.data[0];
+                    createCurrentStatusChartOnElementWithData(ctxRpt0, 'summaryMonthlyByStatusCanvas', data0, `SỐ LƯỢNG YÊU CẦU THEO LOẠI - THÁNG ${selectedMonth}/${selectedYear}`);
+
+                    // Số lượng yêu cầu phát sinh theo ngày
+                    const data3 = response.data[2];
+
+                    ctxRpt3.clearRect(0, 0, ctxRpt3.canvas.width, ctxRpt3.canvas.height); // Xóa canvas trước khi vẽ lại
+
+                    if (charts.summaryDailyByTypeCanvas) {
+                        charts.summaryDailyByTypeCanvas.destroy();
+                    }
+
+                    const canvas = document.getElementById('summaryDailyByTypeCanvas'); // Đảm bảo canvas có đúng kích thước trước khi tạo biểu đồ
+
+                    charts.summaryDailyByTypeCanvas = new Chart(ctxRpt3, {
+                        type: 'line',
+                        data: data3,
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: true
+                                },
+                                title: {
+                                    display: true,
+                                    text: `SỐ LƯỢNG YÊU CẦU PHÁT SINH THEO NGÀY - THÁNG ${selectedMonth}/${selectedYear}`
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            return `Số lượng: ${context.raw}`;
+                                        }
+                                    }
+                                }
+                                , datalabels: {
+                                    display: (context) => {
+                                        // Trả về false nếu giá trị bằng 0
+                                        return context.dataset.data[context.dataIndex] > 0;
+                                    }
+                                }
+                            },
+                            scales: {
+                                x: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        precision: 0
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    // Số lượng yêu cầu phát sinh theo ngày
                 },
                 error: function(xhr, status, error) {
                     showErrorOnChart(ctxRpt0);
                     showErrorOnChart(ctx);
+                    showErrorOnChart(ctxRpt2);
+                    showErrorOnChart(ctxRpt3);
                 }
             });
         }

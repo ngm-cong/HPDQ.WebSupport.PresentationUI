@@ -219,6 +219,9 @@ namespace HPDQ.WebSupport.Controllers
 
             /// <summary>Tỉ lệ bo cong của những đường dữ liệu (Nhận giá trị từ 0-1).</summary>
             public double Tension { get; set; }
+
+            /// <summary>Độ dày của các line trên biểu đồ.</summary>
+            public double BorderWidth { get; set; }
         }
 
         /// <summary>
@@ -230,11 +233,17 @@ namespace HPDQ.WebSupport.Controllers
             public IEnumerable<LineChartModel>? Datasets { get; set; }
         }
 
-        private async Task<DashboardViewModel> RptType0(IEnumerable<Ticket>? ticketsInMonth)
+        /// <summary>
+        /// Hàm tạo dữ liệu biểu bồ số lượng yêu cầu nhóm bởi phân loại theo tháng.
+        /// </summary>
+        /// <param name="ticketsInMonth">Danh sách yêu cầu cần tạo dữ liệu biểu đồ.</param>
+        /// <param name="ticketTypes">Danh sách các loại yêu cầu cần tạo dữ liệu biểu đồ.</param>
+        /// <returns>Đối tượng hiển thị dữ liệu biểu bồ số lượng yêu cầu nhóm bởi phân loại theo tháng</returns>
+        private DashboardViewModel RptType0(IEnumerable<Ticket>? ticketsInMonth
+            , IEnumerable<CodeDetail> ticketTypes)
         {
-            var issueTypes = await HPDQ.WebSupport.Utilities.API.Instance.CodeDetail.Load(new Criteria.CodeDetailCriteria { Master = CodeDetailMaster.TicketType }) ?? new List<CodeDetail>();
             var rptByIssueValues = from x in ticketsInMonth
-                                   join t in issueTypes on x.Type equals t.Code
+                                   join t in ticketTypes on x.Type equals t.Code
                                    group x by t.Description into g
                                    orderby g.Key
                                    select new
@@ -242,7 +251,7 @@ namespace HPDQ.WebSupport.Controllers
                                        Label = g.Key,
                                        Total = g.Count(),
                                    };
-            var labels = issueTypes.Select(x => x.Description).OrderBy(x => x).ToList();
+            var labels = ticketTypes.Select(x => x.Description).OrderBy(x => x).ToList();
             var outVal = new DashboardViewModel
             {
                 Labels = labels,
@@ -263,6 +272,12 @@ namespace HPDQ.WebSupport.Controllers
             };
             return outVal;
         }
+
+        /// <summary>
+        /// Hàm tạo dữ liệu biểu đồ nhóm tình trạng yêu cầu đã được tạo trong tháng.
+        /// </summary>
+        /// <param name="ticketsInMonth">Danh sách yêu cầu cần tạo dữ liệu biểu đồ.</param>
+        /// <returns>Đối tượng hiển thị biểu đồ nhóm tình trạng yêu cầu đã được tạo trong tháng.</returns>
         private DashboardViewModel RptType1(IEnumerable<Ticket>? ticketsInMonth)
         {
             var rptValues = from x in ticketsInMonth
@@ -307,9 +322,10 @@ namespace HPDQ.WebSupport.Controllers
             switch (rptType)
             {
                 case 0:
+                    var ticketTypes = await HPDQ.WebSupport.Utilities.API.Instance.CodeDetail.Load(new Criteria.CodeDetailCriteria { Master = CodeDetailMaster.TicketType }) ?? new List<CodeDetail>();
                     var outVal = new APIResult<DashboardViewModel>
                     {
-                        Data = await RptType0(ticketsInMonth),
+                        Data = RptType0(ticketsInMonth, ticketTypes),
                     };
                     return outVal;
                 case 1:
@@ -362,12 +378,84 @@ namespace HPDQ.WebSupport.Controllers
                         }
                     };
                 case 3: //equal 0,1
+                    #region Số lượng YC phát sinh theo ngày
+                    ticketTypes = await HPDQ.WebSupport.Utilities.API.Instance.CodeDetail.Load(new Criteria.CodeDetailCriteria { Master = CodeDetailMaster.TicketType }) ?? new List<CodeDetail>();
+                    var grpRptValues = ticketsInMonth!.GroupBy(x => new { x.CreatedOn.Day, x.Type }).Select(x => new { x.Key.Day, x.Key.Type, Count = x.Count() });
+                    int[] days = Enumerable.Range(1, DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month)).ToArray();
+                    var rptByIssueValues = from x in ticketsInMonth
+                                           join t in ticketTypes on x.Type equals t.Code
+                                           group x by t.Description into g
+                                           orderby g.Key
+                                           select new
+                                           {
+                                               Label = g.Key,
+                                               Total = g.Count(),
+                                           };
+                    labels = days.Select(x => $"Ngày {x}").ToList();
+                    var rptType2 = new DashboardViewModel
+                    {
+                        Labels = labels,
+                        Datasets = from tt in ticketTypes
+                                   select new LineChartModel
+                                   {
+                                       Label = tt.Description,
+                                       Data = from d in days
+                                              join v in grpRptValues on new { Day = d, Type = tt.Code } equals new { v.Day, v.Type } into leftv
+                                              from v in leftv.DefaultIfEmpty()
+                                              select Convert.ToDouble(v?.Count ?? 0),
+                                       //BorderColor = Globals.ChartFormats.Select(x => x.BorderColor).Take(labels.Count()),
+                                       //BackgroundColor = Globals.ChartFormats.Select(x => x.BackgroundColor).Take(labels.Count()),
+                                       Tension = 0.4,
+                                       BorderWidth = 0.5,
+                                   }
+                    };
+                    #endregion Số lượng YC phát sinh theo ngày
+
+                    #region Số lượng YC chưa được xử trí
+                    criteria = new Criteria.TicketCriteria
+                    {
+                        ExcludeStatus = new List<TicketStatus> { TicketStatus.Closed, TicketStatus.Done }
+                    };
+                    var unFinishedTickets = await HPDQ.WebSupport.Utilities.API.Instance.Ticket.Load(criteria);
+                    unFinishedTickets = unFinishedTickets ?? new List<Ticket>();
+
+                    var rptValues = from x in ticketsInMonth
+                                    group x by x.CreatedOn.Day into g
+                                    select new
+                                    {
+                                        Date = g.Key,
+                                        Total = g.Count(),
+                                        Processed = g.Count(x => x.Status == TicketStatus.Done || x.Status == TicketStatus.Closed),
+                                        InProgress = g.Count(x => x.Status == TicketStatus.InProgress),
+                                    };
+                    labels = ticketTypes.Select(x => x.Description).OrderBy(x => x).ToList();
+                    var inProgress = rptValues.Sum(x => x.InProgress);
+                    var processed = rptValues.Sum(x => x.Processed);
+                    var rptType4 = new DashboardViewModel
+                    {
+                        Labels = labels,
+                        Datasets = new List<LineChartModel>() {
+                            new LineChartModel
+                            {
+                                Label = "Số lượng yêu cầu",
+                                Data = from tt in ticketTypes
+                                       join t in unFinishedTickets!.GroupBy(x=>x.Type) on tt.Code equals t.Key into lt
+                                       from t in lt.DefaultIfEmpty()
+                                       select t?.Count() ?? 0d,
+                                Tension = 0.4,
+                            },
+                        },
+                    };
+                    #endregion Số lượng YC chưa được xử trí
+
                     return new APIResult<IEnumerable<DashboardViewModel>>
                     {
                         Data = new List<DashboardViewModel>
                         {
-                            await RptType0(ticketsInMonth),
+                            RptType0(ticketsInMonth,ticketTypes),
                             RptType1(ticketsInMonth),
+                            rptType2,
+                            rptType4,
                         }
                     };
                 default:
