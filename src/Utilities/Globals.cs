@@ -42,9 +42,9 @@
         /// <summary>Danh sách các cài đặt dữ liệu trên chart sắp xếp theo thứ tự.</summary>
         public static IEnumerable<ChartFormat> ChartFormats = new List<ChartFormat>
         {
-            new ChartFormat { BorderColor = "red", BackgroundColor = "rgba(255,0,0,0.1)" },
-            new ChartFormat { BorderColor = "blue", BackgroundColor = "rgba(0,0,255,0.1)" },
-            new ChartFormat { BorderColor = "green", BackgroundColor = "rgba(0,255,0,0.1)" },
+            new ChartFormat { BorderColor = "red", BackgroundColor = "#45adeb" },
+            new ChartFormat { BorderColor = "blue", BackgroundColor = "#ff809a" },
+            new ChartFormat { BorderColor = "green", BackgroundColor = "#ffa500" },
             new ChartFormat { BorderColor = "orange", BackgroundColor = "rgba(255,165,0,0.1)" },
             new ChartFormat { BorderColor = "purple", BackgroundColor = "rgba(128,0,128,0.1)" },
             new ChartFormat { BorderColor = "cyan", BackgroundColor = "rgba(0,255,255,0.1)" },

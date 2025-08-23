@@ -222,6 +222,9 @@ namespace HPDQ.WebSupport.Controllers
 
             /// <summary>Độ dày của các line trên biểu đồ.</summary>
             public double BorderWidth { get; set; }
+
+            /// <summary>Độ dày của các point trên từng line biểu đồ.</summary>
+            public IEnumerable<double>? PointRadius { get; set; }
         }
 
         /// <summary>
@@ -403,10 +406,14 @@ namespace HPDQ.WebSupport.Controllers
                                               join v in grpRptValues on new { Day = d, Type = tt.Code } equals new { v.Day, v.Type } into leftv
                                               from v in leftv.DefaultIfEmpty()
                                               select Convert.ToDouble(v?.Count ?? 0),
-                                       //BorderColor = Globals.ChartFormats.Select(x => x.BorderColor).Take(labels.Count()),
-                                       //BackgroundColor = Globals.ChartFormats.Select(x => x.BackgroundColor).Take(labels.Count()),
+                                       BorderColor = Globals.ChartFormats.Select(x => x.BorderColor).Take(labels.Count()),
+                                       BackgroundColor = Globals.ChartFormats.Select(x => x.BackgroundColor).Take(labels.Count()),
                                        Tension = 0.4,
                                        BorderWidth = 0.5,
+                                       PointRadius = from d in days
+                                                     join v in grpRptValues on new { Day = d, Type = tt.Code } equals new { v.Day, v.Type } into leftv
+                                                     from v in leftv.DefaultIfEmpty()
+                                                     select v?.Count > 0 ? 2d : 0,
                                    }
                     };
                     #endregion Số lượng YC phát sinh theo ngày
@@ -452,7 +459,7 @@ namespace HPDQ.WebSupport.Controllers
                     {
                         Data = new List<DashboardViewModel>
                         {
-                            RptType0(ticketsInMonth,ticketTypes),
+                            RptType0(ticketsInMonth, ticketTypes),
                             RptType1(ticketsInMonth),
                             rptType2,
                             rptType4,

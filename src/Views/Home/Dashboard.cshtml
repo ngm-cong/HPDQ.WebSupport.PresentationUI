@@ -73,7 +73,7 @@
         </div>
     </div>
 </div>
-<div class="chart-container mb-4">
+<div class="chart-container">
     <div id="monthlyByTypeChart" class="chart-item d-none">
         <div class="card shadow-sm">
             <div class="card-header bg-primary text-white">
@@ -135,15 +135,20 @@
             height: 100%;
         }
 
-        .chart-item .card.shadow-sm, .chart-item .card.shadow-sm .card-body {
-            width: 100%;
-            height: 92%;
-        }
+            .chart-item .card.shadow-sm {
+                width: 100%;
+                height: 100%;
+            }
 
-        .chart-item .card.shadow-sm .card-body table {
-            margin: 0;
-            padding: 0;
-        }
+                .chart-item .card.shadow-sm .card-body {
+                    width: 100%;
+                    height: 92%;
+                }
+
+                    .chart-item .card.shadow-sm .card-body table {
+                        margin: 0;
+                        padding: 0;
+                    }
 
         .btn:not(#toggleSidebar) {
             border-radius: 20px;
@@ -358,9 +363,6 @@
             if (charts[chartId]) {
                 charts[chartId].destroy();
             }
-
-            // Đảm bảo canvas có đúng kích thước trước khi tạo biểu đồ
-            const canvas = document.getElementById(chartId);
 
             charts[chartId] = new Chart(ctx, {
                 type: 'bar',
@@ -620,8 +622,6 @@
                     ctxRpt2.clearRect(0, 0, ctxRpt2.canvas.width, ctxRpt2.canvas.height); // Xóa canvas trước khi vẽ lại
 
                     const data4 = response.data[3];
-                    console.log(data);
-                    console.log(data4);
 
                     if (charts.summaryUnFinishedCanvas) {
                         charts.summaryUnFinishedCanvas.destroy();
@@ -848,31 +848,37 @@
             // Gắn sự kiện cho nút làm mới
             document.getElementById('refreshData').addEventListener('click', refreshData);
 
-            // Tạo một kết nối tới Hub
-            const connection = new signalR.HubConnectionBuilder()
-                .withUrl("@HPDQ.WebSupport.Utilities.Globals.SignalRUrl/signalrhub", {
-                    headers: {
-                        "X-API-KEY": '@HPDQ.WebSupport.Utilities.Globals.APIKey'
+            try {
+                // Tạo một kết nối tới Hub
+                const connection = new signalR.HubConnectionBuilder()
+                    .withUrl("@HPDQ.WebSupport.Utilities.Globals.SignalRUrl/signalrhub", {
+                        headers: {
+                            "X-API-KEY": '@HPDQ.WebSupport.Utilities.Globals.APIKey'
+                        }
+                    })
+                    .build();
+                // Lắng nghe phương thức "ReceiveMessage" từ server
+                connection.on("ReceiveMessage", (user, message) => {
+                    // Xử lý dữ liệu nhận được, ví dụ: hiển thị lên trang
+                    // const li = document.createElement("li");
+                    // li.textContent = `${user}: ${message}`;
+                    // document.getElementById("messagesList").appendChild(li);
+                    if (currentChart == 'summary') {
+                        createSummaryChart();
                     }
-                })
-                .build();
-            // Lắng nghe phương thức "ReceiveMessage" từ server
-            connection.on("ReceiveMessage", (user, message) => {
-                // Xử lý dữ liệu nhận được, ví dụ: hiển thị lên trang
-                // const li = document.createElement("li");
-                // li.textContent = `${user}: ${message}`;
-                // document.getElementById("messagesList").appendChild(li);
-                if (currentChart == 'summary') {
-                    createSummaryChart();
-                }
-            });
-            // Bắt đầu kết nối
-            connection.start()
-                .then(() => {
-                })
-                .catch(err => {
-                    console.error(err);
                 });
+                // Bắt đầu kết nối
+                connection.start()
+                    .then(() => {
+                    })
+                    .catch(err => {
+                        // console.log('Lỗi kết nối SignalR');
+                        // console.error(err);
+                        console.clear();
+                    });
+            } catch (e) {
+                // console.log('Lỗi kết nối SignalR');
+            }
 
             // Click các tab header
             $('button.showChart').on('click', (event) => {

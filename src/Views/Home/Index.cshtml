@@ -55,12 +55,6 @@
             </div>
             <hr />
             <div class="item-list">
-                <script>
-                    // Giả sử biến "group" là danh sách model trong server
-                    var groupData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(group));
-                    console.log(groupData);
-                </script>
-
                 @foreach (var model in group)
                 {
                     <div class="item" tag="@(model.Id)" tagEMP_ID="@(model.EMP_ID)" tagStatus="@((byte)model.Status)">

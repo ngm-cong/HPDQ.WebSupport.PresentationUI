@@ -145,6 +145,13 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
-
+    <script type="text/javascript">
+        $(document).ready(function() {
+            var isMobile = /Android|iPad|iPhone|iPod|Mobile/i.test(navigator.userAgent);
+            if (isMobile) {
+                $('#toggleSidebar').trigger('click');
+            }
+        });
+    </script>
 </body>
 </html>
