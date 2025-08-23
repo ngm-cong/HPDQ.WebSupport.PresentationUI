@@ -4,6 +4,10 @@
     var emp_id = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
         ?? User.FindFirst("preferred_username")?.Value
         ?? User.FindFirst("upn")?.Value;
+
+    var groupedByType = (Model ?? new List<HomeViewModel>())
+        .GroupBy(t => t.Type)
+        .OrderBy(g => g.Key);
 }
 
 @model IEnumerable<HomeViewModel>
@@ -42,13 +46,38 @@
 </form>
 
 <div class="contentlist" id="contentlist">
-    @foreach (var model in (Model ?? new List<HomeViewModel>()))
+    @foreach (var group in groupedByType)
     {
-        <div class="item" tag="@(model.Id)" tagEMP_ID="@(model.EMP_ID)" tagStatus="@((byte)model.Status)">
-            <div class="card-title text-muted small">[@(model.CreatedOn.ToString("HH:mm dd/MM/yyyy"))] [#@(model.Code)] @(model.FullName)</div>
-            <div class="text-container">
-                <div class="text-content">@(model.Description)</div>
-                <div class="corner-label @(model.Status == HPDQ.WebSupport.DataEntitites.TicketStatus.Done ? "done" : "") @(model.Status == HPDQ.WebSupport.DataEntitites.TicketStatus.Closed ? "closed" : "") @(model.Status == HPDQ.WebSupport.DataEntitites.TicketStatus.InProgress ? "progress" : "")">@(model.Status.GetDescription())</div>
+        <div class="type-group">
+            <div class="group-header">
+                <span class="chevron">&#9660;</span>
+                @group.First().TypeDescription
+            </div>
+            <hr />
+            <div class="item-list">
+                <script>
+                    // Giả sử biến "group" là danh sách model trong server
+                    var groupData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(group));
+                    console.log(groupData);
+                </script>
+
+                @foreach (var model in group)
+                {
+                    <div class="item" tag="@(model.Id)" tagEMP_ID="@(model.EMP_ID)" tagStatus="@((byte)model.Status)">
+                        <div class="card-title text-muted small">
+                            <b>#@(model.Code) <br /></b>
+                            [@(model.CreatedOn.ToString("HH:mm dd/MM/yyyy"))] @(model.FullName)
+                        </div>
+                        <div class="text-container">
+                            <div class="text-content">@(model.Description)</div>
+                            <div class="corner-label @(model.Status == HPDQ.WebSupport.DataEntitites.TicketStatus.Done ? "done" : "")
+                                            @(model.Status == HPDQ.WebSupport.DataEntitites.TicketStatus.Closed ? "closed" : "")
+                                            @(model.Status == HPDQ.WebSupport.DataEntitites.TicketStatus.InProgress ? "progress" : "")">
+                                @(model.Status.GetDescription())
+                            </div>
+                        </div>
+                    </div>
+                }
             </div>
         </div>
     }
@@ -453,6 +482,14 @@
             if (searchtext && searchtext != null && searchtext != '') {
                 $('#filterRequestId').val(searchtext);
             }
+
+            $('.group-header').on('click', function() {
+                $(this).toggleClass('collapsed');
+                $(this).nextAll('.item-list').first().slideToggle(300);
+            });
+
+            $('.item-list').show();
+            $('.group-header').removeClass('collapsed');
         });
         // Hàm Loaded
         function showImagePopup(element, isTicket) {

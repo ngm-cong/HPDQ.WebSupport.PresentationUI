@@ -94,6 +94,10 @@ body {
     background-color: #06428B !important;
 }
 
+.nav-link:hover {
+    background-color: #d0d0d0;
+}
+
 /* logout button */
 #logout_btn {
     cursor: pointer;
