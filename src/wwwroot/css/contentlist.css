@@ -1,5 +1,5 @@
 ﻿div.contentlist {
-    height: calc(100vh - 110px);
+    height: calc(100vh - 150px);
     overflow-y: auto;
 }
 
@@ -95,7 +95,7 @@ div.contentlist .itemcontainer {
     }
 
 .type-group {
-    border: 1px solid #000;
+    border: 1px solid #ccc;
     border-radius: 8px;
     margin-bottom: 28px;
     background: #fff;
