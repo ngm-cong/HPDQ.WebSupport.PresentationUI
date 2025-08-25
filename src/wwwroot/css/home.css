@@ -26,7 +26,7 @@
         #chatbox .item.reply {
             background: #F6F6F6;
             cursor: default;
-            margin-right: 250px;
+            margin-right: 5%;
         }
 
             #chatbox .item.reply .card-title {
@@ -36,7 +36,7 @@
         #chatbox .item:not(.reply) {
             background: #E6F2FF;
             cursor: default;
-            margin-left: 250px;
+            margin-left: 5%;
         }
 
         #chatbox .item:not(:first-child) {
