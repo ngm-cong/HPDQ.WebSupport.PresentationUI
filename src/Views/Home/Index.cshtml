@@ -583,10 +583,10 @@
             dialogModalImage.show();
         }
         function openfile(fileurl) {
-            if (!/\.(txt|pdf)$/i.test(fileurl)) {
-                window.open(fileurl, '_blank');
-                return true;
-            }
+            // if (!/\.(txt|pdf)$/i.test(fileurl)) {
+            //     window.open(fileurl, '_blank');
+            //     return true;
+            // }
             var iframe = document.getElementById("filePreviewFrame");
             iframe.src = fileurl;
 
