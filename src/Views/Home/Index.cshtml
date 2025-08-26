@@ -8,6 +8,8 @@
     var groupedByType = (Model ?? new List<HomeViewModel>())
         .GroupBy(t => t.Type)
         .OrderBy(g => g.Key);
+
+    var currentPath = ViewContext.RouteData.Values["action"]?.ToString()?.ToLower();
 }
 
 @model IEnumerable<HomeViewModel>
@@ -58,9 +60,15 @@
                 @foreach (var model in group)
                 {
                     <div class="item" tag="@(model.Id)" tagEMP_ID="@(model.EMP_ID)" tagStatus="@((byte)model.Status)">
-                        <div class="card-title text-muted small">
+                        <div class="card-title text-muted small" style="position: relative;">
                             <b>#@(model.Code) <br /></b>
                             [@(model.CreatedOn.ToString("HH:mm dd/MM/yyyy"))] @(model.FullName)
+                            @if (currentPath == "index")
+                            {
+                                <div class="editbuttonzone">
+                                    <img src="~/img/edit.png" />
+                                </div>
+                            }
                         </div>
                         <div class="text-container">
                             <div class="text-content">@Html.Raw(model.Description)</div>
@@ -227,6 +235,13 @@
             cursor: pointer;
             padding-right: 20px;
         }
+
+        .editbuttonzone {
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+        }
     </style>
 }
 @section Scripts {
@@ -265,7 +280,7 @@
             $('#contentlist .item').click(function () {
                 if ($(this).attr('tagEMP_ID') != '@emp_id' && $(this).attr('tagStatus') == '1') $('#lblcomplete').show();
                 else $('#lblcomplete').hide();
-                if ($(this).attr('tagEMP_ID') == '@emp_id' && $(this).attr('tagStatus') == '2') $('#lblclose').show();
+                if ($(this).attr('tagEMP_ID') == '@emp_id' && ($(this).attr('tagStatus') == '0' || $(this).attr('tagStatus') == '2')) $('#lblclose').show();
                 else $('#lblclose').hide();
                 $('#divprocessby').hide();
                 function loadImages() {
@@ -514,6 +529,13 @@
                 var iframe = document.getElementById("filePreviewFrame");
                 iframe.src = ""; // Xóa src để giải phóng bộ nhớ
                 $('#dialogModal').focus();
+            });
+            $('.editbuttonzone img').on('click', function(event) {
+                // Prevent the default paste behavior (which might insert a large image)
+                event.preventDefault();
+                var href = '@Url.Action("EditTicket", "Home", new { id = "ID_PLACEHOLDER" })';
+                window.location.href = href.replace('ID_PLACEHOLDER', $(this.parentElement.parentElement.parentElement).attr('tag'));
+                return false;
             });
         });
         // Hàm Loaded

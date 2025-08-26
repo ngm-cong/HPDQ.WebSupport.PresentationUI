@@ -36,7 +36,14 @@
                 <select id="cbotype" class="form-select" style="max-width: 200px;">
                     @foreach (var item in (Model.TicketTypes ?? new List<HPDQ.WebSupport.DataEntitites.CodeDetail>()))
                     {
-                        <option value="@item.Code">@item.Description</option>
+                        if (Model.Type == item.Code)
+                        {
+                            <option value="@item.Code" selected>@item.Description</option>                            
+                        }
+                        else
+                        {
+                            <option value="@item.Code">@item.Description</option>
+                        }
                     }
                 </select>
             </div>
@@ -46,7 +53,9 @@
                 <label for="description" id="desc_label" class="form-label fw-bold position-absolute bg-white px-2">
                     Mô tả yêu cầu
                 </label>
-                <div id="txtdescription" style="width: 100%; min-height: 300px; border: 1px solid #ccc;" contenteditable="true"></div>
+                <div id="txtdescription" style="width: 100%; min-height: 300px; border: 1px solid #ccc;" contenteditable="true">
+                    @Html.Raw(Model.Description)
+                </div>
             </div>
 
             <!-- File đính kèm + Nút gửi -->
@@ -70,10 +79,32 @@
     <script src="~/js/fileinput.js"></script>
     <script src="~/js/contenteditable.js"></script>
     <script>
+        function updateTicket(id) {
+            var bodydata = {
+                id: id,
+                status: 0,
+                description: $('#txtdescription').html(),
+                type: $('#cbotype').val()
+            };
+            postData('@HPDQ.WebSupport.Utilities.Globals.DomainAPIUrl/Tickets/Update?emp_id=@emp_id', '@HPDQ.WebSupport.Utilities.Globals.APIKey', bodydata, function(response) {
+                if (response.errorCode != 0)
+                {
+                    alert(response.message);
+                    return;
+                }
+                window.location.href = '@Url.Action("Index", "Home")';
+            });
+        }
         $(function () {
             $('#btnconfirm').click(function () {
                 if ($('#txtdescription').html() === '') {
                     $('#txtdescription').focus();
+                    return;
+                }
+
+                var id = '@Model.Id';
+                if (id && id != '0') {
+                    updateTicket(id);
                     return;
                 }
 
