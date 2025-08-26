@@ -424,6 +424,7 @@
                         id: $('#modelTag').val(),
                         status: 1,
                         progressBy_EMP_ID: '@emp_id',
+                        progressByEMPFullName: '@User.FindFirst(ClaimTypes.GivenName)?.Value',
                     };
                     postData('@HPDQ.WebSupport.Utilities.Globals.DomainAPIUrl/Tickets/Update?emp_id=@emp_id', '@HPDQ.WebSupport.Utilities.Globals.APIKey', bodydata, function(response) {
                         if (response.errorCode != 0)
