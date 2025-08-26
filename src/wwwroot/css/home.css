@@ -109,6 +109,17 @@
     width: 100%;
     resize: none;
     margin-top: 8px;
+    height: 78px;
+    border: 1px solid #ccc;
+    overflow-y: auto;
+    padding: 5px;
+}
+
+#txtdescription table {
+    border-collapse: collapse;
+}
+#txtdescription td {
+    border: 1px solid #ccc;
 }
 
 #btnconfirm {

@@ -1,0 +1,14 @@
+#txtdescription {
+    padding: 5px;
+}
+#txtdescription:focus {
+    border-color: cornflowerblue;
+    outline-color: cornflowerblue;
+    outline-width: 0.5px;
+}
+#txtdescription table {
+    border-collapse: collapse;
+}
+#txtdescription td {
+    border: 1px solid #ccc;
+}
