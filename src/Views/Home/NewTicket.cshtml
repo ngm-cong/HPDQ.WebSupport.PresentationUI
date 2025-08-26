@@ -25,6 +25,7 @@
         color: #3b3c36;
     }
 </style>
+<link rel="stylesheet" href="~/css/contenteditable.css" />
 
 <div class="container-fluid p-3">
     <div class="card">
@@ -45,8 +46,7 @@
                 <label for="description" id="desc_label" class="form-label fw-bold position-absolute bg-white px-2">
                     Mô tả yêu cầu
                 </label>
-                <textarea id="txtdescription" class="form-control border-primary-subtle mt-2 mb-2"
-                          rows="12" style="min-height: 300px;"></textarea>
+                <div id="txtdescription" style="width: 100%; min-height: 300px; border: 1px solid #ccc;" contenteditable="true"></div>
             </div>
 
             <!-- File đính kèm + Nút gửi -->
@@ -68,10 +68,11 @@
 @section Scripts {
     <script src="~/js/ajaxutil.js"></script>
     <script src="~/js/fileinput.js"></script>
+    <script src="~/js/contenteditable.js"></script>
     <script>
         $(function () {
             $('#btnconfirm').click(function () {
-                if ($('#txtdescription').val() === '') {
+                if ($('#txtdescription').html() === '') {
                     $('#txtdescription').focus();
                     return;
                 }
@@ -94,7 +95,7 @@
 
                 var bodydata = {
                     emp_id: '@emp_id',
-                    description: $('#txtdescription').val(),
+                    description: $('#txtdescription').html(),
                     files: files,
                     type: $('#cbotype').val(),
                     fullName: '@Html.Raw(User.FindFirst(ClaimTypes.GivenName)?.Value)'

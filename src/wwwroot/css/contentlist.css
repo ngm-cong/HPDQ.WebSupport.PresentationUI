@@ -34,6 +34,25 @@
     align-items: center;
     justify-content: space-between;
     min-height: 50px;
+    flex-wrap: wrap; /* Rất quan trọng để các phần tử có thể xuống hàng */
+}
+
+#chatbox .text-container {
+    white-space: pre-line;
+}
+
+#chatbox .text-container div:not([class]) {
+    width: 100%;
+    flex-basis: 100%;
+    flex-grow: 0;
+}
+
+#chatbox .text-container table {
+    border-collapse: collapse;
+}
+
+#chatbox .text-container td {
+    border: 1px solid #ccc;
 }
 
 .text-content {
@@ -47,6 +66,14 @@
     max-height: 2.8em;
     margin-right: 16px;
     white-space: pre-line;
+}
+
+.text-content table {
+    border-collapse: collapse;
+}
+
+.text-content td {
+    border: 1px solid #ccc;
 }
 
 .corner-label {

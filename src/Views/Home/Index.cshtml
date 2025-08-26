@@ -63,7 +63,7 @@
                             [@(model.CreatedOn.ToString("HH:mm dd/MM/yyyy"))] @(model.FullName)
                         </div>
                         <div class="text-container">
-                            <div class="text-content">@(model.Description)</div>
+                            <div class="text-content">@Html.Raw(model.Description)</div>
                             <div class="corner-label @(model.Status == HPDQ.WebSupport.DataEntitites.TicketStatus.Done ? "done" : "")
                                             @(model.Status == HPDQ.WebSupport.DataEntitites.TicketStatus.Closed ? "closed" : "")
                                             @(model.Status == HPDQ.WebSupport.DataEntitites.TicketStatus.InProgress ? "progress" : "")">
@@ -92,7 +92,7 @@
                     <div id="chatbox" class="content contentlist card">
                     </div>
                     <div class="card wrapperfooter">
-                        <div style="min-height: 26px;">
+                        <div style="min-height: 20px;">
                             <div id="divprocessby" style="display: none;">
                                 <table>
                                     <tr>
@@ -126,7 +126,7 @@
                             <table>
                                 <tr>
                                     <td style="width: 100%;">
-                                        <textarea id="txtdescription" rows="3" contenteditable="true"></textarea>
+                                        <div id="txtdescription" rows="3" contenteditable="true"></div>
                                     </td>
                                     <td style="white-space: nowrap;">
                                         <div>
@@ -174,6 +174,7 @@
 
 @section Styles {
     <link rel="stylesheet" href="~/css/contentlist.css" />
+    <link rel="stylesheet" href="~/css/contenteditable.css" />
     <link rel="stylesheet" href="~/css/home.css" />
     <style type="text/css">
         #dialogModalImage .modal-dialog {
@@ -230,6 +231,7 @@
 }
 @section Scripts {
     <script src="~/js/fileinput.js"></script>
+    <script src="~/js/contenteditable.js"></script>
     <script src="~/js/ajaxutil.js"></script>
     <script type="text/javascript">
         function formatDateTime(input) {
@@ -371,7 +373,7 @@
                 });
             });
             $('#btnconfirm').click(function () {
-                var desc = $('#txtdescription').val();
+                var desc = $('#txtdescription').html();
                 if (!desc || desc == '') return;
 
                 var uploadCompleted = false;
@@ -422,6 +424,7 @@
                         id: $('#modelTag').val(),
                         status: 1,
                         progressBy_EMP_ID: '@emp_id',
+                        progressByEMPFullName: '@User.FindFirst(ClaimTypes.GivenName)?.Value',
                     };
                     postData('@HPDQ.WebSupport.Utilities.Globals.DomainAPIUrl/Tickets/Update?emp_id=@emp_id', '@HPDQ.WebSupport.Utilities.Globals.APIKey', bodydata, function(response) {
                         if (response.errorCode != 0)
@@ -481,34 +484,7 @@
             $('#dialogModalImage').on('hidden.bs.modal', function (e) {
                 $('#dialogModal').focus();
             });
-            $('#txtdescription').on('paste', function(event) {
-                var items = (event.originalEvent || event).clipboardData.items;
-
-                if (items.length > 0 && items[0].type.indexOf('text') >= 0) return;
-
-                // Prevent the default paste behavior (which might insert a large image)
-                event.preventDefault();
-
-                // Check for an image in the clipboard data
-                for (var i = 0; i < items.length; i++) {
-                    var file = items[i].getAsFile();
-
-                    // Create a new DataTransfer object
-                    var dataTransfer = new DataTransfer();
-
-                    // Add the file to the DataTransfer object
-                    dataTransfer.items.add(file);
-
-                    // Get your file input element (assuming it has ID 'your-file-input')
-                    var fileInput = document.getElementById('fileinput');
-
-                    // Set the files property of the file input
-                    fileInput.files = dataTransfer.files;
-
-                    formData.append("files", file);
-                    $('#divattachment').html(formDataFileLength());
-                }
-            });
+            
             const urlParams = new URLSearchParams(window.location.search);
             const tickettype = urlParams.get('TicketType');
             const ticketstatus = urlParams.get('TicketStatus');
