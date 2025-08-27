@@ -123,6 +123,7 @@
                                     <td class="footerfuncbutton">
                                         <span id="lblclose" class="function">Đóng</span>
                                         <span id="lblcomplete" class="function">Hoàn thành</span>
+                                        <span id="lbdelegate" class="function">Phân công</span>
                                         <span id="lblaccept" class="function">Tiếp nhận</span>
                                         <span id="lblattach"><i class="fa-solid fa-paperclip"></i> Đính kèm</span>
                                         <input id="fileinput" type="file" multiple style="display: none;" />
@@ -175,6 +176,25 @@
             </div>
             <div class="modal-body" style="width: 100%; height: 100%;">
                 <iframe id="filePreviewFrame" style="width: 100%; height: 100%;"></iframe>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* Dialog xem trước các file đính kèm *@
+<div class="modal fade" id="delegationModal" tabindex="-1" aria-labelledby="myDelegation" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="myDelegation">PHÂN CÔNG</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="width: 100%; height: 100%;">
+                Nhân sự tiếp nhận: <select id='cboemployee' class="form-select"></select>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-primary">Xác nhận</button>
             </div>
         </div>
     </div>
@@ -434,12 +454,12 @@
             });
             initFileInput();
             if ('@ViewBag.Type' == '1') {
-                $('#lblaccept').on('click', function () {
+                function acceptTicket(emp_id, fullName) {
                     var bodydata = {
                         id: $('#modelTag').val(),
                         status: 1,
-                        progressBy_EMP_ID: '@emp_id',
-                        progressByEMPFullName: '@User.FindFirst(ClaimTypes.GivenName)?.Value',
+                        progressBy_EMP_ID: emp_id,
+                        progressByEMPFullName: fullName,
                     };
                     postData('@HPDQ.WebSupport.Utilities.Globals.DomainAPIUrl/Tickets/Update?emp_id=@emp_id', '@HPDQ.WebSupport.Utilities.Globals.APIKey', bodydata, function(response) {
                         if (response.errorCode != 0)
@@ -449,8 +469,29 @@
                         }
                         location.reload();
                     });
+                }
+                $('#lblaccept').on('click', function () {
+                    acceptTicket('@emp_id', '@User.FindFirst(ClaimTypes.GivenName)?.Value');
                 });
                 $('#lblaccept').show();
+                $('#delegationModal .btn.btn-primary').click(function () {
+                    acceptTicket($('#cboemployee').val(), $('#cboemployee option:selected').text());
+                });
+                $('#lbdelegate').on('click', function () {
+                    var optionElements = $('#cboemployee').find('option');
+                    if (!(optionElements.length > 0)) {
+                        getData('@HPDQ.WebSupport.Utilities.Globals.DomainAPIUrl/Upload/LoadEmployees', '@HPDQ.WebSupport.Utilities.Globals.APIKey', function(response) {
+                            if (response && response.length > 0) {
+                                $.each(response, function(index, value) {
+                                    $('#cboemployee').append(`<option value="${value.maNV}">${value.hoTen}</option>`);
+                                });
+                            }
+                        });
+                    }
+                    var delegationModal = new bootstrap.Modal(document.getElementById('delegationModal'), { backdrop: true, keyboard: true });
+                    delegationModal.show();
+                });
+                $('#lbdelegate').show();
             }
             $('#lblcomplete').on('click', function () {
                 var bodydata = {
@@ -497,6 +538,12 @@
                 this.focus();
             });
             $('#dialogModalImage').on('hidden.bs.modal', function (e) {
+                $('#dialogModal').focus();
+            });
+            document.getElementById('delegationModal').addEventListener('shown.bs.modal', function () {
+                this.focus();
+            });
+            $('#delegationModal').on('hidden.bs.modal', function (e) {
                 $('#dialogModal').focus();
             });
             
