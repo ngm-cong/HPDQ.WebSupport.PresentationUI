@@ -24,6 +24,19 @@
         left: 12px;
         color: #3b3c36;
     }
+
+    .tbListPreview {
+        border-collapse: collapse;
+    }
+    .tbListPreview td, .tbListPreview th {
+        border: 1px solid #ccc;
+    }
+    .tbListPreview td:first-child {
+        cursor: pointer;
+    }
+    #divPreviewTicketList {
+        padding-right: 20px;
+    }
 </style>
 <link rel="stylesheet" href="~/css/contenteditable.css" />
 
@@ -47,7 +60,8 @@
                     }
                 </select>
             </div>
-
+            <b><u><span class="me-2 fw-bold text-secondary">Tiêu đề:</span></u></b> <input type="text" id="lbtitle" class="form-control" placeholder="Nhập tiêu đề" />
+            <hr/>
             <!-- Mô tả yêu cầu -->
             <div class="mb-3 border rounded p-3 position-relative">
                 <label for="description" id="desc_label" class="form-label fw-bold position-absolute bg-white px-2">
@@ -74,17 +88,65 @@
     </div>
 </div>
 
+@* Question dialog *@
+<div class="modal fade" id="dialogModal" tabindex="-1" aria-labelledby="myDialogModal" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="max-height: calc(100vh - 150px); overflow-y: auto;">
+            <div class="modal-header">
+                <h5 class="modal-title" id="myDialogModal">THÔNG BÁO</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="overflow-y: auto;">
+                Tìm thấy một số nội dung liên quan. Bạn có muốn xem trước không?<br/>
+                <i>(Từ chối sẽ đồng ý với tiếp tục tạo yêu cầu mà không cần xem trước các yêu cầu giống với nội dung đã được tạo trước đó)</i>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-primary">Xác nhận</button>
+            </div>
+        </div>
+    </div>
+</div>
+@* Question dialog *@
+
+@* Preview dialog *@
+<div class="modal fade" id="dialogModalPreview" tabindex="-1" aria-labelledby="myDialogModalPreview" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl custom-modal-90">
+        <div class="modal-content" style="max-height: calc(100vh - 150px);">
+            <div class="modal-header">
+                <h5 class="modal-title" id="myDialogModalPreview">NỘI DUNG LIÊN QUAN</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="overflow-y: auto;">
+                <table>
+                    <tr>
+                        <td><div id="divPreviewTicketList"></div></td>
+                        <td><div id="divPreviewTicketDescription"></div></td>
+                    </tr>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-primary">Tiếp tục tạo yêu cầu</button>
+            </div>
+        </div>
+    </div>
+</div>
+@* Preview dialog *@
+
 @section Scripts {
     <script src="~/js/ajaxutil.js"></script>
     <script src="~/js/fileinput.js"></script>
     <script src="~/js/contenteditable.js"></script>
     <script>
+        var previewTickets;
         function updateTicket(id) {
             var bodydata = {
                 id: id,
                 status: 0,
                 description: $('#txtdescription').html(),
-                type: $('#cbotype').val()
+                type: $('#cbotype').val(),
+                title: $('#lbtitle').val()
             };
             postData('@HPDQ.WebSupport.Utilities.Globals.DomainAPIUrl/Tickets/Update?emp_id=@emp_id', '@HPDQ.WebSupport.Utilities.Globals.APIKey', bodydata, function(response) {
                 if (response.errorCode != 0)
@@ -94,6 +156,44 @@
                 }
                 window.location.href = '@Url.Action("Index", "Home")';
             });
+        }
+        function createTicket() {
+            var uploadCompleted = false;
+            var files;
+            var uploadVal = uploadFileInputs(
+                '@HPDQ.WebSupport.Utilities.Globals.DomainAPIUrl/Upload/Upload',
+                '@HPDQ.WebSupport.Utilities.Globals.APIKey',
+                uploadCompleted,
+                files
+            );
+            uploadCompleted = uploadVal.uploadCompleted;
+            files = uploadVal.files;
+
+            if (!uploadCompleted) {
+                alert(uploadVal.message);
+                return;
+            }
+
+            var bodydata = {
+                emp_id: '@emp_id',
+                description: $('#txtdescription').html(),
+                files: files,
+                type: $('#cbotype').val(),
+                fullName: '@Html.Raw(User.FindFirst(ClaimTypes.GivenName)?.Value)',
+                title: $('#lbtitle').val()
+            };
+
+            postData('@HPDQ.WebSupport.Utilities.Globals.DomainAPIUrl/Tickets/Create',
+                '@HPDQ.WebSupport.Utilities.Globals.APIKey',
+                bodydata,
+                function (response) {
+                    if (response.errorCode !== 0) {
+                        alert(response.message);
+                        return;
+                    }
+                    window.location.href = '/Home/Index';
+                }
+            );
         }
         $(function () {
             $('#btnconfirm').click(function () {
@@ -108,44 +208,54 @@
                     return;
                 }
 
-                var uploadCompleted = false;
-                var files;
-                var uploadVal = uploadFileInputs(
-                    '@HPDQ.WebSupport.Utilities.Globals.DomainAPIUrl/Upload/Upload',
+                postData('@HPDQ.WebSupport.Utilities.Globals.DomainAPIUrl/Tickets/Load',
                     '@HPDQ.WebSupport.Utilities.Globals.APIKey',
-                    uploadCompleted,
-                    files
-                );
-                uploadCompleted = uploadVal.uploadCompleted;
-                files = uploadVal.files;
-
-                if (!uploadCompleted) {
-                    alert(uploadVal.message);
-                    return;
-                }
-
-                var bodydata = {
-                    emp_id: '@emp_id',
-                    description: $('#txtdescription').html(),
-                    files: files,
-                    type: $('#cbotype').val(),
-                    fullName: '@Html.Raw(User.FindFirst(ClaimTypes.GivenName)?.Value)'
-                };
-
-                postData('@HPDQ.WebSupport.Utilities.Globals.DomainAPIUrl/Tickets/Create',
-                    '@HPDQ.WebSupport.Utilities.Globals.APIKey',
-                    bodydata,
+                    {
+                        plainTextDescription: $('#txtdescription').text(),
+                        type: $('#cbotype').val()
+                    },
                     function (response) {
-                        if (response.errorCode !== 0) {
-                            alert(response.message);
-                            return;
+                        if (response && response.errorCode == 0 && response.data.length > 0) {
+                            previewTickets = response.data;
+                            var dialogModal = new bootstrap.Modal(document.getElementById('dialogModal'), { backdrop: true, keyboard: true });
+                            dialogModal.show();
+                        } else {
+                            createTicket();
                         }
-                        window.location.href = '/Home/Index';
                     }
                 );
             });
-
+            $('#dialogModal .btn.btn-primary').click(function () {
+                $('#dialogModal').modal('hide');
+                $('#divPreviewTicketList').html('');
+                var table = $('<table class="tbListPreview"></table>')
+                table.append('<tr><th>Mã</th><th>Mô tả</th></tr>');
+                $.each(previewTickets, function(index, item) {
+                    table.append(`<tr><td tag="${item.id}" onclick="previewOnClick(this)">#${item.code}</td><td>${item.title}</td></tr>`);
+                });
+                $('#divPreviewTicketList').append(table);
+                var dialogModalPreview = new bootstrap.Modal(document.getElementById('dialogModalPreview'), { backdrop: true, keyboard: true });
+                dialogModalPreview.show();
+            });
+            $('#dialogModal .btn.btn-secondary').click(function () {
+                createTicket();
+            });
+            $('#dialogModalPreview .btn.btn-primary').click(function () {
+                $('#dialogModalPreview').modal('hide');
+                createTicket();
+            });
             initFileInput();
         });
+        function previewOnClick(e) {
+            // Sử dụng $.grep() để tìm phần tử có id nằm trong element
+            var filteredTickets = $.grep(previewTickets, function(item) {
+                return item.id === parseInt($(e).attr('tag'));
+            });
+
+            // Lấy phần tử đầu tiên (và duy nhất) trong mảng kết quả
+            var targetTicket = filteredTickets[0];
+
+            $('#divPreviewTicketDescription').html(targetTicket.description);
+        }
     </script>
 }

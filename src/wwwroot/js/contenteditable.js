@@ -1,4 +1,4 @@
-$(function () {
+﻿$(function () {
     $('#txtdescription').on('paste', function(event) {
         var items = (event.originalEvent || event).clipboardData.items;
 
@@ -27,4 +27,31 @@ $(function () {
             $('#divattachment').html(formDataFileLength());
         }
     });
+    //document.getElementById('txtdescription').addEventListener('keydown', (e) => {
+    //    if (e.key === 'Enter') {
+    //        e.preventDefault();
+
+    //        // Lấy đối tượng Selection hiện tại
+    //        const selection = window.getSelection();
+    //        if (!selection.rangeCount) return;
+
+    //        // Tạo một Node mới để chèn vào
+    //        const brNode = document.createElement('br');
+
+    //        // Lấy Range (vùng chọn) hiện tại
+    //        const range = selection.getRangeAt(0);
+
+    //        // Xóa nội dung được chọn (nếu có)
+    //        range.deleteContents();
+
+    //        // Chèn <br> tại vị trí con trỏ
+    //        range.insertNode(brNode);
+
+    //        // Di chuyển con trỏ xuống sau thẻ <br> vừa chèn
+    //        range.setStartAfter(brNode);
+    //        range.setEndAfter(brNode);
+    //        selection.removeAllRanges();
+    //        selection.addRange(range);
+    //    }
+    //});
 })

@@ -63,7 +63,7 @@
                         <div class="card-title text-muted small" style="position: relative;">
                             <b>#@(model.Code) <br /></b>
                             [@(model.CreatedOn.ToString("HH:mm dd/MM/yyyy"))] @(model.FullName)
-                            @if (currentPath == "index")
+                            @if (currentPath == "index" && model.Status == HPDQ.WebSupport.DataEntitites.TicketStatus.New)
                             {
                                 <div class="editbuttonzone">
                                     <img src="~/img/edit.png" />
