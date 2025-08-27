@@ -21,3 +21,19 @@
         }
     });
 }
+function getData(url, apikey, success) {
+    $.ajax({
+        url: url,
+        method: 'GET',
+        headers: {
+            'X-API-KEY': apikey
+        },
+        dataType: 'json',
+        success: function(response) {
+            success(response);
+        },
+        error: function(xhr, status, error) {
+            console.error('Lỗi:', error);
+        }
+    });
+}

@@ -121,6 +121,18 @@ namespace HPDQ.WebSupport.Controllers
             return View(new NewTicketViewModel { TicketTypes = ticketTypes });
         }
 
+        [Authorize]
+        [Route("dieuchinhyeucau/{id}")]
+        public async Task<IActionResult> EditTicket(int id)
+        {
+            var ticketTypes = await HPDQ.WebSupport.Utilities.API.Instance.CodeDetail.Load(new HPDQ.WebSupport.Criteria.CodeDetailCriteria
+            {
+                Master = CodeDetailMaster.TicketType,
+            });
+            var ticket = (await HPDQ.WebSupport.Utilities.API.Instance.Ticket.Load(new Criteria.TicketCriteria { Id = id }))!.First();
+            return View("NewTicket", new NewTicketViewModel { TicketTypes = ticketTypes, Id = ticket.Id, Description = ticket.Description, Type = ticket.Type });
+        }
+
         /// <summary>
         /// Hiển thị trang lỗi chung của ứng dụng.
         /// </summary>
