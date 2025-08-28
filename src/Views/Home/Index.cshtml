@@ -103,7 +103,7 @@
                                     {
                                         foreach (var item in (ViewBag.TicketTypes as IEnumerable<HPDQ.WebSupport.DataEntitites.CodeDetail>)!)
                                         {
-                                            <option value="@item.Code">@item.Description</option>
+                                            <option value="@item.Description">@item.Description</option>
                                         }
                                     }
                                 </select>
@@ -132,7 +132,7 @@
                                     <option value="">-- Trạng thái --</option>
                                     @foreach (var item in Enum.GetValues<HPDQ.WebSupport.DataEntitites.TicketStatus>())
                                     {
-                                        <option value="@((byte)item)">@item.GetDescription()</option>
+                                        <option value="@(item.GetDescription())">@item.GetDescription()</option>
                                     }
                                 </select>
                             </li>
@@ -640,6 +640,24 @@
         }
 
         $('.filter-input').on('input change', function() {
+            var dropdownMenu = $(this).closest('.dropdown-menu');
+            var filterBtn = dropdownMenu.siblings('button');
+            var hasValue = $(this).val() && $(this).val().trim() !== '';
+
+            if (hasValue) {
+                filterBtn.closest('.filter-btn').addClass('active');
+            } else {
+                var allEmpty = true;
+                dropdownMenu.find('.filter-input').each(function() {
+                    if ($(this).val() && $(this).val().trim() !== '') {
+                        allEmpty = false;
+                    }
+                });
+                if (allEmpty) {
+                    filterBtn.closest('.filter-btn').removeClass('active');
+                }
+            }
+
             var filters = [];
             $('.filter-input').each(function() {
                 filters[$(this).data('column')] = $(this).val().toLowerCase();

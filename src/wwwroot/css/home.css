@@ -43,6 +43,11 @@ div.contentlist .itemcontainer img {
     border: 1px solid black;
     background-color: whitesmoke;
 }
+    .filter-btn.active {
+        background-color: #ffd966;
+        font-weight: bold;
+    }
+
 .filter-btn button {
     margin-bottom: 3px;
 }
