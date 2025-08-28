@@ -51,7 +51,7 @@
                     Mã
                     <div class="filter-btn dropdown d-inline">
                         <button class="btn btn-link btn-sm dropdown-toggle p-0 ms-1" type="button" data-bs-toggle="dropdown" aria-expanded="false"></button>
-                        <ul class="dropdown-menu" style="padding: 4px; width: 200px;">
+                        <ul class="dropdown-menu">
                             <li>
                                 <input type="text" class="form-control form-control-sm" placeholder="Lọc tiêu đề..." />
                             </li>
@@ -62,7 +62,7 @@
                     Thời gian
                     <div class="filter-btn dropdown d-inline">
                         <button class="btn btn-link btn-sm dropdown-toggle p-0 ms-1" type="button" data-bs-toggle="dropdown" aria-expanded="false"></button>
-                        <ul class="dropdown-menu" style="padding: 4px; width: 200px;">
+                        <ul class="dropdown-menu">
                             <li>
                                 <input type="text" class="form-control form-control-sm" placeholder="Lọc tiêu đề..." />
                             </li>
@@ -73,7 +73,7 @@
                     Người yêu cầu
                     <div class="filter-btn dropdown d-inline">
                         <button class="btn btn-link btn-sm dropdown-toggle p-0 ms-1" type="button" data-bs-toggle="dropdown" aria-expanded="false"></button>
-                        <ul class="dropdown-menu" style="padding: 4px; width: 200px;">
+                        <ul class="dropdown-menu">
                             <li>
                                 <input type="text" class="form-control form-control-sm" placeholder="Lọc tiêu đề..." />
                             </li>
@@ -84,7 +84,7 @@
                     Tiêu đề
                     <div class="filter-btn dropdown d-inline">
                         <button class="btn btn-link btn-sm dropdown-toggle p-0 ms-1" type="button" data-bs-toggle="dropdown" aria-expanded="false"></button>
-                        <ul class="dropdown-menu" style="padding: 4px; width: 200px;">
+                        <ul class="dropdown-menu">
                             <li>
                                 <input type="text" class="form-control form-control-sm" placeholder="Lọc tiêu đề..." />
                             </li>
@@ -95,7 +95,7 @@
                     Loại yêu cầu
                     <div class="filter-btn dropdown d-inline">
                         <button class="btn btn-link btn-sm dropdown-toggle p-0 ms-1" type="button" data-bs-toggle="dropdown" aria-expanded="false"></button>
-                        <ul class="dropdown-menu" style="padding: 4px; width: 200px;">
+                        <ul class="dropdown-menu">
                             <li>
                                 <select class="form-select" name="TicketType" id="filterRequestType">
                                     <option value="">-- Loại yêu cầu --</option>
@@ -115,7 +115,7 @@
                     Người phụ trách
                     <div class="filter-btn dropdown d-inline">
                         <button class="btn btn-link btn-sm dropdown-toggle p-0 ms-1" type="button" data-bs-toggle="dropdown" aria-expanded="false"></button>
-                        <ul class="dropdown-menu" style="padding: 4px; width: 200px;">
+                        <ul class="dropdown-menu">
                             <li>
                                 <input type="text" class="form-control form-control-sm" placeholder="Lọc tiêu đề..." />
                             </li>
@@ -126,7 +126,7 @@
                     Trạng thái
                     <div class="filter-btn dropdown d-inline">
                         <button class="btn btn-link btn-sm dropdown-toggle p-0 ms-1" type="button" data-bs-toggle="dropdown" aria-expanded="false"></button>
-                        <ul class="dropdown-menu" style="padding: 4px; width: 200px;">
+                        <ul class="dropdown-menu">
                             <li>
                                 <select class="form-select" name="TicketStatus" id="filterStatus">
                                     <option value="">-- Trạng thái --</option>
@@ -293,78 +293,8 @@
 </div>
 
 @section Styles {
-    <link rel="stylesheet" href="~/css/contentlist.css" />
     <link rel="stylesheet" href="~/css/contenteditable.css" />
     <link rel="stylesheet" href="~/css/home.css" />
-    <style type="text/css">
-        #dialogModalImage .modal-dialog {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            max-width: 90vw;
-        }
-        #dialogModalImage .modal-content {
-            width: fit-content;
-        }
-        #dialogModal .modal-body {
-            padding: 5px;
-            border-radius: 5px;
-        }
-
-        #dialogModalImage .modal-body > div {
-            margin-bottom: 8px;
-        }
-
-            #dialogModalImage .modal-body > div:last-child {
-                margin-bottom: 0;
-            }
-
-        #dialogModalImage .modal-body img {
-            border: 2px solid #ddd;
-            border-radius: 4px;
-            display: block;
-            max-width: 100%;
-            height: auto;
-        }
-
-        .filehref {
-            float: right;
-            color: royalblue;
-            cursor: pointer;
-            padding-right: 20px;
-        }
-
-        .title-cell {
-            max-width: 700px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .filter-btn {
-            float: right;
-            margin-top: 2px;
-            margin-right: 4px;
-            width: 20px;
-            height: 20px;
-            border: 1px solid black;
-        }
-
-        .filter-btn button {
-            margin-bottom: 3px;
-        }
-
-            .filter-btn:focus-within {
-                outline: 2px solid #0d6efd;
-                border-radius: 4px;
-            }
-
-            .filter-btn button:focus {
-                outline: none !important;
-                box-shadow: none !important;
-            }
-
-    </style>
 }
 @section Scripts {
     <script src="~/js/fileinput.js"></script>
@@ -663,13 +593,7 @@
                 $('#filterRequestId').val(searchtext);
             }
 
-            $('.group-header').on('click', function() {
-                $(this).toggleClass('collapsed');
-                $(this).nextAll('.item-list').first().slideToggle(300);
-            });
-
             $('.item-list').show();
-            $('.group-header').removeClass('collapsed');
 
             document.getElementById('filePreviewModal').addEventListener('shown.bs.modal', function () {
                 this.focus();
