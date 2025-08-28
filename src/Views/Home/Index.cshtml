@@ -5,85 +5,144 @@
         ?? User.FindFirst("preferred_username")?.Value
         ?? User.FindFirst("upn")?.Value;
 
-    var groupedByType = (Model ?? new List<HomeViewModel>())
-        .GroupBy(t => t.Type)
-        .OrderBy(g => g.Key);
-
     var currentPath = ViewContext.RouteData.Values["action"]?.ToString()?.ToLower();
 }
 
 @model IEnumerable<HomeViewModel>
 
-<form method="get" class="row gy-2 align-items-center mb-3" id="requestFilterForm">
-    <div class="col-auto">
-        <select class="form-select" name="TicketType" id="filterRequestType">
-            <option value="">-- Loại yêu cầu --</option>
-            @if (ViewBag.TicketTypes != null && ViewBag.TicketTypes is IEnumerable<HPDQ.WebSupport.DataEntitites.CodeDetail>)
-            {
-                foreach (var item in (ViewBag.TicketTypes as IEnumerable<HPDQ.WebSupport.DataEntitites.CodeDetail>)!)
-                {
-                    <option value="@item.Code">@item.Description</option>
-                }
-            }
-        </select>
-    </div>
-    <div class="col-auto">
-        <select class="form-select" name="TicketStatus" id="filterStatus">
-            <option value="">-- Trạng thái --</option>
-            @foreach(var item in Enum.GetValues<HPDQ.WebSupport.DataEntitites.TicketStatus>())
-            {
-                <option value="@((byte)item)">@item.GetDescription()</option>
-            }
-        </select>
-    </div>
-    <div class="col-auto">
-        <input type="text" class="form-control" name="SearchText" id="filterRequestId" placeholder="Tìm theo nội dung yêu cầu">
-    </div>
-    <div class="col-auto">
-        <button type="submit" class="btn btn-primary">
-            <i class="bi bi-search"></i> Tìm kiếm
-        </button>
-        <a href="#" class="btn btn-secondary" onclick="clearfilter()">Xoá lọc</a>
-    </div>
-</form>
-
 <div class="contentlist" id="contentlist">
-    @foreach (var group in groupedByType)
-    {
-        <div class="type-group">
-            <div class="group-header">
-                <span class="chevron">&#9660;</span>
-                @group.First().TypeDescription
-            </div>
-            <hr />
-            <div class="item-list">
-                @foreach (var model in group)
-                {
-                    <div class="item" tag="@(model.Id)" tagEMP_ID="@(model.EMP_ID)" tagStatus="@((byte)model.Status)">
-                        <div class="card-title text-muted small" style="position: relative;">
-                            <b>#@(model.Code) <br /></b>
-                            [@(model.CreatedOn.ToString("HH:mm dd/MM/yyyy"))] @(model.FullName)
-                            @if (currentPath == "index" && model.Status == HPDQ.WebSupport.DataEntitites.TicketStatus.New)
-                            {
-                                <div class="editbuttonzone">
-                                    <img src="~/img/edit.png" />
-                                </div>
-                            }
-                        </div>
-                        <div class="text-container">
-                            <div class="text-content">@Html.Raw(model.Description)</div>
-                            <div class="corner-label @(model.Status == HPDQ.WebSupport.DataEntitites.TicketStatus.Done ? "done" : "")
-                                            @(model.Status == HPDQ.WebSupport.DataEntitites.TicketStatus.Closed ? "closed" : "")
-                                            @(model.Status == HPDQ.WebSupport.DataEntitites.TicketStatus.InProgress ? "progress" : "")">
-                                @(model.Status.GetDescription())
-                            </div>
-                        </div>
+    <table class="table table-bordered table-striped table-sm">
+        <thead class="table-light">
+            <tr>
+                <th style="width: 90px;">
+                    Mã
+                    <div class="filter-btn dropdown d-inline">
+                        <button class="btn btn-link btn-sm dropdown-toggle p-0 ms-1" type="button" data-bs-toggle="dropdown" aria-expanded="false"></button>
+                        <ul class="dropdown-menu" style="padding: 4px; width: 200px;">
+                            <li>
+                                <input type="text" class="form-control form-control-sm" placeholder="Lọc tiêu đề..." />
+                            </li>
+                        </ul>
                     </div>
+                </th>
+                <th style="width: 140px;">
+                    Thời gian
+                    <div class="filter-btn dropdown d-inline">
+                        <button class="btn btn-link btn-sm dropdown-toggle p-0 ms-1" type="button" data-bs-toggle="dropdown" aria-expanded="false"></button>
+                        <ul class="dropdown-menu" style="padding: 4px; width: 200px;">
+                            <li>
+                                <input type="text" class="form-control form-control-sm" placeholder="Lọc tiêu đề..." />
+                            </li>
+                        </ul>
+                    </div>
+                </th>
+                <th style="width: 200px;">
+                    Người yêu cầu
+                    <div class="filter-btn dropdown d-inline">
+                        <button class="btn btn-link btn-sm dropdown-toggle p-0 ms-1" type="button" data-bs-toggle="dropdown" aria-expanded="false"></button>
+                        <ul class="dropdown-menu" style="padding: 4px; width: 200px;">
+                            <li>
+                                <input type="text" class="form-control form-control-sm" placeholder="Lọc tiêu đề..." />
+                            </li>
+                        </ul>
+                    </div>
+                </th>
+                <th>
+                    Tiêu đề
+                    <div class="filter-btn dropdown d-inline">
+                        <button class="btn btn-link btn-sm dropdown-toggle p-0 ms-1" type="button" data-bs-toggle="dropdown" aria-expanded="false"></button>
+                        <ul class="dropdown-menu" style="padding: 4px; width: 200px;">
+                            <li>
+                                <input type="text" class="form-control form-control-sm" placeholder="Lọc tiêu đề..." />
+                            </li>
+                        </ul>
+                    </div>
+                </th>
+                <th style="width: 150px;">
+                    Loại yêu cầu
+                    <div class="filter-btn dropdown d-inline">
+                        <button class="btn btn-link btn-sm dropdown-toggle p-0 ms-1" type="button" data-bs-toggle="dropdown" aria-expanded="false"></button>
+                        <ul class="dropdown-menu" style="padding: 4px; width: 200px;">
+                            <li>
+                                <select class="form-select" name="TicketType" id="filterRequestType">
+                                    <option value="">-- Loại yêu cầu --</option>
+                                    @if (ViewBag.TicketTypes != null && ViewBag.TicketTypes is IEnumerable<HPDQ.WebSupport.DataEntitites.CodeDetail>)
+                                    {
+                                        foreach (var item in (ViewBag.TicketTypes as IEnumerable<HPDQ.WebSupport.DataEntitites.CodeDetail>)!)
+                                        {
+                                            <option value="@item.Code">@item.Description</option>
+                                        }
+                                    }
+                                </select>
+                            </li>
+                        </ul>
+                    </div>
+                </th>
+                <th style="width: 200px;">
+                    Người phụ trách
+                    <div class="filter-btn dropdown d-inline">
+                        <button class="btn btn-link btn-sm dropdown-toggle p-0 ms-1" type="button" data-bs-toggle="dropdown" aria-expanded="false"></button>
+                        <ul class="dropdown-menu" style="padding: 4px; width: 200px;">
+                            <li>
+                                <input type="text" class="form-control form-control-sm" placeholder="Lọc tiêu đề..." />
+                            </li>
+                        </ul>
+                    </div>
+                </th>
+                <th style="width: 120px;">
+                    Trạng thái
+                    <div class="filter-btn dropdown d-inline">
+                        <button class="btn btn-link btn-sm dropdown-toggle p-0 ms-1" type="button" data-bs-toggle="dropdown" aria-expanded="false"></button>
+                        <ul class="dropdown-menu" style="padding: 4px; width: 200px;">
+                            <li>
+                                <select class="form-select" name="TicketStatus" id="filterStatus">
+                                    <option value="">-- Trạng thái --</option>
+                                    @foreach (var item in Enum.GetValues<HPDQ.WebSupport.DataEntitites.TicketStatus>())
+                                    {
+                                        <option value="@((byte)item)">@item.GetDescription()</option>
+                                    }
+                                </select>
+                            </li>
+                        </ul>
+                    </div>
+                </th>
+                @if (currentPath == "index")
+                {
+                    <th style="width: 50px;"></th>
                 }
-            </div>
-        </div>
-    }
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var model in Model ?? new List<HomeViewModel>())
+            {
+                <tr class="item" tag="@(model.Id)" tagEMP_ID="@(model.EMP_ID)" tagStatus="@((byte)model.Status)">
+                    <td><b>#@(model.Code)</b></td>
+                    <td>@(model.CreatedOn.ToString("HH:mm dd/MM/yyyy"))</td>
+                    <td>@(model.FullName)</td>
+                    <td class="title-cell">@Html.Raw(model.Title)</td>
+                    <td>@Html.Raw(model.TypeDescription)</td>
+                    <td>@Html.Raw(model.ProgressByEMPFullName)</td>
+                    <td class="text-center">
+                        <span style="padding: 0.5em 0.65em;" class="badge
+                                @(model.Status == HPDQ.WebSupport.DataEntitites.TicketStatus.New ? "bg-primary" : "")
+                                @(model.Status == HPDQ.WebSupport.DataEntitites.TicketStatus.InProgress ? "bg-warning text-dark" : "")
+                                @(model.Status == HPDQ.WebSupport.DataEntitites.TicketStatus.Done ? "bg-success" : "")
+                                @(model.Status == HPDQ.WebSupport.DataEntitites.TicketStatus.Closed ? "bg-secondary" : "")">
+                            @(model.Status.GetDescription())
+                        </span>
+                    </td>
+                    @if (currentPath == "index" && model.Status == HPDQ.WebSupport.DataEntitites.TicketStatus.New)
+                    {
+                        <td class="text-center editbuttonzone">
+                            <img src="~/img/edit.png" class="edit-btn" />
+                        </td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
 </div>
+
 
 <!-- Modal -->
 <div class="modal fade" id="dialogModal" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true">
@@ -242,12 +301,36 @@
             padding-right: 20px;
         }
 
-        .editbuttonzone {
-            position: absolute;
-            right: 0;
-            top: 50%;
-            transform: translateY(-50%);
+        .title-cell {
+            max-width: 700px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
+
+        .filter-btn {
+            float: right;
+            margin-top: 2px;
+            margin-right: 4px;
+            width: 20px;
+            height: 20px;
+            border: 1px solid black;
+        }
+
+        .filter-btn button {
+            margin-bottom: 3px;
+        }
+
+            .filter-btn:focus-within {
+                outline: 2px solid #0d6efd;
+                border-radius: 4px;
+            }
+
+            .filter-btn button:focus {
+                outline: none !important;
+                box-shadow: none !important;
+            }
+
     </style>
 }
 @section Scripts {

@@ -58,7 +58,7 @@ body {
 .content {
     flex-grow: 1;
     overflow-y: hidden;
-    padding: 8px 12px;
+    padding: 12px 12px;
     background-color: #fff;
 }
 
