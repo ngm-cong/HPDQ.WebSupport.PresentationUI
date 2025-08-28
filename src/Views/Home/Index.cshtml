@@ -10,6 +10,39 @@
 
 @model IEnumerable<HomeViewModel>
 
+<form method="get" class="row gy-2 align-items-center mb-3" id="requestFilterForm">
+    <div class="col-auto">
+        <select class="form-select" name="TicketType" id="filterRequestType">
+            <option value="">-- Loại yêu cầu --</option>
+            @if (ViewBag.TicketTypes != null && ViewBag.TicketTypes is IEnumerable<HPDQ.WebSupport.DataEntitites.CodeDetail>)
+            {
+                foreach (var item in (ViewBag.TicketTypes as IEnumerable<HPDQ.WebSupport.DataEntitites.CodeDetail>)!)
+                {
+                    <option value="@item.Code">@item.Description</option>
+                }
+            }
+        </select>
+    </div>
+    <div class="col-auto">
+        <select class="form-select" name="TicketStatus" id="filterStatus">
+            <option value="">-- Trạng thái --</option>
+            @foreach (var item in Enum.GetValues<HPDQ.WebSupport.DataEntitites.TicketStatus>())
+            {
+                <option value="@((byte)item)">@item.GetDescription()</option>
+            }
+        </select>
+    </div>
+    <div class="col-auto">
+        <input type="text" class="form-control" name="SearchText" id="filterRequestId" placeholder="Tìm theo nội dung yêu cầu">
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-search"></i> Tìm kiếm
+        </button>
+        <a href="#" class="btn btn-secondary" onclick="clearfilter()">Xoá lọc</a>
+    </div>
+</form>
+
 <div class="contentlist" id="contentlist">
     <table class="table table-bordered table-striped table-sm">
         <thead class="table-light">
