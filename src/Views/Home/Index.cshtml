@@ -359,19 +359,8 @@
                                         others.push(value.fileName);
                                         return true;
                                     }
-                                    $.ajax({
-                                        url: `@HPDQ.WebSupport.Utilities.Globals.DomainAPIUrl/Upload/Get/${value.fileName}`,
-                                        method: 'GET',
-                                        headers: {
-                                            'X-API-KEY': '@HPDQ.WebSupport.Utilities.Globals.APIKey'
-                                        },
-                                        dataType: 'json',
-                                        success: function(response) {
-                                            itemcontainer.append(`<img src="data:image/png;base64,${response.data}" />`);
-                                        },
-                                        error: function(xhr, status, error) {
-                                            console.error('Lỗi:', error);
-                                        }
+                                    getData(`@HPDQ.WebSupport.Utilities.Globals.DomainAPIUrl/Upload/Get/${value.fileName}`, '@HPDQ.WebSupport.Utilities.Globals.APIKey', function(response) {
+                                        itemcontainer.append(`<img src="data:image/png;base64,${response.data}" />`);
                                     });
                                 });
                                 if (others && others.length > 0)
@@ -632,20 +621,9 @@
                         if (!/\.jpe?g$|\.png$/i.test(value.fileName)) {
                             return true;
                         }
-                        $.ajax({
-                            url: `@HPDQ.WebSupport.Utilities.Globals.DomainAPIUrl/Upload/Get/${value.fileName}`,
-                            method: 'GET',
-                            headers: {
-                                'X-API-KEY': '@HPDQ.WebSupport.Utilities.Globals.APIKey'
-                            },
-                            dataType: 'json',
-                            success: function(response) {
-                                $('#dialogModalImage div.modal-body').append(`<div><img src="data:image/png;base64,${response.data}" /></div>`);
-                                $('#dialogModalImage').focus();
-                            },
-                            error: function(xhr, status, error) {
-                                console.error('Lỗi:', error);
-                            }
+                        getData(`@HPDQ.WebSupport.Utilities.Globals.DomainAPIUrl/Upload/Get/${value.fileName}`, '@HPDQ.WebSupport.Utilities.Globals.APIKey', function(response) {
+                            $('#dialogModalImage div.modal-body').append(`<div><img src="data:image/png;base64,${response.data}" /></div>`);
+                            $('#dialogModalImage').focus();
                         });
                     });
                 }
@@ -654,10 +632,6 @@
             dialogModalImage.show();
         }
         function openfile(fileurl) {
-            // if (!/\.(txt|pdf)$/i.test(fileurl)) {
-            //     window.open(fileurl, '_blank');
-            //     return true;
-            // }
             var iframe = document.getElementById("filePreviewFrame");
             iframe.src = fileurl;
 
