@@ -1,5 +1,4 @@
-﻿/*46*/
-div.contentlist {
+﻿div.contentlist {
     height: calc(100vh - 150px);
     overflow-y: auto;
 }
@@ -31,7 +30,6 @@ div.contentlist .itemcontainer img {
     width: 200px;
 }
 
-/*52*/
 .filter-btn {
     float: right;
     margin-top: 2px;
@@ -52,7 +50,6 @@ div.contentlist .itemcontainer img {
     box-shadow: none !important;
 }
 
-/*155*/
 .title-cell {
     max-width: 700px;
     white-space: nowrap;
@@ -60,7 +57,6 @@ div.contentlist .itemcontainer img {
     text-overflow: ellipsis;
 }
 
-/*181*/
 #dialogModal .modal-header {
     padding: 8px;
     background: #06428B;
@@ -77,7 +73,6 @@ div.contentlist .itemcontainer img {
     color: white;
 }
 
-/*191*/
 #requestDetailModal {
     position: relative;
     height: 100vh;
@@ -85,7 +80,6 @@ div.contentlist .itemcontainer img {
     flex-direction: column;
 }
 
-/*192*/
 #chatbox .text-container {
     white-space: pre-line;
 }
@@ -139,7 +133,6 @@ div.contentlist .itemcontainer img {
     cursor: pointer;
 }
 
-/*194*/
 .wrapperfooter {
     position: fixed;
     bottom: 5px;
@@ -171,27 +164,23 @@ div.contentlist .itemcontainer img {
     outline-width: 1px;
 }
 
-/*210*/
 .footertitle {
     width: 100%;
     font-weight: bold;
     text-decoration: underline;
 }
 
-/*212*/
 #divattachment {
     display: inline-block;
     color: red;
     font-weight: bold;
 }
 
-/*213*/
 #imgattachment {
     display: none;
     margin-right: 10px;
 }
 
-/*215*/
 .footerfuncbutton {
     white-space: nowrap;
     text-decoration: underline;
@@ -199,13 +188,11 @@ div.contentlist .itemcontainer img {
     cursor: pointer;
 }
 
-/*216*/
 .function {
     display: none;
     margin-right: 20px;
 }
 
-/*230*/
 #txtdescription {
     width: 100%;
     resize: none;
@@ -221,14 +208,12 @@ div.contentlist .itemcontainer img {
     border: 1px solid #ccc;
 }
 
-/*234*/
 #btnconfirm {
     background: #2980b9;
     color: #fff;
     border: 1px solid #ccc;
 }
 
-/*248*/
 #dialogModalImage .modal-dialog {
     display: flex;
     align-items: center;
@@ -252,7 +237,6 @@ div.contentlist .itemcontainer img {
     height: auto;
 }
 
-/*382*/
 .filehref {
     float: right;
     color: royalblue;
@@ -260,7 +244,6 @@ div.contentlist .itemcontainer img {
     padding-right: 20px;
 }
 
-/*471*/
 .card-title {
     height: fit-content;
     background: #7fb3d5;
@@ -269,7 +252,6 @@ div.contentlist .itemcontainer img {
     padding: 2px 8px;
 }
 
-/*472*/
 .text-container {
     position: relative;
     padding: 5px 8px;
@@ -281,7 +263,6 @@ div.contentlist .itemcontainer img {
     flex-wrap: wrap; /* Rất quan trọng để các phần tử có thể xuống hàng */
 }
 
-/*472*/
 .corner-label {
     position: static;
     flex-shrink: 0;
