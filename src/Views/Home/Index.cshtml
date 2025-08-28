@@ -45,7 +45,7 @@
 
 <div class="contentlist" id="contentlist">
     <table class="table table-bordered table-striped table-sm">
-        <thead class="table-light">
+        <thead style="background-color: #D7E5F0;">
             <tr>
                 <th style="width: 90px;">
                     Mã
@@ -53,7 +53,7 @@
                         <button class="btn btn-link btn-sm dropdown-toggle p-0 ms-1" type="button" data-bs-toggle="dropdown" aria-expanded="false"></button>
                         <ul class="dropdown-menu">
                             <li>
-                                <input type="text" class="form-control form-control-sm" placeholder="Lọc tiêu đề..." />
+                                <input type="text" class="form-control form-control-sm filter-input" data-column="0" placeholder="Lọc tiêu đề..." />
                             </li>
                         </ul>
                     </div>
@@ -64,7 +64,7 @@
                         <button class="btn btn-link btn-sm dropdown-toggle p-0 ms-1" type="button" data-bs-toggle="dropdown" aria-expanded="false"></button>
                         <ul class="dropdown-menu">
                             <li>
-                                <input type="text" class="form-control form-control-sm" placeholder="Lọc tiêu đề..." />
+                                <input type="text" class="form-control form-control-sm filter-input" data-column="1" placeholder="Lọc tiêu đề..." />
                             </li>
                         </ul>
                     </div>
@@ -75,7 +75,7 @@
                         <button class="btn btn-link btn-sm dropdown-toggle p-0 ms-1" type="button" data-bs-toggle="dropdown" aria-expanded="false"></button>
                         <ul class="dropdown-menu">
                             <li>
-                                <input type="text" class="form-control form-control-sm" placeholder="Lọc tiêu đề..." />
+                                <input type="text" class="form-control form-control-sm filter-input" data-column="2" placeholder="Lọc tiêu đề..." />
                             </li>
                         </ul>
                     </div>
@@ -86,7 +86,7 @@
                         <button class="btn btn-link btn-sm dropdown-toggle p-0 ms-1" type="button" data-bs-toggle="dropdown" aria-expanded="false"></button>
                         <ul class="dropdown-menu">
                             <li>
-                                <input type="text" class="form-control form-control-sm" placeholder="Lọc tiêu đề..." />
+                                <input type="text" class="form-control form-control-sm filter-input" data-column="3" placeholder="Lọc tiêu đề..." />
                             </li>
                         </ul>
                     </div>
@@ -97,7 +97,7 @@
                         <button class="btn btn-link btn-sm dropdown-toggle p-0 ms-1" type="button" data-bs-toggle="dropdown" aria-expanded="false"></button>
                         <ul class="dropdown-menu">
                             <li>
-                                <select class="form-select" name="TicketType" id="filterRequestType">
+                                <select class="form-select filter-input" data-column="4" name="TicketType" id="filterRequestType">
                                     <option value="">-- Loại yêu cầu --</option>
                                     @if (ViewBag.TicketTypes != null && ViewBag.TicketTypes is IEnumerable<HPDQ.WebSupport.DataEntitites.CodeDetail>)
                                     {
@@ -117,7 +117,7 @@
                         <button class="btn btn-link btn-sm dropdown-toggle p-0 ms-1" type="button" data-bs-toggle="dropdown" aria-expanded="false"></button>
                         <ul class="dropdown-menu">
                             <li>
-                                <input type="text" class="form-control form-control-sm" placeholder="Lọc tiêu đề..." />
+                                <input type="text" class="form-control form-control-sm filter-input" data-column="5" placeholder="Lọc tiêu đề..." />
                             </li>
                         </ul>
                     </div>
@@ -128,7 +128,7 @@
                         <button class="btn btn-link btn-sm dropdown-toggle p-0 ms-1" type="button" data-bs-toggle="dropdown" aria-expanded="false"></button>
                         <ul class="dropdown-menu">
                             <li>
-                                <select class="form-select" name="TicketStatus" id="filterStatus">
+                                <select class="form-select filter-input" data-column="6" name="TicketStatus" id="filterStatus">
                                     <option value="">-- Trạng thái --</option>
                                     @foreach (var item in Enum.GetValues<HPDQ.WebSupport.DataEntitites.TicketStatus>())
                                     {
@@ -638,5 +638,27 @@
             var filePreviewModal = new bootstrap.Modal(document.getElementById('filePreviewModal'), { backdrop: true, keyboard: true });
             filePreviewModal.show();
         }
+
+        $('.filter-input').on('input change', function() {
+            var filters = [];
+            $('.filter-input').each(function() {
+                filters[$(this).data('column')] = $(this).val().toLowerCase();
+            });
+
+            $('tbody tr').each(function() {
+                var isMatch = true;
+                $(this).find('td').each(function(idx) {
+                    var filterVal = filters[idx];
+                    if (filterVal && filterVal.length > 0) {
+                        var cellText = $(this).text().toLowerCase();
+                        if (cellText.indexOf(filterVal) === -1) {
+                            isMatch = false;
+                        }
+                    }
+                });
+                $(this).toggle(isMatch);
+            });
+        });
+
     </script>
 }

@@ -30,6 +30,10 @@ div.contentlist .itemcontainer img {
     width: 200px;
 }
 
+#contentlist tr {
+    border-color: #ccc;
+}
+
 .filter-btn {
     float: right;
     margin-top: 2px;
@@ -37,6 +41,7 @@ div.contentlist .itemcontainer img {
     width: 20px;
     height: 20px;
     border: 1px solid black;
+    background-color: whitesmoke;
 }
 .filter-btn button {
     margin-bottom: 3px;
