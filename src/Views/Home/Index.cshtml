@@ -167,7 +167,7 @@
                     @if (currentPath == "index" && model.Status == HPDQ.WebSupport.DataEntitites.TicketStatus.New)
                     {
                         <td class="text-center editbuttonzone">
-                            <img src="~/img/edit.png" class="edit-btn" />
+                            <img src="~/img/edit.png" class="edit-btn" tag='@(model.Id)' />
                         </td>
                     }
                 </tr>
@@ -596,7 +596,7 @@
                 // Prevent the default paste behavior (which might insert a large image)
                 event.preventDefault();
                 var href = '@Url.Action("EditTicket", "Home", new { id = "ID_PLACEHOLDER" })';
-                window.location.href = href.replace('ID_PLACEHOLDER', $(this.parentElement.parentElement.parentElement).attr('tag'));
+                window.location.href = href.replace('ID_PLACEHOLDER', $(this).attr('tag'));
                 return false;
             });
         });
