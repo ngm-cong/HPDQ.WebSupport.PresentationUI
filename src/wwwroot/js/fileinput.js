@@ -19,6 +19,7 @@ function initFileInput() {
         }
         for (let i = 0; i < this.files.length; i++) {
             formData.append("files", this.files[i]); // "files" matches API parameter
+            // $('#divattachmentdetail').append(`<div>${this.files[i].name}<img src='img/delete.png' onclick='deletefile(this)' /></div>`);
         }
         $('#divattachment').html(formDataFileLength());
         $('#imgattachment').show();
@@ -70,4 +71,25 @@ function uploadFileInputs(url, apikey) {
         files: files,
         message: message
     };
+}
+
+function deletefile(element) {
+    var indexToDelete = $(element.parentElement).index();
+    var newFormData = new FormData();
+    let fileCount = 0;
+    $('#divattachmentdetail').html('');
+    for (const [key, value] of formData.entries()) {
+        if (value instanceof File && key === 'files') { // Change 'files' to your file input's name
+            if (fileCount !== indexToDelete) {
+                newFormData.append(key, value);
+                $('#divattachmentdetail').append(`<div>${value.name}<img src='img/delete.png' onclick='deletefile(this)' /></div>`);
+            }
+        } else {
+            newFormData.append(key, value);
+        }
+        fileCount++;
+    }
+    formData = new FormData();
+    formData = newFormData;
+    $('#divattachment').html(formDataFileLength());
 }

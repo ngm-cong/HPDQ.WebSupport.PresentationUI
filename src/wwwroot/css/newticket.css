@@ -1,0 +1,42 @@
+.card {
+    border-radius: 0.5rem;
+    box-shadow: 0 0 8px rgba(0,0,0,0.05);
+    border: 1px solid #06428B;
+}
+
+#requestType {
+    width: 25%;
+    margin-left: 20px;
+}
+
+#desc_label {
+    top: -12px;
+    left: 12px;
+    color: #3b3c36;
+}
+
+.tbListPreview {
+    border-collapse: collapse;
+}
+.tbListPreview td, .tbListPreview th {
+    border: 1px solid #ccc;
+}
+.tbListPreview td:first-child {
+    cursor: pointer;
+}
+#divPreviewTicketList {
+    padding-right: 20px;
+}
+
+#divattachmentdetail div {
+    border: 1px solid #ccc;
+    font-size: 0.8em;
+    line-height: 26px;
+    float: left;
+    margin-left: -1px;
+    color: gray;
+}
+#divattachmentdetail div img {
+    margin-left: 10px;
+    cursor: pointer;
+}

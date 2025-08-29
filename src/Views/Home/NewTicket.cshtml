@@ -7,37 +7,7 @@
         ?? User.FindFirst("upn")?.Value;
 }
 
-<style>
-    .card {
-        border-radius: 0.5rem;
-        box-shadow: 0 0 8px rgba(0,0,0,0.05);
-        border: 1px solid #06428B;
-    }
-
-    #requestType {
-        width: 25%;
-        margin-left: 20px;
-    }
-
-    #desc_label {
-        top: -12px;
-        left: 12px;
-        color: #3b3c36;
-    }
-
-    .tbListPreview {
-        border-collapse: collapse;
-    }
-    .tbListPreview td, .tbListPreview th {
-        border: 1px solid #ccc;
-    }
-    .tbListPreview td:first-child {
-        cursor: pointer;
-    }
-    #divPreviewTicketList {
-        padding-right: 20px;
-    }
-</style>
+<link rel="stylesheet" href="~/css/newticket.css" />
 <link rel="stylesheet" href="~/css/contenteditable.css" />
 
 <div class="container-fluid p-3">
@@ -80,6 +50,7 @@
                     </label>
                     <input id="fileinput" type="file" multiple class="d-none" />
                     <div id="divattachment" class="ms-3 fw-bold text-danger"></div>
+                    <div id="divattachmentdetail" class="ms-3 fw-bold text-danger"></div>
                     <img id="imgattachment" src="/img/attachment.png" class="d-none ms-2" />
                 </div>
                 <input id="btnconfirm" type="button" value="Gửi" class="btn btn-primary px-4" />
