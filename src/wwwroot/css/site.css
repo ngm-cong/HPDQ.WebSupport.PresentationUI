@@ -1,18 +1,5 @@
-html {
+﻿html {
     font-size: 14px;
-}
-
-@media (min-width: 768px) {
-    html {
-        font-size: 16px;
-    }
-}
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
     padding: 0;
     margin: 0;
     background: #fff;
@@ -23,6 +10,16 @@ body {
     font-family: 'Roboto', sans-serif;
     padding: 0;
     margin: 0;
+}
+
+@media (min-width: 768px) {
+    html {
+        font-size: 16px;
+    }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
 /*GiangDNB*/
@@ -36,12 +33,40 @@ body {
     transition: all 0.3s ease;
     overflow: hidden;
 }
+/* Hide sidebar */
+#sidebar.collapsed {
+    width: 0;
+    padding: 0 !important;
+    overflow: hidden;
+    opacity: 0;
+    flex: 0 0 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+/* hightlight active sidebar */
+.nav-link.active {
+    background-color: #06428B !important;
+}
+.nav-link:hover {
+    background-color: #d0d0d0;
+}
+
+.lbversion {
+    color: #a8a8a8;
+    font-size: 8pt;
+    text-align: right;
+}
 
 /* MAIN CONTAINER */
 .main {
     display: flex;
     flex-direction: column;
     height: 100vh;
+}
+/* Full content */
+.main.full-width {
+    margin-left: 0;
 }
 
 /* HEADER */
@@ -58,7 +83,7 @@ body {
 .content {
     flex-grow: 1;
     overflow-y: hidden;
-    padding: 8px 12px;
+    padding: 12px 12px;
     background-color: #fff;
 }
 
@@ -73,43 +98,30 @@ body {
     margin-top: auto;
 }
 
-/* Full content */
-.main.full-width {
-    margin-left: 0;
-}
-
-/* Hide sidebar */
-#sidebar.collapsed {
-    width: 0;
-    padding: 0 !important;
-    overflow: hidden;
-    opacity: 0;
-    flex: 0 0 0;
-    visibility: hidden;
-    transition: all 0.3s ease;
-}
-
-/* hightlight active sidebar */
-.nav-link.active {
-    background-color: #06428B !important;
-}
-
-.nav-link:hover {
-    background-color: #d0d0d0;
-}
-
 /* logout button */
 #logout_btn {
     cursor: pointer;
 }
 /*GiangDNB*/
 
-.lbversion {
-    color: #a8a8a8;
-    font-size: 8pt;
-    text-align: right;
+#busyindicator {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    opacity: 0.5;
+    z-index: 9999;
+    padding-left: calc(50% - 250px);
+    padding-top: 250px;
+    background: white;
+    user-select: none; /* Ngăn chọn văn bản */
+    -webkit-user-select: none; /* Safari/Chrome */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* IE/Edge */
 }
 
+/*Sử dụng chung cho các view*/
 .custom-modal-90 {
     width: 90vw; /* 90% of viewport width */
     max-width: 90vw; /* Ensure it doesn't exceed this on larger screens */
@@ -118,7 +130,6 @@ body {
     display: flex; /* For vertical centering of content */
     align-items: center; /* For vertical centering of content */
 }
-
 /* Make sure the modal-content also takes up the full height */
 .custom-modal-90 .modal-content {
     height: 100%;

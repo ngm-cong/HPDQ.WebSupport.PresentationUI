@@ -130,7 +130,14 @@ namespace HPDQ.WebSupport.Controllers
                 Master = CodeDetailMaster.TicketType,
             });
             var ticket = (await HPDQ.WebSupport.Utilities.API.Instance.Ticket.Load(new Criteria.TicketCriteria { Id = id }))!.First();
-            return View("NewTicket", new NewTicketViewModel { TicketTypes = ticketTypes, Id = ticket.Id, Description = ticket.Description, Type = ticket.Type });
+            return View("NewTicket", new NewTicketViewModel
+            {
+                TicketTypes = ticketTypes,
+                Id = ticket.Id,
+                Description = ticket.Description,
+                Type = ticket.Type,
+                Title = ticket.Title,
+            });
         }
 
         /// <summary>

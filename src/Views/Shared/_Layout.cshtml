@@ -18,24 +18,6 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link href="~/css/font-awesome-all.min.css" rel="stylesheet" />
     @await RenderSectionAsync("Styles", required: false)
-    <style type="text/css">
-        #busyindicator {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            opacity: 0.5;
-            z-index: 9999;
-            padding-left: calc(50% - 250px);
-            padding-top: 250px;
-            background: white;
-            user-select: none; /* Ngăn chọn văn bản */
-            -webkit-user-select: none; /* Safari/Chrome */
-            -moz-user-select: none; /* Firefox */
-            -ms-user-select: none; /* IE/Edge */
-        }
-    </style>
 </head>
 
 <body>
@@ -86,7 +68,7 @@
                 </li>
             </ul>
             <hr />
-            <div class="lbversion"><span>Phiên bản: 1.0.0.7</span></div>
+            <div class="lbversion"><span>Phiên bản: 1.0.0.8</span></div>
         </div>
 
         <div class="main flex-grow-1 d-flex flex-column">

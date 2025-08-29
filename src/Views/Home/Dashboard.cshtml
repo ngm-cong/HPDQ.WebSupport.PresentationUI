@@ -872,6 +872,7 @@
                             "X-API-KEY": '@HPDQ.WebSupport.Utilities.Globals.APIKey'
                         }
                     })
+                    .configureLogging(signalR.LogLevel.Error)
                     .build();
                 // Lắng nghe phương thức "ReceiveMessage" từ server
                 connection.on("ReceiveMessage", (user, message) => {
