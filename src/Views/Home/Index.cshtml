@@ -614,6 +614,9 @@
                 window.location.href = href.replace('ID_PLACEHOLDER', $(this).attr('tag'));
                 return false;
             });
+            if ('@User.IsInRole("Admin")'.toLowerCase() === 'true') {
+                
+            }
         });
         // Hàm Loaded
         function showImagePopup(element, isTicket) {
