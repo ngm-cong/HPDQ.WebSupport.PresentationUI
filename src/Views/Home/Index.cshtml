@@ -394,7 +394,7 @@
                         });
                         loadImages();
                         var dialogModal = new bootstrap.Modal(document.getElementById('dialogModal'));
-                        $('#txtdescription').val('');
+                        $('#txtdescription').html('');
                         if (progressbyempid && progressbyempid != '') {
                             $('#divprocessby').show();
                             $('#lblempprocessbyname').html(progressbyempid);
@@ -470,7 +470,7 @@
                     $('#fileinput').val('');
                     formData = new FormData();
                     $('#divattachment').html(formDataFileLength());
-                    $('#txtdescription').val('');
+                    $('#txtdescription').html('');
                 });
             });
             initFileInput();
@@ -553,7 +553,7 @@
                 $('#fileinput').val('');
                 formData = new FormData();
                 $('#divattachment').html(formDataFileLength());
-                $('#txtdescription').val('');
+                $('#txtdescription').html('');
             });
             document.getElementById('dialogModalImage').addEventListener('shown.bs.modal', function () {
                 this.focus();
