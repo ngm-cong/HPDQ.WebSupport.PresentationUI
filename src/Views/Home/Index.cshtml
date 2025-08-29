@@ -503,9 +503,15 @@
                     if (!(optionElements.length > 0)) {
                         getData('@HPDQ.WebSupport.Utilities.Globals.DomainAPIUrl/Upload/LoadEmployees', '@HPDQ.WebSupport.Utilities.Globals.APIKey', function(response) {
                             if (response && response.length > 0) {
-                                $.each(response, function(index, value) {
-                                    $('#cboemployee').append(`<option value="${value.maNV}">${value.hoTen}</option>`);
-                                });
+                                var employee = response.find(e => e.maNV === '@emp_id');
+                                if (employee && employee.is_lead) {
+                                    var results = $.grep(response, function(e) { 
+                                        return e.job_group === employee.job_group;
+                                    });
+                                    $.each(results, function(index, value) {
+                                        $('#cboemployee').append(`<option value="${value.maNV}">${value.hoTen}</option>`);
+                                    });
+                                }
                             }
                         });
                     }
