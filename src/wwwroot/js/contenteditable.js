@@ -24,6 +24,9 @@
             fileInput.files = dataTransfer.files;
 
             formData.append("files", file);
+            if ($('#divattachmentdetail').length) {
+                $('#divattachmentdetail').append(`<div>${file.name}<img src='img/delete.png' onclick='deletefile(this)' /></div>`);
+            }
             $('#divattachment').html(formDataFileLength());
         }
     });

@@ -19,7 +19,9 @@ function initFileInput() {
         }
         for (let i = 0; i < this.files.length; i++) {
             formData.append("files", this.files[i]); // "files" matches API parameter
-            // $('#divattachmentdetail').append(`<div>${this.files[i].name}<img src='img/delete.png' onclick='deletefile(this)' /></div>`);
+            if ($('#divattachmentdetail').length) {
+                $('#divattachmentdetail').append(`<div>${this.files[i].name}<img src='img/delete.png' onclick='deletefile(this)' /></div>`);
+            }
         }
         $('#divattachment').html(formDataFileLength());
         $('#imgattachment').show();
