@@ -35,6 +35,15 @@
     <div class="col-auto">
         <input type="text" class="form-control" name="SearchText" id="filterRequestId" placeholder="Tìm theo nội dung yêu cầu">
     </div>
+    @if (currentPath == "index")
+    {
+    <div class="col-auto">
+        <select id="cboshowtype" class="form-select">
+            <option value="">-- Hiển thị --</option>
+            <option value="@(HPDQ.WebSupport.DataEntitites.TicketStatus.Done.GetDescription())">Ẩn danh sách đã xử lý</option>
+        </select>
+    </div>
+    }
     <div class="col-auto">
         <button type="submit" class="btn btn-primary">
             <i class="bi bi-search"></i> Tìm kiếm
@@ -644,7 +653,23 @@
             var filePreviewModal = new bootstrap.Modal(document.getElementById('filePreviewModal'), { backdrop: true, keyboard: true });
             filePreviewModal.show();
         }
-
+        $('#cboshowtype').change(function() {
+            var filterVal = $(this).val();
+            var statusIndex = $('th:contains("Trạng thái")').index();
+            $('#contentlist tbody tr').each(function() {
+                if (filterVal == '') {
+                    $(this).toggle(true);
+                    return;
+                }
+                var isMatch = true;
+                $(this).find('td').each(function(idx) {
+                    if (idx == statusIndex && $(this).text().indexOf(filterVal) > -1) {
+                        isMatch = false;
+                    }
+                });
+                $(this).toggle(isMatch);
+            });
+        });
         $('.filter-input').on('input change', function() {
             var dropdownMenu = $(this).closest('.dropdown-menu');
             var filterBtn = dropdownMenu.siblings('button');
