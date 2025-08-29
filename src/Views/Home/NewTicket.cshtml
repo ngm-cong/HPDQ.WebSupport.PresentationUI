@@ -183,7 +183,7 @@
                     '@HPDQ.WebSupport.Utilities.Globals.APIKey',
                     {
                         plainTextDescription: $('#txtdescription').text(),
-                        type: $('#cbotype').val()
+                        types: [ $('#cbotype').val() ]
                     },
                     function (response) {
                         if (response && response.errorCode == 0 && response.data.length > 0) {
