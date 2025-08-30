@@ -35,6 +35,15 @@
     <div class="col-auto">
         <input type="text" class="form-control" name="SearchText" id="filterRequestId" placeholder="Tìm theo nội dung yêu cầu">
     </div>
+    @if (currentPath == "index")
+    {
+    <div class="col-auto">
+        <select id="cboshowtype" class="form-select">
+            <option value="">-- Hiển thị --</option>
+            <option value="@(HPDQ.WebSupport.DataEntitites.TicketStatus.Done.GetDescription())">Ẩn danh sách đã xử lý</option>
+        </select>
+    </div>
+    }
     <div class="col-auto">
         <button type="submit" class="btn btn-primary">
             <i class="bi bi-search"></i> Tìm kiếm
@@ -503,9 +512,15 @@
                     if (!(optionElements.length > 0)) {
                         getData('@HPDQ.WebSupport.Utilities.Globals.DomainAPIUrl/Upload/LoadEmployees', '@HPDQ.WebSupport.Utilities.Globals.APIKey', function(response) {
                             if (response && response.length > 0) {
-                                $.each(response, function(index, value) {
-                                    $('#cboemployee').append(`<option value="${value.maNV}">${value.hoTen}</option>`);
-                                });
+                                var employee = response.find(e => e.maNV === '@emp_id');
+                                if (employee && employee.is_lead) {
+                                    var results = $.grep(response, function(e) { 
+                                        return e.job_group === employee.job_group;
+                                    });
+                                    $.each(results, function(index, value) {
+                                        $('#cboemployee').append(`<option value="${value.maNV}">${value.hoTen}</option>`);
+                                    });
+                                }
                             }
                         });
                     }
@@ -599,6 +614,9 @@
                 window.location.href = href.replace('ID_PLACEHOLDER', $(this).attr('tag'));
                 return false;
             });
+            if ('@User.IsInRole("Admin")'.toLowerCase() === 'true') {
+                
+            }
         });
         // Hàm Loaded
         function showImagePopup(element, isTicket) {
@@ -638,7 +656,23 @@
             var filePreviewModal = new bootstrap.Modal(document.getElementById('filePreviewModal'), { backdrop: true, keyboard: true });
             filePreviewModal.show();
         }
-
+        $('#cboshowtype').change(function() {
+            var filterVal = $(this).val();
+            var statusIndex = $('th:contains("Trạng thái")').index();
+            $('#contentlist tbody tr').each(function() {
+                if (filterVal == '') {
+                    $(this).toggle(true);
+                    return;
+                }
+                var isMatch = true;
+                $(this).find('td').each(function(idx) {
+                    if (idx == statusIndex && $(this).text().indexOf(filterVal) > -1) {
+                        isMatch = false;
+                    }
+                });
+                $(this).toggle(isMatch);
+            });
+        });
         $('.filter-input').on('input change', function() {
             var dropdownMenu = $(this).closest('.dropdown-menu');
             var filterBtn = dropdownMenu.siblings('button');
