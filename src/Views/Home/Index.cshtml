@@ -35,15 +35,6 @@
     <div class="col-auto">
         <input type="text" class="form-control" name="SearchText" id="filterRequestId" placeholder="Tìm theo nội dung yêu cầu">
     </div>
-    @if (currentPath == "index")
-    {
-    <div class="col-auto">
-        <select id="cboshowtype" class="form-select">
-            <option value="">-- Hiển thị --</option>
-            <option value="@(HPDQ.WebSupport.DataEntitites.TicketStatus.Done.GetDescription())">Ẩn danh sách đã xử lý</option>
-        </select>
-    </div>
-    }
     <div class="col-auto">
         <button type="submit" class="btn btn-primary">
             <i class="bi bi-search"></i> Tìm kiếm
@@ -137,11 +128,15 @@
                         <button class="btn btn-link btn-sm dropdown-toggle p-0 ms-1" type="button" data-bs-toggle="dropdown" aria-expanded="false"></button>
                         <ul class="dropdown-menu">
                             <li>
-                                <select class="form-select filter-input" data-column="6" name="TicketStatus" id="filterStatus">
+                                <select class="form-select filter-input" data-column="6" id="filterRowStatus">
                                     <option value="">-- Trạng thái --</option>
                                     @foreach (var item in Enum.GetValues<HPDQ.WebSupport.DataEntitites.TicketStatus>())
                                     {
                                         <option value="@(item.GetDescription())">@item.GetDescription()</option>
+                                    }
+                                    @if (currentPath == "index")
+                                    {
+                                    <option value="--1-">Ẩn danh sách đã xử lý</option>
                                     }
                                 </select>
                             </li>
@@ -501,7 +496,7 @@
                     });
                 }
                 $('#lblaccept').on('click', function () {
-                    acceptTicket('@emp_id', '@User.FindFirst(ClaimTypes.GivenName)?.Value');
+                    acceptTicket('@emp_id', '@Html.Raw(User.FindFirst(ClaimTypes.GivenName)?.Value)');
                 });
                 $('#lblaccept').show();
                 $('#delegationModal .btn.btn-primary').click(function () {
@@ -614,8 +609,9 @@
                 window.location.href = href.replace('ID_PLACEHOLDER', $(this).attr('tag'));
                 return false;
             });
-            if ('@User.IsInRole("Admin")'.toLowerCase() === 'true') {
-                
+            if ('@User.IsInRole("Admin")'.toLowerCase() === 'true' && '@currentPath' == "index") {
+                $('#filterRowStatus').val("--1-");
+                $('#filterRowStatus').change();
             }
         });
         // Hàm Loaded
@@ -656,23 +652,6 @@
             var filePreviewModal = new bootstrap.Modal(document.getElementById('filePreviewModal'), { backdrop: true, keyboard: true });
             filePreviewModal.show();
         }
-        $('#cboshowtype').change(function() {
-            var filterVal = $(this).val();
-            var statusIndex = $('th:contains("Trạng thái")').index();
-            $('#contentlist tbody tr').each(function() {
-                if (filterVal == '') {
-                    $(this).toggle(true);
-                    return;
-                }
-                var isMatch = true;
-                $(this).find('td').each(function(idx) {
-                    if (idx == statusIndex && $(this).text().indexOf(filterVal) > -1) {
-                        isMatch = false;
-                    }
-                });
-                $(this).toggle(isMatch);
-            });
-        });
         $('.filter-input').on('input change', function() {
             var dropdownMenu = $(this).closest('.dropdown-menu');
             var filterBtn = dropdownMenu.siblings('button');
@@ -697,20 +676,27 @@
                 filters[$(this).data('column')] = $(this).val().toLowerCase();
             });
 
+            var statusIndex = $('#contentlist th:contains("Trạng thái")').index();
             $('tbody tr').each(function() {
                 var isMatch = true;
                 $(this).find('td').each(function(idx) {
                     var filterVal = filters[idx];
                     if (filterVal && filterVal.length > 0) {
                         var cellText = $(this).text().toLowerCase();
-                        if (cellText.indexOf(filterVal) === -1) {
-                            isMatch = false;
+                        if (idx == statusIndex && filterVal === "--1-") {
+                            if (cellText.indexOf('@Html.Raw(HPDQ.WebSupport.DataEntitites.TicketStatus.Done.GetDescription().ToLower())') > -1) {
+                                isMatch = false;
+                            }
+                        }
+                        else {
+                            if (cellText.indexOf(filterVal) === -1) {
+                                isMatch = false;
+                            }
                         }
                     }
                 });
                 $(this).toggle(isMatch);
             });
         });
-
     </script>
 }
