@@ -366,6 +366,7 @@ namespace HPDQ.WebSupport.Controllers
                                     BorderColor = Globals.ChartFormats.Select(x => x.BorderColor).Take(1),
                                     BackgroundColor = Globals.ChartFormats.Select(x => x.BackgroundColor).Take(1),
                                     Tension = 0.4,
+                                    BorderWidth = 0.5,
                                 },
                                 new LineChartModel
                                 {
@@ -374,6 +375,7 @@ namespace HPDQ.WebSupport.Controllers
                                     BorderColor = Globals.ChartFormats.Select(x => x.BorderColor).Skip(1).Take(1),
                                     BackgroundColor = Globals.ChartFormats.Select(x => x.BackgroundColor).Skip(1).Take(1),
                                     Tension = 0.4,
+                                    BorderWidth = 0.5,
                                 },
                             },
                         }
