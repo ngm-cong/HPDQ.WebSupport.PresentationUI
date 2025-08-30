@@ -97,7 +97,7 @@ namespace HPDQ.WebSupport.Controllers
                     var role = "User";
                     if (empToken.maPhongBan == 1961) role = "Admin";
                     var claims = new List<Claim> {
-                        new Claim(ClaimTypes.NameIdentifier, emp_id),
+                        new Claim(ClaimTypes.NameIdentifier, emp_id.ToUpper()),
                         new Claim(ClaimTypes.GivenName, empToken.hoTen!),
                         new Claim(ClaimTypes.Role, role)
                     };
