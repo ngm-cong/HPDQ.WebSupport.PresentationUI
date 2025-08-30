@@ -145,6 +145,7 @@
                 </th>
                 @if (currentPath == "index")
                 {
+                    <th style="width: 50px;">STT</th>
                     <th style="width: 50px;"></th>
                 }
             </tr>
@@ -168,10 +169,14 @@
                             @(model.Status.GetDescription())
                         </span>
                     </td>
-                    @if (currentPath == "index" && model.Status == HPDQ.WebSupport.DataEntitites.TicketStatus.New)
+                    @if (currentPath == "index")
                     {
+                        <td>@(model.Ordinal)</td>
                         <td class="text-center editbuttonzone">
+                            @if (model.Status == HPDQ.WebSupport.DataEntitites.TicketStatus.New)
+                            {
                             <img src="~/img/edit.png" class="edit-btn" tag='@(model.Id)' />
+                            }
                         </td>
                     }
                 </tr>
