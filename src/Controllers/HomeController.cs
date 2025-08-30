@@ -74,7 +74,7 @@ namespace HPDQ.WebSupport.Controllers
                 if (ticketType != null) criteria.Types = new List<byte> { ticketType.Value };
                 if (ticketStatus != null) criteria.Statuses = new List<TicketStatus> { ticketStatus.Value };
                 if (string.IsNullOrEmpty(searchText) == false) criteria.SearchText = searchText;
-                var tickets = (await HPDQ.WebSupport.Utilities.API.Instance.Ticket.Load(criteria))?.Select(x => Core.RESTful.Utilities.CopyValue<HomeViewModel>(x)).ToList();
+                var tickets = ((IEnumerable<Ticket>?)await HPDQ.WebSupport.Utilities.API.Instance.Ticket.Load(criteria: criteria, isLoadOrdinal: true))?.Select(x => Core.RESTful.Utilities.CopyValue<HomeViewModel>(x)).ToList();
                 ViewBag.TicketTypes = await LoadAndFillTicketTypes(tickets);
                 return View(tickets);
             }
@@ -319,7 +319,7 @@ namespace HPDQ.WebSupport.Controllers
                 CreatedOnFr = DateTime.Now.Date.AddDays(-1 * DateTime.Now.Day),
                 ExcludeStatus = null,
             };
-            var ticketsInMonth = await HPDQ.WebSupport.Utilities.API.Instance.Ticket.Load(criteria);
+            var ticketsInMonth = (IEnumerable<Ticket>?)await HPDQ.WebSupport.Utilities.API.Instance.Ticket.Load(criteria);
             switch (rptType)
             {
                 case 0:
@@ -421,7 +421,7 @@ namespace HPDQ.WebSupport.Controllers
                     {
                         ExcludeStatus = new List<TicketStatus> { TicketStatus.Closed, TicketStatus.Done }
                     };
-                    var unFinishedTickets = await HPDQ.WebSupport.Utilities.API.Instance.Ticket.Load(criteria);
+                    var unFinishedTickets = (IEnumerable<Ticket>?)await HPDQ.WebSupport.Utilities.API.Instance.Ticket.Load(criteria);
                     unFinishedTickets = unFinishedTickets ?? new List<Ticket>();
 
                     var rptValues = from x in ticketsInMonth
