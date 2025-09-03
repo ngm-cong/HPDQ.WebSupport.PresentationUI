@@ -1,4 +1,8 @@
 ﻿@using System.Security.Claims
+@using HPDQ.WebSupport.Utilities
+@using HPDQ.WebSupport.Criteria
+@using HPDQ.WebSupport.DataEntitites
+
 @{
     ViewData["Title"] = ViewData["Title"] ?? "Danh sách yêu cầu";
     var emp_id = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
@@ -6,6 +10,11 @@
         ?? User.FindFirst("upn")?.Value;
 
     var currentPath = ViewContext.RouteData.Values["action"]?.ToString()?.ToLower();
+
+    var types = await API.Instance.CodeDetail.Load(new CodeDetailCriteria
+    {
+        Master = CodeDetailMaster.PriorityType
+    }) ?? new List<CodeDetail>();
 }
 
 @model IEnumerable<HomeViewModel>
@@ -293,6 +302,17 @@
             <div class="modal-body" style="width: 100%; height: 100%;">
                 Nhân sự tiếp nhận: <select id='cboemployee' class="form-select"></select>
             </div>
+            <div class="modal-body" style="width: 100%; height: 100%;">
+                Tình trạng ưu tiên:
+                <select id="priority" class="form-select">
+                    <option value="">-- Mức độ ưu tiên --</option>
+                    @foreach (var item in types)
+                    {
+                        <option value="@item.Code">@item.Description</option>
+                    }
+                </select>
+            </div>
+
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
                 <button type="button" class="btn btn-primary">Xác nhận</button>
@@ -300,6 +320,37 @@
         </div>
     </div>
 </div>
+
+<!-- Modal Tiếp nhận -->
+<div class="modal fade" id="acceptModal" tabindex="-1" aria-labelledby="myAcceptModal" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="myAcceptModal">TIẾP NHẬN YÊU CẦU</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Nhân sự tiếp nhận:
+                <select id='cboemployeeAccept' class="form-select"></select>
+            </div>
+            <div class="modal-body">
+                Tình trạng ưu tiên:
+                <select id="priorityAccept" class="form-select">
+                    <option value="">-- Mức độ ưu tiên --</option>
+                    @foreach (var item in types)
+                    {
+                        <option value="@item.Code">@item.Description</option>
+                    }
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-primary" id="btnAcceptConfirm">Xác nhận</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 @section Styles {
     <link rel="stylesheet" href="~/css/contenteditable.css" />
@@ -500,10 +551,57 @@
                         location.reload();
                     });
                 }
-                $('#lblaccept').on('click', function () {
-                    acceptTicket('@emp_id', '@Html.Raw(User.FindFirst(ClaimTypes.GivenName)?.Value)');
-                });
+
                 $('#lblaccept').show();
+                $('#lblaccept').on('click', function () {
+                    var optionElements = $('#cboemployeeAccept').find('option');
+                    if (!(optionElements.length > 0)) {
+                        getData('@HPDQ.WebSupport.Utilities.Globals.DomainAPIUrl/Upload/LoadEmployees', '@HPDQ.WebSupport.Utilities.Globals.APIKey', function(response) {
+                            if (response && response.length > 0) {
+                                var employee = response.find(e => e.maNV === '@emp_id');
+                                if (employee && employee.is_lead) {
+                                    var results = $.grep(response, function(e) {
+                                        return e.job_group === employee.job_group;
+                                    });
+                                    $.each(results, function(index, value) {
+                                        $('#cboemployeeAccept').append(`<option value="${value.maNV}">${value.hoTen}</option>`);
+                                    });
+                                }
+                            }
+                        });
+                    }
+
+                    var acceptModal = new bootstrap.Modal(document.getElementById('acceptModal'), { backdrop: true, keyboard: true });
+                    acceptModal.show();
+                });
+
+                $('#btnAcceptConfirm').on('click', function () {
+                    var empId = $('#cboemployeeAccept').val();
+                    var empName = $('#cboemployeeAccept option:selected').text();
+                    var priority = $('#priorityAccept').val();
+
+                    if (!empId || !priority) {
+                        alert("Vui lòng chọn Nhân sự thực hiện và Mức độ ưu tiên!");
+                        return;
+                    }
+
+                    var bodydata = {
+                        id: $('#modelTag').val(),
+                        status: 1,
+                        progressBy_EMP_ID: empId,
+                        progressByEMPFullName: empName,
+                        priority: priority
+                    };
+
+                    postData('@HPDQ.WebSupport.Utilities.Globals.DomainAPIUrl/Tickets/Update?emp_id=@emp_id', '@HPDQ.WebSupport.Utilities.Globals.APIKey', bodydata, function(response) {
+                        if (response.errorCode != 0) {
+                            alert(response.message);
+                            return;
+                        }
+                        location.reload();
+                    });
+                });
+
                 $('#delegationModal .btn.btn-primary').click(function () {
                     acceptTicket($('#cboemployee').val(), $('#cboemployee option:selected').text());
                 });
@@ -524,6 +622,7 @@
                             }
                         });
                     }
+
                     var delegationModal = new bootstrap.Modal(document.getElementById('delegationModal'), { backdrop: true, keyboard: true });
                     delegationModal.show();
                 });
@@ -657,6 +756,7 @@
             var filePreviewModal = new bootstrap.Modal(document.getElementById('filePreviewModal'), { backdrop: true, keyboard: true });
             filePreviewModal.show();
         }
+        
         $('.filter-input').on('input change', function() {
             var dropdownMenu = $(this).closest('.dropdown-menu');
             var filterBtn = dropdownMenu.siblings('button');
