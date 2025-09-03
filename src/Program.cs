@@ -101,3 +101,5 @@ finally
 {
     Log.CloseAndFlush();
 }
+// dotnet remove package HPDQ.WebSupport.DataEntitites
+// dotnet add reference "../../1. HPDQ.WebSupport.DataEntitites/src/HPDQ.WebSupport.DataEntitites.csproj"

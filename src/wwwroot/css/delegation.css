@@ -1,0 +1,72 @@
+﻿/* Thiết lập cơ bản cho treeview */
+.treeview, .treeview ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+    /* Ẩn các ul con ban đầu */
+    .treeview ul {
+        display: none;
+    }
+
+    /* Hiển thị các ul con khi có class .open */
+    .treeview .open > ul {
+        display: block;
+    }
+
+    /* Ẩn biểu tượng mặc định của li */
+    .treeview li::before,
+    .treeview li::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+
+    /* Tạo đường gạch dọc */
+    .treeview li:not(:last-child)::after {
+        height: 100%;
+        border-left: 1px solid #ccc; /* Đường dọc */
+        left: -10px;
+    }
+
+    /* Tạo đường gạch ngang */
+    .treeview li::before {
+        width: 15px;
+        height: 1em;
+        border-top: 1px solid #ccc; /* Đường ngang */
+        border-left: 1px solid #ccc; /* Kết hợp đường ngang và dọc */
+        left: -10px;
+        top: 0.5em;
+        transform: translateY(-50%);
+    }
+
+    /* Xóa đường nối không cần thiết cho item cuối cùng */
+    .treeview li:last-child::after {
+        height: 0;
+    }
+
+    /* Đặt vị trí cho các li con */
+    .treeview li {
+        position: relative;
+        margin-left: 20px;
+        line-height: 2em;
+    }
+
+        /* CSS cho biểu tượng expand/collapse */
+        .treeview li.can-toggle::before {
+            content: '▶';
+            width: auto;
+            height: auto;
+            border: none;
+            transform: none;
+            position: static;
+            display: inline-block;
+            margin-right: 5px;
+            cursor: pointer;
+        }
+
+        .treeview li.can-toggle.open::before {
+            content: '▼';
+        }

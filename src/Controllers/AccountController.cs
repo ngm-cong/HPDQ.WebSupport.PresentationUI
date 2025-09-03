@@ -101,6 +101,10 @@ namespace HPDQ.WebSupport.Controllers
                         new Claim(ClaimTypes.GivenName, empToken.hoTen!),
                         new Claim(ClaimTypes.Role, role)
                     };
+                    if (empToken.maNV == "HPDQ34987")
+                    {
+                        claims.Add(new Claim(ClaimTypes.Role, "SystemAdmin"));
+                    }
 
                     var claimsIdentity = new ClaimsIdentity(claims, "MyCookieAuth");
 

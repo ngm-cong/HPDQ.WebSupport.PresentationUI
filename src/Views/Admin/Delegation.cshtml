@@ -1,0 +1,30 @@
+@using HPDQ.WebSupport.DataEntitites
+@{
+    ViewData["Title"] = "Nhân viên";
+}
+@model IEnumerable<Employee>
+
+
+<ul class="treeview">
+    @foreach (var item in Model.Where(x => string.IsNullOrEmpty(x.JOB_GROUP) == false).GroupBy(x => x.JOB_GROUP).Select(x => x.Key))
+    {
+        <li class="can-toggle">
+            @item
+            <ul>
+                @foreach (var level1 in Model.Where(x => x.JOB_GROUP == @item).OrderBy(x => (x.Attribute & EmployeeAttribute.IsLead) > 0 ? 0 : 1))
+                {
+                    <li>
+                        [@level1.EMP_ID] @level1.FullName
+                    </li>
+                }
+            </ul>
+        </li>
+    }
+</ul>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/delegation.css" />
+}
+@section Scripts {
+    <script src="~/js/delegation.js"></script>
+}

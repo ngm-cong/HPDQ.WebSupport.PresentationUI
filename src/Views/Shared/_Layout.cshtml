@@ -66,6 +66,21 @@
                         Lịch sử yêu cầu
                     </a>
                 </li>
+                @if (User.IsInRole("SystemAdmin"))
+                {
+                    <li>
+                        <a asp-controller="Admin" asp-action="MasterData" class="nav-link @(currentPath == "masterdata" ? "active" : "link-dark")">
+                            <i class="fa fa-database"></i>
+                            Danh mục dùng chung
+                        </a>
+                    </li>
+                    <li>
+                        <a asp-controller="Admin" asp-action="Delegation" class="nav-link @(currentPath == "delegation" ? "active" : "link-dark")">
+                            <i class="fa-regular fa-user"></i>
+                            Nhân viên
+                        </a>
+                    </li>
+                }
             </ul>
             <hr />
             <div class="lbversion"><span>Phiên bản: 1.0.0.9</span></div>
