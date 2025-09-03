@@ -305,10 +305,11 @@
             <div class="modal-body" style="width: 100%; height: 100%;">
                 Tình trạng ưu tiên:
                 <select id="priority" class="form-select">
-                    <option value="">-- Mức độ ưu tiên --</option>
                     @foreach (var item in types)
                     {
-                        <option value="@item.Code">@item.Description</option>
+                        <option value=@item.Code selected="@(item.Code == 0 ? "selected" : null)">
+                            @item.Description
+                        </option>
                     }
                 </select>
             </div>
@@ -333,10 +334,11 @@
             <div class="modal-body">
                 Tình trạng ưu tiên:
                 <select id="priorityAccept" class="form-select">
-                    <option value="">-- Mức độ ưu tiên --</option>
                     @foreach (var item in types)
                     {
-                        <option value="@item.Code">@item.Description</option>
+                        <option value=@item.Code selected="@(item.Code == 0 ? "selected" : null)">
+                            @item.Description
+                        </option>
                     }
                 </select>
             </div>
@@ -532,16 +534,22 @@
             });
             initFileInput();
             if ('@ViewBag.Type' == '1') {
-                function acceptTicket(emp_id, fullName) {
+                function acceptTicket(emp_id, fullName, priority) {
                     var bodydata = {
                         id: $('#modelTag').val(),
                         status: 1,
                         progressBy_EMP_ID: emp_id,
-                        progressByEMPFullName: fullName,
+                        progressByEMPFullName: fullName
                     };
-                    postData('@HPDQ.WebSupport.Utilities.Globals.DomainAPIUrl/Tickets/Update?emp_id=@emp_id', '@HPDQ.WebSupport.Utilities.Globals.APIKey', bodydata, function(response) {
-                        if (response.errorCode != 0)
-                        {
+
+                    if (priority !== undefined) {
+                        bodydata.priority = priority;
+                    }
+                    postData('@HPDQ.WebSupport.Utilities.Globals.DomainAPIUrl/Tickets/Update?emp_id=@emp_id',
+                             '@HPDQ.WebSupport.Utilities.Globals.APIKey',
+                             bodydata,
+                             function(response) {
+                        if (response.errorCode != 0) {
                             alert(response.message);
                             return;
                         }
@@ -559,30 +567,14 @@
                 });
 
                 $('#btnAcceptConfirm').on('click', function () {
-                    var priority = $('#priorityAccept').val();
-
-                    if (!priority) {
+                    var priority = parseInt($('#priorityAccept').val(), 10);
+                    if (isNaN(priority)) {
                         alert("Vui lòng chọn Mức độ ưu tiên!");
                         return;
                     }
-
-                    var bodydata = {
-                        id: $('#modelTag').val(),
-                        status: 1,
-                        priority: priority
-                    };
-
-                    postData('@HPDQ.WebSupport.Utilities.Globals.DomainAPIUrl/Tickets/Update?emp_id=@emp_id',
-                             '@HPDQ.WebSupport.Utilities.Globals.APIKey',
-                             bodydata,
-                             function(response) {
-                        if (response.errorCode != 0) {
-                            alert(response.message);
-                            return;
-                        }
-                        location.reload();
-                    });
+                    acceptTicket('@emp_id', '@Html.Raw(User.FindFirst(ClaimTypes.GivenName)?.Value)', priority);
                 });
+
 
                 $('#delegationModal .btn.btn-primary').click(function () {
                     acceptTicket($('#cboemployee').val(), $('#cboemployee option:selected').text());
