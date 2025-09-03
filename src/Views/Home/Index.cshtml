@@ -329,10 +329,7 @@
                 <h5 class="modal-title" id="myAcceptModal">TIẾP NHẬN YÊU CẦU</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
-                Nhân sự tiếp nhận:
-                <select id='cboemployeeAccept' class="form-select"></select>
-            </div>
+
             <div class="modal-body">
                 Tình trạng ưu tiên:
                 <select id="priorityAccept" class="form-select">
@@ -554,46 +551,31 @@
 
                 $('#lblaccept').show();
                 $('#lblaccept').on('click', function () {
-                    var optionElements = $('#cboemployeeAccept').find('option');
-                    if (!(optionElements.length > 0)) {
-                        getData('@HPDQ.WebSupport.Utilities.Globals.DomainAPIUrl/Upload/LoadEmployees', '@HPDQ.WebSupport.Utilities.Globals.APIKey', function(response) {
-                            if (response && response.length > 0) {
-                                var employee = response.find(e => e.maNV === '@emp_id');
-                                if (employee && employee.is_lead) {
-                                    var results = $.grep(response, function(e) {
-                                        return e.job_group === employee.job_group;
-                                    });
-                                    $.each(results, function(index, value) {
-                                        $('#cboemployeeAccept').append(`<option value="${value.maNV}">${value.hoTen}</option>`);
-                                    });
-                                }
-                            }
-                        });
-                    }
-
-                    var acceptModal = new bootstrap.Modal(document.getElementById('acceptModal'), { backdrop: true, keyboard: true });
+                    var acceptModal = new bootstrap.Modal(document.getElementById('acceptModal'), {
+                        backdrop: true,
+                        keyboard: true
+                    });
                     acceptModal.show();
                 });
 
                 $('#btnAcceptConfirm').on('click', function () {
-                    var empId = $('#cboemployeeAccept').val();
-                    var empName = $('#cboemployeeAccept option:selected').text();
                     var priority = $('#priorityAccept').val();
 
-                    if (!empId || !priority) {
-                        alert("Vui lòng chọn Nhân sự thực hiện và Mức độ ưu tiên!");
+                    if (!priority) {
+                        alert("Vui lòng chọn Mức độ ưu tiên!");
                         return;
                     }
 
                     var bodydata = {
                         id: $('#modelTag').val(),
                         status: 1,
-                        progressBy_EMP_ID: empId,
-                        progressByEMPFullName: empName,
                         priority: priority
                     };
 
-                    postData('@HPDQ.WebSupport.Utilities.Globals.DomainAPIUrl/Tickets/Update?emp_id=@emp_id', '@HPDQ.WebSupport.Utilities.Globals.APIKey', bodydata, function(response) {
+                    postData('@HPDQ.WebSupport.Utilities.Globals.DomainAPIUrl/Tickets/Update?emp_id=@emp_id',
+                             '@HPDQ.WebSupport.Utilities.Globals.APIKey',
+                             bodydata,
+                             function(response) {
                         if (response.errorCode != 0) {
                             alert(response.message);
                             return;
