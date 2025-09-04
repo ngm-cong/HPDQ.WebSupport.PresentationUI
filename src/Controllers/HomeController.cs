@@ -3,8 +3,15 @@ using HPDQ.WebSupport.Models;
 using HPDQ.WebSupport.Utilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Data;
 using System.Diagnostics;
+using System.Net.WebSockets;
 using System.Security.Claims;
+using System.Text.Json;
+using System.Text.Json.Nodes;
+using System.Threading.Tasks;
+using System.Xml.Linq;
+using static System.Text.Json.JsonElement;
 
 namespace HPDQ.WebSupport.Controllers
 {
@@ -468,6 +475,74 @@ namespace HPDQ.WebSupport.Controllers
                 default:
                     return new APIResult<DashboardViewModel> { };
             }
+        }
+
+        public IActionResult Report()
+        {
+            return View();
+        }
+
+        private DataTable? JsonStringToDataTable(string jsonString)
+        {
+            try
+            {
+                using (JsonDocument document = JsonDocument.Parse(jsonString))
+                {
+                    JsonElement root = document.RootElement;
+                    if (root.ValueKind == JsonValueKind.Array)
+                    {
+                        DataTable? dataTable = null;
+                        foreach (JsonElement element in root.EnumerateArray().Where(x => x.ValueKind == JsonValueKind.Object))
+                        {
+                            var jsonProperties = element.EnumerateObject();
+                            if (dataTable == null)
+                            {
+                                dataTable = new DataTable();
+                                foreach (JsonProperty property in jsonProperties)
+                                {
+                                    dataTable.Columns.Add(property.Name, typeof(string));
+                                }    
+                            }
+                            var newRow = dataTable.NewRow();
+                            // Enumerate the properties of the JSON object
+                            foreach (JsonProperty property in jsonProperties)
+                            {
+                                try
+                                {
+                                    newRow[property.Name] = property.Value.GetString();
+                                }
+                                catch
+                                {
+                                    throw;
+                                }
+                            }
+                            dataTable.Rows.Add(newRow);
+                        }
+                        return dataTable;
+                    }
+                }
+                return null;
+            }
+            catch (Exception ex)
+            {
+                // Handle errors if the JSON structure is not compatible with a DataTable
+                Console.WriteLine($"Error deserializing JSON: {ex.Message}");
+                return null;
+            }
+        }
+        [HttpPost]
+        public async Task<IActionResult> Report(int? rptType = null)
+        {
+            var criteria = new Utilities.Models.ReportCriteria();
+            switch (rptType)
+            {
+                case 1:
+                    criteria.ProcedureName = "[HPDQ.WebSupport].[dbo].[spRptTicketResolvedByTime]";
+                    break;
+            }
+            var jsonString = await HPDQ.WebSupport.Utilities.API.Instance.Procedure.ExecuteDataTable(criteria);
+            var dataTable = JsonStringToDataTable(jsonString!);
+            return View(dataTable);
         }
     }
 }

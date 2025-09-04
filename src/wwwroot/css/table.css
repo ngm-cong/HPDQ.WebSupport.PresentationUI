@@ -2,7 +2,7 @@ table.content {
     width: 100%;
     border-collapse: collapse;
 }
-table.content tr:first-child {
+table.content thead tr {
     background-color: #0b5ed7;
     color: whitesmoke;
     cursor: pointer;
