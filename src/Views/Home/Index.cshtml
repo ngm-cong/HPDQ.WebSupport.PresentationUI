@@ -152,6 +152,7 @@
                         </ul>
                     </div>
                 </th>
+                <th style="width: 140px;">Ưu tiên</th>
                 @if (currentPath == "index")
                 {
                     <th style="width: 50px;">STT</th>
@@ -178,6 +179,7 @@
                             @(model.Status.GetDescription())
                         </span>
                     </td>
+                    <td>@(model.Priority.GetDescription())</td>
                     @if (currentPath == "index")
                     {
                         <td>@(model.Ordinal)</td>
