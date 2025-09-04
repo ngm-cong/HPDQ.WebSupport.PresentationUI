@@ -1,4 +1,8 @@
 ﻿@using System.Security.Claims
+@using HPDQ.WebSupport.Utilities
+@using HPDQ.WebSupport.Criteria
+@using HPDQ.WebSupport.DataEntitites
+
 @{
     ViewData["Title"] = ViewData["Title"] ?? "Danh sách yêu cầu";
     var emp_id = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
@@ -6,6 +10,11 @@
         ?? User.FindFirst("upn")?.Value;
 
     var currentPath = ViewContext.RouteData.Values["action"]?.ToString()?.ToLower();
+
+    var types = await API.Instance.CodeDetail.Load(new CodeDetailCriteria
+    {
+        Master = CodeDetailMaster.PriorityType
+    }) ?? new List<CodeDetail>();
 }
 
 @model IEnumerable<HomeViewModel>
@@ -136,7 +145,7 @@
                                     }
                                     @if (currentPath == "index")
                                     {
-                                    <option value="--1-">Ẩn danh sách đã xử lý</option>
+                                        <option value="--1-">Ẩn danh sách đã xử lý</option>
                                     }
                                 </select>
                             </li>
@@ -151,7 +160,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var model in Model ?? new List<HomeViewModel>())
+            @foreach (var model in (Model ?? new List<HomeViewModel>()).OrderBy(x => x.Type))
             {
                 <tr class="item" tag="@(model.Id)" tagEMP_ID="@(model.EMP_ID)" tagStatus="@((byte)model.Status)">
                     <td><b>#@(model.Code)</b></td>
@@ -162,10 +171,10 @@
                     <td>@Html.Raw(model.ProgressByEMPFullName)</td>
                     <td class="text-center">
                         <span style="padding: 0.5em 0.65em;" class="badge
-                                @(model.Status == HPDQ.WebSupport.DataEntitites.TicketStatus.New ? "bg-primary" : "")
-                                @(model.Status == HPDQ.WebSupport.DataEntitites.TicketStatus.InProgress ? "bg-warning text-dark" : "")
-                                @(model.Status == HPDQ.WebSupport.DataEntitites.TicketStatus.Done ? "bg-success" : "")
-                                @(model.Status == HPDQ.WebSupport.DataEntitites.TicketStatus.Closed ? "bg-secondary" : "")">
+                                    @(model.Status == HPDQ.WebSupport.DataEntitites.TicketStatus.New ? "bg-primary" : "")
+                                    @(model.Status == HPDQ.WebSupport.DataEntitites.TicketStatus.InProgress ? "bg-warning text-dark" : "")
+                                    @(model.Status == HPDQ.WebSupport.DataEntitites.TicketStatus.Done ? "bg-success" : "")
+                                    @(model.Status == HPDQ.WebSupport.DataEntitites.TicketStatus.Closed ? "bg-secondary" : "")">
                             @(model.Status.GetDescription())
                         </span>
                     </td>
@@ -175,7 +184,7 @@
                         <td class="text-center editbuttonzone">
                             @if (model.Status == HPDQ.WebSupport.DataEntitites.TicketStatus.New)
                             {
-                            <img src="~/img/edit.png" class="edit-btn" tag='@(model.Id)' />
+                                <img src="~/img/edit.png" class="edit-btn" tag='@(model.Id)' />
                             }
                         </td>
                     }
@@ -293,6 +302,18 @@
             <div class="modal-body" style="width: 100%; height: 100%;">
                 Nhân sự tiếp nhận: <select id='cboemployee' class="form-select"></select>
             </div>
+            <div class="modal-body" style="width: 100%; height: 100%;">
+                Tình trạng ưu tiên:
+                <select id="priority" class="form-select">
+                    @foreach (var item in types)
+                    {
+                        <option value=@item.Code selected="@(item.Code == 0 ? "selected" : null)">
+                            @item.Description
+                        </option>
+                    }
+                </select>
+            </div>
+
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
                 <button type="button" class="btn btn-primary">Xác nhận</button>
@@ -300,6 +321,35 @@
         </div>
     </div>
 </div>
+
+<!-- Modal Tiếp nhận -->
+<div class="modal fade" id="acceptModal" tabindex="-1" aria-labelledby="myAcceptModal" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="myAcceptModal">TIẾP NHẬN YÊU CẦU</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body">
+                Tình trạng ưu tiên:
+                <select id="priorityAccept" class="form-select">
+                    @foreach (var item in types)
+                    {
+                        <option value=@item.Code selected="@(item.Code == 0 ? "selected" : null)">
+                            @item.Description
+                        </option>
+                    }
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-primary" id="btnAcceptConfirm">Xác nhận</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 @section Styles {
     <link rel="stylesheet" href="~/css/contenteditable.css" />
@@ -484,26 +534,48 @@
             });
             initFileInput();
             if ('@ViewBag.Type' == '1') {
-                function acceptTicket(emp_id, fullName) {
+                function acceptTicket(emp_id, fullName, priority) {
                     var bodydata = {
                         id: $('#modelTag').val(),
                         status: 1,
                         progressBy_EMP_ID: emp_id,
-                        progressByEMPFullName: fullName,
+                        progressByEMPFullName: fullName
                     };
-                    postData('@HPDQ.WebSupport.Utilities.Globals.DomainAPIUrl/Tickets/Update?emp_id=@emp_id', '@HPDQ.WebSupport.Utilities.Globals.APIKey', bodydata, function(response) {
-                        if (response.errorCode != 0)
-                        {
+
+                    if (priority !== undefined) {
+                        bodydata.priority = priority;
+                    }
+                    postData('@HPDQ.WebSupport.Utilities.Globals.DomainAPIUrl/Tickets/Update?emp_id=@emp_id',
+                             '@HPDQ.WebSupport.Utilities.Globals.APIKey',
+                             bodydata,
+                             function(response) {
+                        if (response.errorCode != 0) {
                             alert(response.message);
                             return;
                         }
                         location.reload();
                     });
                 }
-                $('#lblaccept').on('click', function () {
-                    acceptTicket('@emp_id', '@Html.Raw(User.FindFirst(ClaimTypes.GivenName)?.Value)');
-                });
+
                 $('#lblaccept').show();
+                $('#lblaccept').on('click', function () {
+                    var acceptModal = new bootstrap.Modal(document.getElementById('acceptModal'), {
+                        backdrop: true,
+                        keyboard: true
+                    });
+                    acceptModal.show();
+                });
+
+                $('#btnAcceptConfirm').on('click', function () {
+                    var priority = parseInt($('#priorityAccept').val(), 10);
+                    if (isNaN(priority)) {
+                        alert("Vui lòng chọn Mức độ ưu tiên!");
+                        return;
+                    }
+                    acceptTicket('@emp_id', '@Html.Raw(User.FindFirst(ClaimTypes.GivenName)?.Value)', priority);
+                });
+
+
                 $('#delegationModal .btn.btn-primary').click(function () {
                     acceptTicket($('#cboemployee').val(), $('#cboemployee option:selected').text());
                 });
@@ -514,7 +586,7 @@
                             if (response && response.length > 0) {
                                 var employee = response.find(e => e.maNV === '@emp_id');
                                 if (employee && employee.is_lead) {
-                                    var results = $.grep(response, function(e) { 
+                                    var results = $.grep(response, function(e) {
                                         return e.job_group === employee.job_group;
                                     });
                                     $.each(results, function(index, value) {
@@ -524,6 +596,7 @@
                             }
                         });
                     }
+
                     var delegationModal = new bootstrap.Modal(document.getElementById('delegationModal'), { backdrop: true, keyboard: true });
                     delegationModal.show();
                 });
@@ -582,7 +655,7 @@
             $('#delegationModal').on('hidden.bs.modal', function (e) {
                 $('#dialogModal').focus();
             });
-            
+
             const urlParams = new URLSearchParams(window.location.search);
             const tickettype = urlParams.get('TicketType');
             const ticketstatus = urlParams.get('TicketStatus');
@@ -657,6 +730,7 @@
             var filePreviewModal = new bootstrap.Modal(document.getElementById('filePreviewModal'), { backdrop: true, keyboard: true });
             filePreviewModal.show();
         }
+        
         $('.filter-input').on('input change', function() {
             var dropdownMenu = $(this).closest('.dropdown-menu');
             var filterBtn = dropdownMenu.siblings('button');

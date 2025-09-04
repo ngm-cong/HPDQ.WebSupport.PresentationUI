@@ -1,0 +1,9 @@
+table th:nth-child(2) {
+    width: 100%;
+}
+table th:last-child, table td:last-child {
+    white-space: nowrap;
+}
+.edit-btn {
+    cursor: pointer;
+}

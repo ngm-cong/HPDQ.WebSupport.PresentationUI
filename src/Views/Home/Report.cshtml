@@ -1,0 +1,61 @@
+@using System.Data
+@{
+    ViewData["Title"] = "Báo cáo";
+}
+@model DataTable
+<table>
+    <tr>
+        <td>
+            <form asp-controller="Home" asp-action="Report" method="post">
+                <div style="border: 1px solid #ccc; border-radius: 4px; min-height: calc(100vh - 120px); padding: 5px;">
+                    <table>
+                        <tr>
+                            <td>Báo cáo: </td>
+                            <td>
+                                <select class="form-select" name="rptType">
+                                    <option value="1">Thời gian xử lý</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" style="text-align: right;">
+                                <input type="submit" value="Xem" class="btn btn-primary" />
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </form>
+        </td>
+        <td>
+            <div style="vertical-align: top; min-height: calc(100vh - 120px); padding: 5px;">
+                @if (Model != null)
+                {
+                    <table class="content">
+                        <thead>
+                            <tr>
+                                @foreach(DataColumn column in Model.Columns)
+                                {
+                                    <th>@column.ColumnName</th>
+                                }
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach(DataRow row in Model.Rows)
+                            {
+                                <tr>
+                                    @foreach(var cell in row.ItemArray)
+                                    {
+                                        <td>@cell?.ToString()</td>
+                                    }
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+            </div>
+        </td>
+    </tr>
+</table>
+@section Styles {
+    <link rel="stylesheet" href="~/css/table.css" />
+}

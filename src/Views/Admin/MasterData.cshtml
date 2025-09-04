@@ -1,0 +1,91 @@
+@using HPDQ.WebSupport.DataEntitites
+@{
+    ViewData["Title"] = "Quản lý danh mục dùng chung";
+}
+@model IEnumerable<CodeDetail>
+<div>
+    <table style="width: 100%;">
+        <tr>
+            <td style="white-space: nowrap;"><span style="font-weight: bold; padding-right: 10px;">Loại danh mục:</span> </td>
+            <td style="width: 100%;">
+                <select id="cbomaster" class="form-select" style="width: 250px;">
+                    @foreach (var item in Enum.GetValues<HPDQ.WebSupport.DataEntitites.CodeDetailMaster>().Where(x => x != HPDQ.WebSupport.DataEntitites.CodeDetailMaster.PriorityType))
+                    {
+                        <option value="@((int)item)">@item.GetDescription()</option>
+                    }
+                </select>
+            </td>
+            <td style="text-align: right;">
+                <span id="lbaddnew" style="color: cornflowerblue; cursor: pointer;"><i><u>Thêm mới</u></i></span>
+            </td>
+        </tr>
+    </table>
+</div>
+<div>
+    <table class="content">
+        <thead>
+            <tr>
+                <th>Mã</th>
+                <th>Mô tả</th>
+                <th></th>
+            </tr>
+        </thead>
+        @foreach(var item in Model)
+        {
+            <tr>
+                <td>
+                    @item.Code
+                </td>
+                <td>
+                    @item.Description
+                </td>
+                <td>
+                    <img src="~/img/edit.png" class="edit-btn" tag='@(item.Code)' />
+                </td>
+            </tr>
+        }
+    </table>
+</div>
+
+<div class="modal fade" id="dialogModalEdit" tabindex="-1" aria-labelledby="myModalEdit" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="max-height: calc(100vh - 150px); overflow-y: auto;">
+            <div class="modal-header">
+                <h5 class="modal-title" id="myModalEdit">DANH MỤC</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="overflow-y: auto;">
+                <table style="width: 100%;">
+                    <tr>
+                        <td>Mã:</td>
+                        <td><input type="text" id="txtcode" readonly class="form-control" /></td>
+                    </tr>
+                    <tr>
+                        <td>Mô tả:</td>
+                        <td style="padding: 10px 0;">
+                            <input type="text" id="txtdescription" class="form-control" />
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-primary">Lưu</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/table.css" />
+    <link rel="stylesheet" href="~/css/masterdata.css" />
+}
+@section Scripts {
+    <script src="~/js/masterdata.js"></script>
+    <script src="~/js/ajaxutil.js"></script>
+    <script type="text/javascript">
+        var myModel = JSON.parse('@Html.Raw(Json.Serialize(Model))');
+        var domainAPIUrl = '@HPDQ.WebSupport.Utilities.Globals.DomainAPIUrl';
+        var apiKey = '@HPDQ.WebSupport.Utilities.Globals.APIKey';
+    </script>
+}
