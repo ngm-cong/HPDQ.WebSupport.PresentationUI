@@ -1,19 +1,26 @@
 @using System.Data
+@using static HPDQ.WebSupport.Controllers.HomeController
 @{
     ViewData["Title"] = "Báo cáo";
 }
-@model DataTable
+@model ReportViewModel
 <table>
     <tr>
         <td>
             <form asp-controller="Home" asp-action="Report" method="post">
-                <div style="border: 1px solid #ccc; border-radius: 4px; min-height: calc(100vh - 120px); padding: 5px;">
+                <div style="border: 1px solid #ccc; border-radius: 4px; min-height: calc(100vh - 120px); padding: 5px;" id="reportmenu">
                     <table>
                         <tr>
-                            <td>Báo cáo: </td>
+                            <td style="white-space: nowrap;">Báo cáo: </td>
                             <td>
-                                <select class="form-select" name="rptType">
-                                    <option value="1">Thời gian xử lý</option>
+                                <select class="form-select" name="rptType" style="min-width: 180px;">
+                                    @if (Model?.ReportTypes != null)
+                                    {
+                                        foreach (var item in Model.ReportTypes)
+                                        {
+                                            <option value="@item.Id">@item.Description</option>
+                                        }
+                                    }
                                 </select>
                             </td>
                         </tr>
@@ -23,24 +30,27 @@
                             </td>
                         </tr>
                     </table>
+                    <div class="reportmenubutton">
+                        <i class="bi bi-arrow-bar-left"></i>
+                    </div>
                 </div>
             </form>
         </td>
         <td>
             <div style="vertical-align: top; min-height: calc(100vh - 120px); padding: 5px;">
-                @if (Model != null)
+                @if (Model?.DataTable != null)
                 {
                     <table class="content">
                         <thead>
                             <tr>
-                                @foreach(DataColumn column in Model.Columns)
+                                @foreach(DataColumn column in Model.DataTable.Columns)
                                 {
                                     <th>@column.ColumnName</th>
                                 }
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach(DataRow row in Model.Rows)
+                            @foreach (DataRow row in Model.DataTable.Rows)
                             {
                                 <tr>
                                     @foreach(var cell in row.ItemArray)
@@ -58,4 +68,8 @@
 </table>
 @section Styles {
     <link rel="stylesheet" href="~/css/table.css" />
+    <link rel="stylesheet" href="~/css/report.css" />
+}
+@section Scripts {
+    <script src="~/js/report.js"></script>
 }

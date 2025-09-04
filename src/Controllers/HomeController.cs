@@ -5,13 +5,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
 using System.Diagnostics;
-using System.Net.WebSockets;
 using System.Security.Claims;
 using System.Text.Json;
-using System.Text.Json.Nodes;
-using System.Threading.Tasks;
-using System.Xml.Linq;
-using static System.Text.Json.JsonElement;
 
 namespace HPDQ.WebSupport.Controllers
 {
@@ -25,6 +20,61 @@ namespace HPDQ.WebSupport.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+
+        /// <summary>Tham biến cached danh sách loại báo cáo</summary>
+        private static IEnumerable<ReportType>? _reportTypes;
+
+        /// <summary>Hàm chuyển chuỗi json thành datatable.</summary>
+        /// <param name="jsonString">Chuỗi json cần chuyển.</param>
+        /// <returns>Một datatable được chuyển đổi từ chuỗi json.</returns>
+        private DataTable? JsonStringToDataTable(string jsonString)
+        {
+            try
+            {
+                using (JsonDocument document = JsonDocument.Parse(jsonString))
+                {
+                    JsonElement root = document.RootElement;
+                    if (root.ValueKind == JsonValueKind.Array)
+                    {
+                        DataTable? dataTable = null;
+                        foreach (JsonElement element in root.EnumerateArray().Where(x => x.ValueKind == JsonValueKind.Object))
+                        {
+                            var jsonProperties = element.EnumerateObject();
+                            if (dataTable == null)
+                            {
+                                dataTable = new DataTable();
+                                foreach (JsonProperty property in jsonProperties)
+                                {
+                                    dataTable.Columns.Add(property.Name, typeof(string));
+                                }
+                            }
+                            var newRow = dataTable.NewRow();
+                            // Enumerate the properties of the JSON object
+                            foreach (JsonProperty property in jsonProperties)
+                            {
+                                try
+                                {
+                                    newRow[property.Name] = property.Value.GetString();
+                                }
+                                catch
+                                {
+                                    throw;
+                                }
+                            }
+                            dataTable.Rows.Add(newRow);
+                        }
+                        return dataTable;
+                    }
+                }
+                return null;
+            }
+            catch (Exception ex)
+            {
+                // Handle errors if the JSON structure is not compatible with a DataTable
+                Console.WriteLine($"Error deserializing JSON: {ex.Message}");
+                return null;
+            }
+        }
 
         /// <summary>
         /// Khởi tạo một đối tượng mới của <see cref="HomeController"/>.
@@ -477,72 +527,33 @@ namespace HPDQ.WebSupport.Controllers
             }
         }
 
-        public IActionResult Report()
+        /// <summary>Hàm hiển thị view mặc định cho UI báo cáo.</summary>
+        /// <returns>View UI báo cáo.</returns>
+        public async Task<IActionResult> Report()
         {
-            return View();
+            _reportTypes = _reportTypes ?? await HPDQ.WebSupport.Utilities.API.Instance.ReportType.Load();
+            return View(new ReportViewModel
+            {
+                ReportTypes = _reportTypes,
+            });
         }
 
-        private DataTable? JsonStringToDataTable(string jsonString)
-        {
-            try
-            {
-                using (JsonDocument document = JsonDocument.Parse(jsonString))
-                {
-                    JsonElement root = document.RootElement;
-                    if (root.ValueKind == JsonValueKind.Array)
-                    {
-                        DataTable? dataTable = null;
-                        foreach (JsonElement element in root.EnumerateArray().Where(x => x.ValueKind == JsonValueKind.Object))
-                        {
-                            var jsonProperties = element.EnumerateObject();
-                            if (dataTable == null)
-                            {
-                                dataTable = new DataTable();
-                                foreach (JsonProperty property in jsonProperties)
-                                {
-                                    dataTable.Columns.Add(property.Name, typeof(string));
-                                }    
-                            }
-                            var newRow = dataTable.NewRow();
-                            // Enumerate the properties of the JSON object
-                            foreach (JsonProperty property in jsonProperties)
-                            {
-                                try
-                                {
-                                    newRow[property.Name] = property.Value.GetString();
-                                }
-                                catch
-                                {
-                                    throw;
-                                }
-                            }
-                            dataTable.Rows.Add(newRow);
-                        }
-                        return dataTable;
-                    }
-                }
-                return null;
-            }
-            catch (Exception ex)
-            {
-                // Handle errors if the JSON structure is not compatible with a DataTable
-                Console.WriteLine($"Error deserializing JSON: {ex.Message}");
-                return null;
-            }
-        }
+        /// <summary>Hàm hiển thị view có dữ liệu báo cáo cho UI báo cáo.</summary>
+        /// <param name="rptType">Id báo cáo cần hiển thị dữ liệu.</param>
+        /// <returns>View UI báo cáo có bao gồm dữ liệu báo cáo.</returns>
         [HttpPost]
         public async Task<IActionResult> Report(int? rptType = null)
         {
             var criteria = new Utilities.Models.ReportCriteria();
-            switch (rptType)
-            {
-                case 1:
-                    criteria.ProcedureName = "[HPDQ.WebSupport].[dbo].[spRptTicketResolvedByTime]";
-                    break;
-            }
+            criteria.ProcedureName = _reportTypes!.First(x => x.Id == rptType).ProcedureName!;
             var jsonString = await HPDQ.WebSupport.Utilities.API.Instance.Procedure.ExecuteDataTable(criteria);
             var dataTable = JsonStringToDataTable(jsonString!);
-            return View(dataTable);
+            ViewBag.IsHideLeftMenu = true;
+            return View(new ReportViewModel
+            {
+                ReportTypes = _reportTypes,
+                DataTable = dataTable,
+            });
         }
     }
 }

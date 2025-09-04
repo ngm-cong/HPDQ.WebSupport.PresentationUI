@@ -151,7 +151,8 @@
     <script type="text/javascript">
         $(document).ready(function() {
             var isMobile = /Android|iPad|iPhone|iPod|Mobile/i.test(navigator.userAgent);
-            if (isMobile) {
+            var isHideLeftMenu = '@ViewBag.IsHideLeftMenu' === 'True';
+            if (isMobile || isHideLeftMenu) {
                 $('#toggleSidebar').trigger('click');
             }
         });
