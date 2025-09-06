@@ -3,8 +3,10 @@ $(function () {
     const toggleItems = document.querySelectorAll('.can-toggle');
     toggleItems.forEach(item => {
         item.addEventListener('click', function (event) {
-            event.stopPropagation();
-            this.classList.toggle('open');
+            if (event.target === this) {
+                event.stopPropagation();
+                this.classList.toggle('open');
+            }
         });
     });
 })

@@ -391,7 +391,7 @@
         // Hàm Loaded
         $(function () {
             $('#contentlist .item').click(function () {
-                if ($(this).attr('tagEMP_ID') != '@emp_id' && $(this).attr('tagStatus') == '1') $('#lblcomplete').show();
+                if ($(this).attr('tagStatus') == '1') $('#lblcomplete').show();
                 else $('#lblcomplete').hide();
                 if ($(this).attr('tagEMP_ID') == '@emp_id' && ($(this).attr('tagStatus') == '0' || $(this).attr('tagStatus') == '2')) $('#lblclose').show();
                 else $('#lblclose').hide();
