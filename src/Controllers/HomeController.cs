@@ -157,6 +157,10 @@ namespace HPDQ.WebSupport.Controllers
             return View(new NewTicketViewModel { TicketTypes = ticketTypes });
         }
 
+        /// <summary>
+        /// Hiển thị trang để điều chỉnh dữ liệu một yêu cầu.
+        /// </summary>
+        /// <returns>View điều chỉnh dữ liệu của yêu cầu.</returns>
         [Authorize]
         [Route("dieuchinhyeucau/{id}")]
         public async Task<IActionResult> EditTicket(int id)

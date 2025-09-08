@@ -19,6 +19,15 @@ namespace HPDQ.WebSupport.Controllers
             _logger = logger;
         }
 
+        /// <summary>
+        /// Hiển thị trang quản lý danh mục (Master Data).
+        /// </summary>
+        /// <remarks>
+        /// Endpoint này chỉ có thể được truy cập bởi người dùng có vai trò "SystemAdmin".
+        /// Nó tải dữ liệu chi tiết mã (CodeDetail) dựa trên giá trị enum được truyền vào.
+        /// </remarks>
+        /// <param name="enumVal">Giá trị enum của danh mục cần hiển thị. Mặc định là 1.</param>
+        /// <returns>Một view Admin/MasterData.cshtml để hiển thị trang danh mục với dữ liệu tương ứng.</returns>
         [Authorize(Roles = "SystemAdmin")]
         [Route("danhmuc")]
         public async Task<IActionResult> MasterData(int enumVal = 1)
@@ -27,6 +36,14 @@ namespace HPDQ.WebSupport.Controllers
             return View(datas);
         }
 
+        /// <summary>
+        /// Hiển thị trang quản lý nhân viên và phân quyền (Delegation).
+        /// </summary>
+        /// <remarks>
+        /// Endpoint này chỉ có thể được truy cập bởi người dùng có vai trò "SystemAdmin".
+        /// Nó tải danh sách tất cả nhân viên để hiển thị trên trang.
+        /// </remarks>
+        /// <returns>Một view Admin/Delegation.cshtml để hiển thị trang quản lý nhân viên.</returns>
         [Authorize(Roles = "SystemAdmin")]
         [Route("nhanvien")]
         public async Task<IActionResult> Delegation()

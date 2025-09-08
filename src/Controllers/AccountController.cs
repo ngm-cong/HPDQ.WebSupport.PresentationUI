@@ -47,23 +47,19 @@ namespace HPDQ.WebSupport.Controllers
         //{
         //    // 1. Create a token handler
         //    var handler = new JwtSecurityTokenHandler();
-
         //    // Check if the token is in a valid format
         //    if (handler.CanReadToken(jwtToken))
         //    {
         //        // 2. Read the token without validating the signature
         //        var token = handler.ReadJwtToken(jwtToken);
-
         //        // 3. Access the token claims
         //        Console.WriteLine("Token Header:");
         //        Console.WriteLine(token.Header.SerializeToJson());
-
         //        Console.WriteLine("\nToken Payload (Claims):");
         //        foreach (var claim in token.Claims)
         //        {
         //            Console.WriteLine($"{claim.Type}: {claim.Value}");
         //        }
-
         //        return new AuthenticateModel { EMP_ID = token.Claims.First(x => x.Type == "MaNV").Value, FullName = token.Claims.First(x => x.Type == "unique_name").Value };
         //    }
         //    else
