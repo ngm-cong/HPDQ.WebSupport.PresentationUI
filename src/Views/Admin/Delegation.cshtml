@@ -5,22 +5,47 @@
 @model IEnumerable<Employee>
 
 
-<ul class="treeview">
-    @foreach (var item in Model.Where(x => string.IsNullOrEmpty(x.JOB_GROUP) == false).GroupBy(x => x.JOB_GROUP).Select(x => x.Key))
-    {
-        <li class="can-toggle">
-            @item
-            <ul>
-                @foreach (var level1 in Model.Where(x => x.JOB_GROUP == @item).OrderBy(x => (x.Attribute & EmployeeAttribute.IsLead) > 0 ? 0 : 1))
+<table>
+    <tr>
+        <td>
+            <ul class="treeview">
+                @foreach (var item in Model.Where(x => string.IsNullOrEmpty(x.JOB_GROUP) == false).GroupBy(x => x.JOB_GROUP).Select(x => x.Key))
                 {
-                    <li>
-                        [@level1.EMP_ID] @level1.FullName
+                    <li class="can-toggle">
+                        @item
+                        <ul>
+                            @foreach (var level1 in Model.Where(x => x.JOB_GROUP == @item).OrderBy(x => (x.Attribute & EmployeeAttribute.IsLead) > 0 ? 0 : 1))
+                            {
+                                <li>
+                                    [@level1.EMP_ID] @level1.FullName
+                                </li>
+                            }
+                        </ul>
                     </li>
                 }
             </ul>
-        </li>
-    }
-</ul>
+        </td>
+        <td style="vertical-align: top; padding-left: 100px;">
+            <table>
+                <tr>
+                    <td><b>Nhóm:</b></td>
+                    <td><input type="text" class="form-control" id="txtgroup" readonly /></td>
+                    <td><b>Nhân sự:</b></td>
+                    <td><input type="text" class="form-control" id="txtemployee" readonly /></td>
+                </tr>
+            </table>
+            <div style="margin-top: 25px;">
+                @foreach(var item in (await HPDQ.WebSupport.Utilities.API.Instance.CodeDetail.Load(new HPDQ.WebSupport.Criteria.CodeDetailCriteria{ Master = CodeDetailMaster.TicketType }))!)
+                {
+                    <div>
+                        <input type="checkbox" value="@item.Code" />
+                        @item.Description
+                    </div>
+                }
+            </div>
+        </td>
+    </tr>
+</table>
 
 @section Styles {
     <link rel="stylesheet" href="~/css/delegation.css" />
