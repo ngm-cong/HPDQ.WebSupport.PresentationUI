@@ -214,6 +214,19 @@ namespace HPDQ.WebSupport.Controllers
                 ProgressBy_EMP_ID = null,
                 SearchOption = HPDQ.WebSupport.Criteria.SearchOption.ISNULL,
             };
+            var employees = await HPDQ.WebSupport.Utilities.API.Instance.Employee.Load();
+            var employee = employees?.FirstOrDefault(x => x.EMP_ID == emp_id);
+            Console.WriteLine(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+            Console.WriteLine(employee?.JOB_GROUP);
+            if (employee != null && string.IsNullOrEmpty(employee.JOB_GROUP) == false)
+            {
+                var employeeFunctions = await HPDQ.WebSupport.Utilities.API.Instance.EmployeeFunction.Load(new Criteria.EmployeeFunctionCriteria
+                {
+                    Job_Group = employee.JOB_GROUP!,
+                });
+                Console.WriteLine(JsonSerializer.Serialize(employeeFunctions));
+                criteria.Types = employeeFunctions?.Select(x => x.TicketType)?.ToList();
+            }
             if (ticketType != null) criteria.Types = new List<byte> { ticketType.Value };
             if (ticketStatus != null) criteria.Statuses = new List<TicketStatus> { ticketStatus.Value };
             if (string.IsNullOrEmpty(searchText) == false) criteria.SearchText = searchText;

@@ -8,6 +8,8 @@
 <table>
     <tr>
         <td>
+            <u><b>Tổ chức nhân sự</b></u>
+            <br />
             <ul class="treeview">
                 @foreach (var item in Model.Where(x => string.IsNullOrEmpty(x.JOB_GROUP) == false).GroupBy(x => x.JOB_GROUP).Select(x => x.Key))
                 {
@@ -26,6 +28,8 @@
             </ul>
         </td>
         <td style="vertical-align: top; padding-left: 100px;">
+            <u><b>Nhóm nhân sự đang xử lý</b></u>
+            <br />
             <table>
                 <tr>
                     <td><b>Nhóm:</b></td>
@@ -34,7 +38,10 @@
                     <td><input type="text" class="form-control" id="txtemployee" readonly /></td>
                 </tr>
             </table>
-            <div style="margin-top: 25px;">
+            <br />
+            <u><b>Phân quyền xử lý</b></u>
+            <br />
+            <div style="margin-top: 25px;" id="divtickettype">
                 @foreach(var item in (await HPDQ.WebSupport.Utilities.API.Instance.CodeDetail.Load(new HPDQ.WebSupport.Criteria.CodeDetailCriteria{ Master = CodeDetailMaster.TicketType }))!)
                 {
                     <div>
@@ -43,6 +50,8 @@
                     </div>
                 }
             </div>
+            <br />
+            <button type="button" class="btn btn-primary">Xác nhận</button>
         </td>
     </tr>
 </table>
@@ -51,5 +60,10 @@
     <link rel="stylesheet" href="~/css/delegation.css" />
 }
 @section Scripts {
+    <script type="text/javascript">
+        var domainAPIUrl = '@HPDQ.WebSupport.Utilities.Globals.DomainAPIUrl';
+        var apiKey = '@HPDQ.WebSupport.Utilities.Globals.APIKey';
+    </script>
+    <script src="~/js/ajaxutil.js"></script>
     <script src="~/js/delegation.js"></script>
 }
